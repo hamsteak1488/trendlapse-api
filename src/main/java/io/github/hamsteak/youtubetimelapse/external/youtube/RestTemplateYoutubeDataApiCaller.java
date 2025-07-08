@@ -1,5 +1,7 @@
 package io.github.hamsteak.youtubetimelapse.external.youtube;
 
+import io.github.hamsteak.youtubetimelapse.common.errors.errorcode.CommonErrorCode;
+import io.github.hamsteak.youtubetimelapse.common.errors.exception.RestApiException;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelListResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoListResponse;
@@ -27,7 +29,9 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
 
         ChannelListResponse response = restTemplate.getForObject(requestUrl, ChannelListResponse.class);
 
-        // Check NullPointerException
+        if (response == null) {
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get channel");
+        }
 
         return response.getItems().get(0);
     }
@@ -38,7 +42,9 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         String requestUrl = String.format("%s/videos?key=%s&part=%s&id=%s", baseUrl, googleApiKey, part, videoYoutubeId);
         VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
 
-        // Check NullPointerException
+        if (response == null) {
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get video");
+        }
 
         return response.getItems().get(0);
     }
@@ -50,7 +56,9 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         String requestUrl = String.format("%s/videos?key=%s&part=%s&chart=mostPopular&maxResults=%s&regionCode=kr", baseUrl, googleApiKey, part, maxResults);
         VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
 
-        // Check NullPointerException
+        if (response == null) {
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get trendings");
+        }
 
         return response;
     }
