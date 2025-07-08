@@ -4,7 +4,6 @@ import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelListRespo
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoListResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -23,7 +22,8 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
 
     @Override
     public ChannelResponse getChannel(String channelYoutubeId) {
-        String requestUrl = String.format("%s/channels?key=%s&part=id,snippet&id=%s", baseUrl, googleApiKey, channelYoutubeId);
+        String part = "id,snippet";
+        String requestUrl = String.format("%s/channels?key=%s&part=%s&id=%s", baseUrl, googleApiKey, part, channelYoutubeId);
 
         ChannelListResponse response = restTemplate.getForObject(requestUrl, ChannelListResponse.class);
 
@@ -34,7 +34,8 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
 
     @Override
     public VideoResponse getVideo(String videoYoutubeId) {
-        String requestUrl = String.format("%s/videos?key=%s&part=id,snippet&id=%s", baseUrl, googleApiKey, videoYoutubeId);
+        String part = "id,snippet";
+        String requestUrl = String.format("%s/videos?key=%s&part=%s&id=%s", baseUrl, googleApiKey, part, videoYoutubeId);
         VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
 
         // Check NullPointerException
@@ -44,7 +45,9 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
 
     @Override
     public VideoListResponse getTrendings() {
-        String requestUrl = String.format("%s/videos?key=%s&part=id&chart=mostPopular&maxResults=10&regionCode=kr", baseUrl, googleApiKey);
+        String part = "id";
+        int maxResults = 10;
+        String requestUrl = String.format("%s/videos?key=%s&part=%s&chart=mostPopular&maxResults=%s&regionCode=kr", baseUrl, googleApiKey, part, maxResults);
         VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
 
         // Check NullPointerException
