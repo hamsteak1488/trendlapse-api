@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.stream.IntStream;
 
@@ -18,7 +19,7 @@ public class TrendingCollector {
 
     @Scheduled(fixedDelay = Constants.COLLECT_INTERVAL)
     public void collect() {
-        LocalDateTime dateTime = LocalDateTime.now();
+        LocalDateTime dateTime = LocalDateTime.now(Clock.systemUTC());
         VideoListResponse trendingResponses = trendingApiCaller.getTrendings();
 
         IntStream.range(0, trendingResponses.getItems().size())
