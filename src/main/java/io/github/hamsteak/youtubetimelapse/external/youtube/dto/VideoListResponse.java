@@ -9,4 +9,5 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VideoListResponse {
     private final List<VideoResponse> items;
+    private final String nextPageToken;
 }

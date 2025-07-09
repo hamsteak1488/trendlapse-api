@@ -1,3 +1,5 @@
+collect-count: 200
+
 spring:
   config:
     import: application-secret.yml

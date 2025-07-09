@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     private final RestTemplate restTemplate;
@@ -64,27 +67,39 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     }
 
     @Override
-    public VideoListResponse getTrendings() {
-        String part = "id";
-        int maxResults = 10;
-        String regionCode = "kr";
-        String chart = "mostPopular";
+    public List<VideoListResponse> getTrendings(int count) {
+        List<VideoListResponse> responses = new ArrayList<>();
 
-        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
-                .path("/videos")
-                .queryParam("key", googleApiKey)
-                .queryParam("part", part)
-                .queryParam("chart", chart)
-                .queryParam("maxResults", maxResults)
-                .queryParam("regionCode", regionCode)
-                .build().toString();
+        int remainCount = count;
+        String pageToken = "";
+        while (remainCount > 0) {
+            int maxResults = Math.min(remainCount, 50);
+            remainCount -= maxResults;
 
-        VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
+            String part = "id";
+            String regionCode = "kr";
+            String chart = "mostPopular";
 
-        if (response == null) {
-            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get trendings");
+            String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+                    .path("/videos")
+                    .queryParam("key", googleApiKey)
+                    .queryParam("part", part)
+                    .queryParam("chart", chart)
+                    .queryParam("maxResults", maxResults)
+                    .queryParam("regionCode", regionCode)
+                    .queryParam("pageToken", pageToken)
+                    .build().toString();
+
+            VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
+
+            if (response == null) {
+                throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get trendings");
+            }
+
+            responses.add(response);
+            pageToken = response.getNextPageToken();
         }
 
-        return response;
+        return responses;
     }
 }
