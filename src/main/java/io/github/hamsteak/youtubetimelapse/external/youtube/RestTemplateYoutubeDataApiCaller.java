@@ -9,6 +9,7 @@ import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
@@ -25,7 +26,13 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     @Override
     public ChannelResponse getChannel(String channelYoutubeId) {
         String part = "id,snippet";
-        String requestUrl = String.format("%s/channels?key=%s&part=%s&id=%s", baseUrl, googleApiKey, part, channelYoutubeId);
+
+        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+                .path("/channels")
+                .queryParam("key", googleApiKey)
+                .queryParam("part", part)
+                .queryParam("id", channelYoutubeId)
+                .build().toString();
 
         ChannelListResponse response = restTemplate.getForObject(requestUrl, ChannelListResponse.class);
 
@@ -39,7 +46,14 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     @Override
     public VideoResponse getVideo(String videoYoutubeId) {
         String part = "id,snippet";
-        String requestUrl = String.format("%s/videos?key=%s&part=%s&id=%s", baseUrl, googleApiKey, part, videoYoutubeId);
+
+        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+                .path("/videos")
+                .queryParam("key", googleApiKey)
+                .queryParam("part", part)
+                .queryParam("id", videoYoutubeId)
+                .build().toString();
+
         VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
 
         if (response == null) {
@@ -53,7 +67,18 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     public VideoListResponse getTrendings() {
         String part = "id";
         int maxResults = 10;
-        String requestUrl = String.format("%s/videos?key=%s&part=%s&chart=mostPopular&maxResults=%s&regionCode=kr", baseUrl, googleApiKey, part, maxResults);
+        String regionCode = "kr";
+        String chart = "mostPopular";
+
+        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+                .path("/videos")
+                .queryParam("key", googleApiKey)
+                .queryParam("part", part)
+                .queryParam("chart", chart)
+                .queryParam("maxResults", maxResults)
+                .queryParam("regionCode", regionCode)
+                .build().toString();
+
         VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
 
         if (response == null) {

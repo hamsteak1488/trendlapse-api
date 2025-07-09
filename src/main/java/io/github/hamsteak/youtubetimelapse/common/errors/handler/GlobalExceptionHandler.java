@@ -24,14 +24,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RestApiException.class)
     public ResponseEntity<Object> handleRestApiException(final RestApiException e) {
-        log.warn("RestApiException occured: {}", e.getMessage(), e);
+        log.warn("RestApiException occurred: {}", e.getMessage(), e);
         final ErrorCode errorCode = e.getErrorCode();
         return handleExceptionInternal(errorCode);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgument(final IllegalArgumentException e) {
-        log.warn("handleIllegalArgument", e);
+        log.warn("IllegalArgumentException occurred", e);
         final ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
         return handleExceptionInternal(errorCode, e.getMessage());
     }
@@ -43,14 +43,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request
     ) {
-        log.warn("handleIllegalArgument", e);
+        log.warn("MethodArgumentNotValidException occurred", e);
         ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
         return handleExceptionInternal(e, errorCode);
     }
 
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAllException(final Exception ex) {
-        log.warn("handleAllException", ex);
+        log.warn("Exception occurred", ex);
         final ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
         return handleExceptionInternal(errorCode);
     }
