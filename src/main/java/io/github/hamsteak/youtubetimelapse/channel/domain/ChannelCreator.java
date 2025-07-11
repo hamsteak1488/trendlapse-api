@@ -11,11 +11,12 @@ public class ChannelCreator {
     private final ChannelRepository channelRepository;
 
     @Transactional
-    public Channel create(String youtubeId, String title) {
+    public Channel create(String youtubeId, String title, String thumbnailUrl) {
         return channelRepository.save(
                 Channel.builder()
                         .youtubeId(youtubeId)
                         .title(title)
+                        .thumbnailUrl(thumbnailUrl)
                         .build()
         );
     }

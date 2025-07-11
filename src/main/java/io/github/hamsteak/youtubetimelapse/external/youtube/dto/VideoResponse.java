@@ -14,5 +14,18 @@ public class VideoResponse {
     public static class Snippet {
         private final String title;
         private final String channelId;
+        private final Thumbnails thumbnails;
+
+        @Getter
+        @RequiredArgsConstructor
+        public static class Thumbnails {
+            private final Thumbnail standard;
+
+            @Getter
+            @RequiredArgsConstructor
+            public static class Thumbnail {
+                private final String url;
+            }
+        }
     }
 }

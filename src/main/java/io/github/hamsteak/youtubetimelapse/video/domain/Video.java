@@ -27,4 +27,8 @@ public class Video {
     @Column
     @NotNull
     private String title;
+
+    @Column
+    @NotNull
+    private String thumbnailUrl;
 }

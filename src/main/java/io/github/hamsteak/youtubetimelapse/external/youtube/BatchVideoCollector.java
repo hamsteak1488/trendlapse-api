@@ -2,6 +2,8 @@ package io.github.hamsteak.youtubetimelapse.external.youtube;
 
 import io.github.hamsteak.youtubetimelapse.channel.domain.BatchChannelCollector;
 import io.github.hamsteak.youtubetimelapse.channel.domain.ChannelReader;
+import io.github.hamsteak.youtubetimelapse.common.errors.errorcode.CommonErrorCode;
+import io.github.hamsteak.youtubetimelapse.common.errors.exception.RestApiException;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.youtubetimelapse.video.domain.Video;
 import io.github.hamsteak.youtubetimelapse.video.domain.VideoCreator;
@@ -49,7 +51,17 @@ public class BatchVideoCollector {
 
         responses.forEach(videoResponse -> {
             long channelId = channelReader.readByYoutubeId(videoResponse.getSnippet().getChannelId()).getId();
-            videoCreator.create(videoResponse.getId(), channelId, videoResponse.getSnippet().getTitle());
+
+            if (videoResponse.getSnippet().getThumbnails().getStandard() == null) {
+                throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to fetch thumbnail of video(id:" + videoResponse.getId() + ")");
+            }
+
+            videoCreator.create(
+                    videoResponse.getId(),
+                    channelId,
+                    videoResponse.getSnippet().getTitle(),
+                    videoResponse.getSnippet().getThumbnails().getStandard().getUrl()
+            );
         });
     }
 }

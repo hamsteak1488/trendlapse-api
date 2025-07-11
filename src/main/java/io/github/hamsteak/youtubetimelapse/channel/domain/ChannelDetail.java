@@ -12,4 +12,6 @@ public class ChannelDetail {
     private final String youtubeId;
     @NonNull
     private final String title;
+    @NonNull
+    private final String thumbnailUrl;
 }

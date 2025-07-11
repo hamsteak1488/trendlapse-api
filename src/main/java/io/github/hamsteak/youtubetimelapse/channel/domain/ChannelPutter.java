@@ -22,6 +22,7 @@ public class ChannelPutter {
                         Channel.builder()
                                 .youtubeId(youtubeId)
                                 .title(channelResponse.getSnippet().getTitle())
+                                .thumbnailUrl(channelResponse.getSnippet().getThumbnails().getHigh().getUrl())
                                 .build()
                         )
                 );

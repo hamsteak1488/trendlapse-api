@@ -14,7 +14,7 @@ public class VideoCreator {
     private final ChannelReader channelReader;
 
     @Transactional
-    public Video create(String youtubeId, long channelId, String title) {
+    public Video create(String youtubeId, long channelId, String title, String thumbnailUrl) {
         Channel channel = channelReader.read(channelId);
 
         return videoRepository.save(
@@ -22,6 +22,7 @@ public class VideoCreator {
                         .youtubeId(youtubeId)
                         .channel(channel)
                         .title(title)
+                        .thumbnailUrl(thumbnailUrl)
                         .build()
         );
     }

@@ -33,6 +33,12 @@ public class BatchChannelCollector {
                 .flatMap(response -> response.getItems().stream())
                 .toList();
 
-        responses.forEach(channelResponse -> channelCreator.create(channelResponse.getId(), channelResponse.getSnippet().getTitle()));
+        responses.forEach(channelResponse ->
+                channelCreator.create(
+                        channelResponse.getId(),
+                        channelResponse.getSnippet().getTitle(),
+                        channelResponse.getSnippet().getThumbnails().getHigh().getUrl()
+                )
+        );
     }
 }

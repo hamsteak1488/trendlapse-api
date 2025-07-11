@@ -45,7 +45,10 @@ class RestTemplateYoutubeDataApiCallerTest {
         // Given
         String channelId = "test-channel-id";
         String channelTitle = "test-channel-title";
-        ChannelResponse mockResponse = new ChannelResponse(channelId, new ChannelResponse.Snippet(channelTitle));
+        ChannelResponse mockResponse = new ChannelResponse(
+                channelId,
+                new ChannelResponse.Snippet(channelTitle, new ChannelResponse.Snippet.Thumbnails(new ChannelResponse.Snippet.Thumbnails.Thumbnail("test-thumbnail-url")))
+        );
         ChannelListResponse mockListResponse = new ChannelListResponse(List.of(mockResponse), "test-page-token");
 
         when(restTemplate.getForObject(anyString(), eq(ChannelListResponse.class)))
