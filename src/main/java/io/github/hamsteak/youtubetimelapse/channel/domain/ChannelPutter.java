@@ -15,7 +15,7 @@ public class ChannelPutter {
 
     @Transactional
     public Channel put(String youtubeId) {
-        ChannelResponse channelResponse = youtubeDataApiCaller.getChannel(youtubeId);
+        ChannelResponse channelResponse = youtubeDataApiCaller.fetchChannel(youtubeId);
 
         return channelRepository.findByYoutubeId(youtubeId)
                 .orElseGet(() -> channelRepository.save(

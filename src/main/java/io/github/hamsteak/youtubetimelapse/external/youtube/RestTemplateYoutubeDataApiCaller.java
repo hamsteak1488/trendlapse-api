@@ -14,6 +14,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.github.hamsteak.youtubetimelapse.config.Constants.*;
+
 @Component
 public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     private final RestTemplate restTemplate;
@@ -27,8 +29,8 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     }
 
     @Override
-    public ChannelResponse getChannel(String channelYoutubeId) {
-        String part = "id,snippet";
+    public ChannelResponse fetchChannel(String channelYoutubeId) {
+        String part = String.join(",", List.of("id", "snippet"));
 
         String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
                 .path("/channels")
@@ -47,8 +49,40 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     }
 
     @Override
-    public VideoResponse getVideo(String videoYoutubeId) {
-        String part = "id,snippet";
+    public List<ChannelListResponse> fetchChannels(List<String> channelYoutubeIds) {
+        String part = String.join(",", List.of("id", "snippet"));
+
+        List<ChannelListResponse> responses = new ArrayList<>();
+        int fetchCount = (channelYoutubeIds.size() - 1) / 50 + 1;
+        String pageToken = "";
+
+        for (int i=0; i<fetchCount; i++) {
+            List<String> fetchIds = channelYoutubeIds.subList(i * MAX_FETCH_COUNT, Math.min((i + 1) * MAX_FETCH_COUNT, channelYoutubeIds.size()));
+
+            String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+                    .path("/channels")
+                    .queryParam("key", googleApiKey)
+                    .queryParam("part", part)
+                    .queryParam("id", String.join(",", fetchIds))
+                    .queryParam("pageToken", pageToken)
+                    .build().toString();
+
+            ChannelListResponse response = restTemplate.getForObject(requestUrl, ChannelListResponse.class);
+
+            if (response == null) {
+                throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get channel");
+            }
+
+            responses.add(response);
+            pageToken = response.getNextPageToken();
+        }
+
+        return responses;
+    }
+
+    @Override
+    public VideoResponse fetchVideo(String videoYoutubeId) {
+        String part = String.join(",", List.of("id", "snippet"));
 
         String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
                 .path("/videos")
@@ -67,18 +101,50 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     }
 
     @Override
-    public List<VideoListResponse> getTrendings(int count) {
+    public List<VideoListResponse> fetchVideos(List<String> videoYoutubeIds) {
+        String part = String.join(",", List.of("id", "snippet"));
+
+        List<VideoListResponse> responses = new ArrayList<>();
+        int fetchCount = (videoYoutubeIds.size() - 1) / 50 + 1;
+        String pageToken = "";
+
+        for (int i=0; i<fetchCount; i++) {
+            List<String> fetchIds = videoYoutubeIds.subList(i * MAX_FETCH_COUNT, Math.min((i + 1) * MAX_FETCH_COUNT, videoYoutubeIds.size()));
+
+            String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+                    .path("/videos")
+                    .queryParam("key", googleApiKey)
+                    .queryParam("part", part)
+                    .queryParam("id", String.join(",", fetchIds))
+                    .queryParam("pageToken", pageToken)
+                    .build().toString();
+
+            VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
+
+            if (response == null) {
+                throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get video");
+            }
+
+            responses.add(response);
+            pageToken = response.getNextPageToken();
+        }
+
+        return responses;
+    }
+
+    @Override
+    public List<VideoListResponse> fetchTrendings(int count) {
+        String part = "id";
+        String regionCode = "kr";
+        String chart = "mostPopular";
+
         List<VideoListResponse> responses = new ArrayList<>();
 
         int remainCount = count;
         String pageToken = "";
         while (remainCount > 0) {
-            int maxResults = Math.min(remainCount, 50);
+            int maxResults = Math.min(remainCount, MAX_FETCH_COUNT);
             remainCount -= maxResults;
-
-            String part = "id";
-            String regionCode = "kr";
-            String chart = "mostPopular";
 
             String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
                     .path("/videos")

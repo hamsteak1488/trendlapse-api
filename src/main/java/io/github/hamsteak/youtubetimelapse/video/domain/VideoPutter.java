@@ -18,7 +18,7 @@ public class VideoPutter {
 
     @Transactional
     public Video put(String youtubeId) {
-        VideoResponse videoResponse = youtubeDataApiCaller.getVideo(youtubeId);
+        VideoResponse videoResponse = youtubeDataApiCaller.fetchVideo(youtubeId);
         Channel channel = channelPutter.put(videoResponse.getSnippet().getChannelId());
 
         return videoRepository.findByYoutubeId(youtubeId)

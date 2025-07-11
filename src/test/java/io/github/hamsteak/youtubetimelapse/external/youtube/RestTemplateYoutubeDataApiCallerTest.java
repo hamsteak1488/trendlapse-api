@@ -41,18 +41,18 @@ class RestTemplateYoutubeDataApiCallerTest {
     }
 
     @Test
-    void givenValidId_whenGetChannel_thenReturnChannel() {
+    void givenValidId_whenFetchChannel_thenReturnChannel() {
         // Given
         String channelId = "test-channel-id";
         String channelTitle = "test-channel-title";
         ChannelResponse mockResponse = new ChannelResponse(channelId, new ChannelResponse.Snippet(channelTitle));
-        ChannelListResponse mockListResponse = new ChannelListResponse(List.of(mockResponse));
+        ChannelListResponse mockListResponse = new ChannelListResponse(List.of(mockResponse), "test-page-token");
 
         when(restTemplate.getForObject(anyString(), eq(ChannelListResponse.class)))
                 .thenReturn(mockListResponse);
 
         // When
-        ChannelResponse result = caller.getChannel(channelId);
+        ChannelResponse result = caller.fetchChannel(channelId);
 
         // Then
         assertThat(result).isNotNull();
@@ -60,10 +60,10 @@ class RestTemplateYoutubeDataApiCallerTest {
     }
 
     @Test
-    void getVideo() {
+    void fetchVideo() {
     }
 
     @Test
-    void getTrendings() {
+    void fetchTrendings() {
     }
 }

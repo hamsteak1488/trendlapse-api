@@ -9,4 +9,5 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChannelListResponse {
     private final List<ChannelResponse> items;
+    private final String nextPageToken;
 }
