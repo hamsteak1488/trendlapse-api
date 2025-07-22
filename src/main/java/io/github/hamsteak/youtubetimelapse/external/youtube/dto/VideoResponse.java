@@ -19,7 +19,7 @@ public class VideoResponse {
         @Getter
         @RequiredArgsConstructor
         public static class Thumbnails {
-            private final Thumbnail standard;
+            private final Thumbnail high;
 
             @Getter
             @RequiredArgsConstructor

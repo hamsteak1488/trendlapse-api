@@ -17,11 +17,11 @@ spring:
 #    show-sql: true
     open-in-view: false
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
     properties:
       hibernate:
         highlight_sql: true
-#        format_sql: true
+        format_sql: true
         default_batch_fetch_size: 200
     defer-datasource-initialization: true
 
@@ -30,7 +30,7 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
-logging:
-  level:
-    org.hibernate.SQL: debug
+#logging:
+#  level:
+#    org.hibernate.SQL: debug
 #    org.hibernate.orm.jdbc.bind: trace

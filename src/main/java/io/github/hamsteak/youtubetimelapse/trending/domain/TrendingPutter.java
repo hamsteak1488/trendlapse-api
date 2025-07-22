@@ -1,5 +1,7 @@
 package io.github.hamsteak.youtubetimelapse.trending.domain;
 
+import io.github.hamsteak.youtubetimelapse.region.domain.Region;
+import io.github.hamsteak.youtubetimelapse.region.domain.RegionReader;
 import io.github.hamsteak.youtubetimelapse.trending.infrastructure.TrendingRepository;
 import io.github.hamsteak.youtubetimelapse.video.domain.Video;
 import io.github.hamsteak.youtubetimelapse.video.domain.VideoPutter;
@@ -14,15 +16,18 @@ import java.time.LocalDateTime;
 public class TrendingPutter {
     private final TrendingRepository trendingRepository;
     private final VideoPutter videoPutter;
+    private final RegionReader regionReader;
 
     @Transactional
-    public Trending put(LocalDateTime dateTime, String videoYoutubeId, int rank) {
+    public Trending put(LocalDateTime dateTime, String videoYoutubeId, int rank, long regionId) {
         Video trendingVideo = videoPutter.put(videoYoutubeId);
+        Region region = regionReader.read(regionId);
 
         return trendingRepository.save(Trending.builder()
                 .dateTime(dateTime)
                 .video(trendingVideo)
                 .rank(rank)
+                .region(region)
                 .build()
         );
     }

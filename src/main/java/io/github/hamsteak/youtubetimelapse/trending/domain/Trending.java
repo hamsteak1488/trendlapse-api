@@ -1,5 +1,6 @@
 package io.github.hamsteak.youtubetimelapse.trending.domain;
 
+import io.github.hamsteak.youtubetimelapse.region.domain.Region;
 import io.github.hamsteak.youtubetimelapse.video.domain.Video;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -29,4 +30,9 @@ public class Trending {
     @Column
     @NotNull
     private Integer rank;
+
+    @ManyToOne
+    @JoinColumn(name = "region_id")
+    @NotNull
+    private Region region;
 }

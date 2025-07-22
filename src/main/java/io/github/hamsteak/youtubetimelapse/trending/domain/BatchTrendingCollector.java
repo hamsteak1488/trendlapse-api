@@ -3,6 +3,8 @@ package io.github.hamsteak.youtubetimelapse.trending.domain;
 import io.github.hamsteak.youtubetimelapse.external.youtube.BatchVideoCollector;
 import io.github.hamsteak.youtubetimelapse.external.youtube.YoutubeDataApiCaller;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoResponse;
+import io.github.hamsteak.youtubetimelapse.region.domain.Region;
+import io.github.hamsteak.youtubetimelapse.region.domain.RegionReader;
 import io.github.hamsteak.youtubetimelapse.video.domain.VideoReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -25,10 +27,13 @@ public class BatchTrendingCollector implements TrendingCollector {
     private final BatchVideoCollector batchVideoCollector;
     private final TrendingCreator trendingCreator;
     private final VideoReader videoReader;
+    private final RegionReader regionReader;
 
     @Override
-    public void collect(LocalDateTime dateTime, int collectCount) {
-        List<String> videoYoutubeIds = youtubeDataApiCaller.fetchTrendings(collectCount).stream()
+    public void collect(LocalDateTime dateTime, int collectCount, long regionId) {
+        Region region = regionReader.read(regionId);
+
+        List<String> videoYoutubeIds = youtubeDataApiCaller.fetchTrendings(collectCount, region.getRegionCode()).stream()
                 .flatMap(response -> response.getItems().stream())
                 .map(VideoResponse::getId)
                 .toList();
@@ -37,7 +42,7 @@ public class BatchTrendingCollector implements TrendingCollector {
         IntStream.range(0, videoYoutubeIds.size())
                 .forEach(i -> {
                     long videoId = videoReader.readByYoutubeId(videoYoutubeIds.get(i)).getId();
-                    trendingCreator.create(dateTime, videoId, i + 1);
+                    trendingCreator.create(dateTime, videoId, i + 1, regionId);
                 });
     }
 }

@@ -52,7 +52,7 @@ public class BatchVideoCollector {
         responses.forEach(videoResponse -> {
             long channelId = channelReader.readByYoutubeId(videoResponse.getSnippet().getChannelId()).getId();
 
-            if (videoResponse.getSnippet().getThumbnails().getStandard() == null) {
+            if (videoResponse.getSnippet().getThumbnails().getHigh() == null) {
                 throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to fetch thumbnail of video(id:" + videoResponse.getId() + ")");
             }
 
@@ -60,7 +60,7 @@ public class BatchVideoCollector {
                     videoResponse.getId(),
                     channelId,
                     videoResponse.getSnippet().getTitle(),
-                    videoResponse.getSnippet().getThumbnails().getStandard().getUrl()
+                    videoResponse.getSnippet().getThumbnails().getHigh().getUrl()
             );
         });
     }

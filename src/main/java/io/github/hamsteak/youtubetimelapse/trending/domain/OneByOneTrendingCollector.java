@@ -2,7 +2,10 @@ package io.github.hamsteak.youtubetimelapse.trending.domain;
 
 import io.github.hamsteak.youtubetimelapse.external.youtube.RestTemplateYoutubeDataApiCaller;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoResponse;
+import io.github.hamsteak.youtubetimelapse.region.domain.Region;
+import io.github.hamsteak.youtubetimelapse.region.domain.RegionReader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -19,16 +22,19 @@ import java.util.stream.IntStream;
 @Component
 @RequiredArgsConstructor
 public class OneByOneTrendingCollector implements TrendingCollector {
+    private final RegionReader regionReader;
     private final RestTemplateYoutubeDataApiCaller trendingApiCaller;
     private final TrendingPutter trendingPutter;
 
     @Override
-    public void collect(LocalDateTime dateTime, int collectCount) {
-        List<VideoResponse> responses = trendingApiCaller.fetchTrendings(collectCount).stream()
+    public void collect(LocalDateTime dateTime, int collectCount, long regionId) {
+        Region region = regionReader.read(regionId);
+
+        List<VideoResponse> responses = trendingApiCaller.fetchTrendings(collectCount, region.getRegionCode()).stream()
                 .flatMap(response -> response.getItems().stream())
                 .toList();
 
         IntStream.range(0, responses.size())
-                .forEach(i -> trendingPutter.put(dateTime, responses.get(i).getId(), i + 1));
+                .forEach(i -> trendingPutter.put(dateTime, responses.get(i).getId(), i + 1, regionId));
     }
 }

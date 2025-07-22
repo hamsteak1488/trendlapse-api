@@ -133,9 +133,8 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     }
 
     @Override
-    public List<VideoListResponse> fetchTrendings(int count) {
+    public List<VideoListResponse> fetchTrendings(int count, String regionCode) {
         String part = "id";
-        String regionCode = "kr";
         String chart = "mostPopular";
 
         List<VideoListResponse> responses = new ArrayList<>();
@@ -164,6 +163,10 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
 
             responses.add(response);
             pageToken = response.getNextPageToken();
+
+            if (response.getNextPageToken() == null) {
+                break;
+            }
         }
 
         return responses;

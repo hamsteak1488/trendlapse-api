@@ -27,7 +27,7 @@ public class VideoPutter {
                                 .youtubeId(youtubeId)
                                 .channel(channel)
                                 .title(videoResponse.getSnippet().getTitle())
-                                .thumbnailUrl(videoResponse.getSnippet().getThumbnails().getStandard().getUrl())
+                                .thumbnailUrl(videoResponse.getSnippet().getThumbnails().getHigh().getUrl())
                                 .build()
                         )
                 );
