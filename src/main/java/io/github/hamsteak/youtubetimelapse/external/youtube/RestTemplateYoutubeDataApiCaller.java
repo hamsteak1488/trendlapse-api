@@ -11,10 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static io.github.hamsteak.youtubetimelapse.config.Constants.*;
 
 @Component
 public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
@@ -49,35 +46,23 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     }
 
     @Override
-    public List<ChannelListResponse> fetchChannels(List<String> channelYoutubeIds) {
+    public ChannelListResponse fetchChannels(List<String> channelYoutubeIds) {
         String part = String.join(",", List.of("id", "snippet"));
 
-        List<ChannelListResponse> responses = new ArrayList<>();
-        int fetchCount = (channelYoutubeIds.size() - 1) / 50 + 1;
-        String pageToken = "";
+        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+                .path("/channels")
+                .queryParam("key", googleApiKey)
+                .queryParam("part", part)
+                .queryParam("id", String.join(",", channelYoutubeIds))
+                .build().toString();
 
-        for (int i=0; i<fetchCount; i++) {
-            List<String> fetchIds = channelYoutubeIds.subList(i * MAX_FETCH_COUNT, Math.min((i + 1) * MAX_FETCH_COUNT, channelYoutubeIds.size()));
+        ChannelListResponse response = restTemplate.getForObject(requestUrl, ChannelListResponse.class);
 
-            String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
-                    .path("/channels")
-                    .queryParam("key", googleApiKey)
-                    .queryParam("part", part)
-                    .queryParam("id", String.join(",", fetchIds))
-                    .queryParam("pageToken", pageToken)
-                    .build().toString();
-
-            ChannelListResponse response = restTemplate.getForObject(requestUrl, ChannelListResponse.class);
-
-            if (response == null) {
-                throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get channel");
-            }
-
-            responses.add(response);
-            pageToken = response.getNextPageToken();
+        if (response == null) {
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get channel");
         }
 
-        return responses;
+        return response;
     }
 
     @Override
@@ -101,74 +86,46 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     }
 
     @Override
-    public List<VideoListResponse> fetchVideos(List<String> videoYoutubeIds) {
+    public VideoListResponse fetchVideos(List<String> videoYoutubeIds) {
         String part = String.join(",", List.of("id", "snippet"));
 
-        List<VideoListResponse> responses = new ArrayList<>();
-        int fetchCount = (videoYoutubeIds.size() - 1) / 50 + 1;
-        String pageToken = "";
+        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+                .path("/videos")
+                .queryParam("key", googleApiKey)
+                .queryParam("part", part)
+                .queryParam("id", String.join(",", videoYoutubeIds))
+                .build().toString();
 
-        for (int i=0; i<fetchCount; i++) {
-            List<String> fetchIds = videoYoutubeIds.subList(i * MAX_FETCH_COUNT, Math.min((i + 1) * MAX_FETCH_COUNT, videoYoutubeIds.size()));
+        VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
 
-            String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
-                    .path("/videos")
-                    .queryParam("key", googleApiKey)
-                    .queryParam("part", part)
-                    .queryParam("id", String.join(",", fetchIds))
-                    .queryParam("pageToken", pageToken)
-                    .build().toString();
-
-            VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
-
-            if (response == null) {
-                throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get video");
-            }
-
-            responses.add(response);
-            pageToken = response.getNextPageToken();
+        if (response == null) {
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get video");
         }
 
-        return responses;
+        return response;
     }
 
     @Override
-    public List<VideoListResponse> fetchTrendings(int count, String regionCode) {
+    public VideoListResponse fetchTrendings(int count, String regionCode, String pageToken) {
         String part = "id";
         String chart = "mostPopular";
 
-        List<VideoListResponse> responses = new ArrayList<>();
+        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+                .path("/videos")
+                .queryParam("key", googleApiKey)
+                .queryParam("part", part)
+                .queryParam("chart", chart)
+                .queryParam("maxResults", count)
+                .queryParam("regionCode", regionCode)
+                .queryParam("pageToken", pageToken)
+                .build().toString();
 
-        int remainCount = count;
-        String pageToken = "";
-        while (remainCount > 0) {
-            int maxResults = Math.min(remainCount, MAX_FETCH_COUNT);
-            remainCount -= maxResults;
+        VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
 
-            String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
-                    .path("/videos")
-                    .queryParam("key", googleApiKey)
-                    .queryParam("part", part)
-                    .queryParam("chart", chart)
-                    .queryParam("maxResults", maxResults)
-                    .queryParam("regionCode", regionCode)
-                    .queryParam("pageToken", pageToken)
-                    .build().toString();
-
-            VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
-
-            if (response == null) {
-                throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get trendings");
-            }
-
-            responses.add(response);
-            pageToken = response.getNextPageToken();
-
-            if (response.getNextPageToken() == null) {
-                break;
-            }
+        if (response == null) {
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get trendings");
         }
 
-        return responses;
+        return response;
     }
 }

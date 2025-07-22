@@ -34,11 +34,11 @@ public class TrendingCollectScheduler {
         regionFetcher.fetch();
 
         LocalDateTime dateTime = LocalDateTime.now(Clock.systemUTC());
-        trendingCollector.collect(dateTime, collectCount, 77L);
+//        trendingCollector.collect(dateTime, collectCount, 77L);
 
-//        regionReader.readAll()
-//                        .forEach(region ->
-//                                trendingCollector.collect(dateTime, collectCount, region.getId())
-//                        );
+        regionReader.readAll()
+                .forEach(region ->
+                        trendingCollector.collect(dateTime, collectCount, region.getId())
+                );
     }
 }
