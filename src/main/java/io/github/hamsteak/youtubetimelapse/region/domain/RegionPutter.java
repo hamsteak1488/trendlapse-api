@@ -6,10 +6,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RegionCreator {
+public class RegionPutter {
     private final RegionRepository regionRepository;
 
-    public void create(String regionCode, String name, String isoCode) {
+    public void put(String regionCode, String name, String isoCode) {
+        Region region = regionRepository.findByRegionCode(regionCode)
+                .orElse(null);
+
+        if (region != null) {
+            return;
+        }
+
         regionRepository.save(Region.builder()
                 .regionCode(regionCode)
                 .name(name)

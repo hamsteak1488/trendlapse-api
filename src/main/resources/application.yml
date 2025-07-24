@@ -28,6 +28,12 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 youtube-data-api:
   base-url: https://www.googleapis.com/youtube/v3
   max-fetch-count: 50

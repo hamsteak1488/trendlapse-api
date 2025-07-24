@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RegionFetcher {
     private final RegionApiCaller regionApiCaller;
-    private final RegionCreator regionCreator;
+    private final RegionPutter regionPutter;
 
     public void fetch() {
         RegionListResponse response = regionApiCaller.fetchRegions();
 
         response.getItems()
                 .forEach(item ->
-                        regionCreator.create(item.getId(), item.getSnippet().getName(), item.getSnippet().getGl())
+                        regionPutter.put(item.getId(), item.getSnippet().getName(), item.getSnippet().getGl())
                 );
     }
 }
