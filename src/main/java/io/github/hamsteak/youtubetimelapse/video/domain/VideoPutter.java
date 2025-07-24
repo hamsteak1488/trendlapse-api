@@ -2,7 +2,7 @@ package io.github.hamsteak.youtubetimelapse.video.domain;
 
 import io.github.hamsteak.youtubetimelapse.channel.domain.Channel;
 import io.github.hamsteak.youtubetimelapse.channel.domain.ChannelPutter;
-import io.github.hamsteak.youtubetimelapse.external.youtube.YoutubeDataApiCaller;
+import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiCaller;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.youtubetimelapse.video.infrastructure.VideoRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +23,12 @@ public class VideoPutter {
 
         return videoRepository.findByYoutubeId(youtubeId)
                 .orElseGet(() -> videoRepository.save(
-                        Video.builder()
-                                .youtubeId(youtubeId)
-                                .channel(channel)
-                                .title(videoResponse.getSnippet().getTitle())
-                                .thumbnailUrl(videoResponse.getSnippet().getThumbnails().getHigh().getUrl())
-                                .build()
+                                Video.builder()
+                                        .youtubeId(youtubeId)
+                                        .channel(channel)
+                                        .title(videoResponse.getSnippet().getTitle())
+                                        .thumbnailUrl(videoResponse.getSnippet().getThumbnails().getHigh().getUrl())
+                                        .build()
                         )
                 );
     }

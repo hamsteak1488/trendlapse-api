@@ -1,12 +1,15 @@
-package io.github.hamsteak.youtubetimelapse.video.domain;
+package io.github.hamsteak.youtubetimelapse.collector.domain;
 
-import io.github.hamsteak.youtubetimelapse.channel.domain.BatchChannelCollector;
 import io.github.hamsteak.youtubetimelapse.channel.domain.ChannelReader;
 import io.github.hamsteak.youtubetimelapse.common.errors.errorcode.CommonErrorCode;
 import io.github.hamsteak.youtubetimelapse.common.errors.exception.RestApiException;
-import io.github.hamsteak.youtubetimelapse.external.youtube.YoutubeDataApiCaller;
+import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiCaller;
+import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiProperties;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoListResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoResponse;
+import io.github.hamsteak.youtubetimelapse.video.domain.Video;
+import io.github.hamsteak.youtubetimelapse.video.domain.VideoCreator;
+import io.github.hamsteak.youtubetimelapse.video.domain.VideoReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,12 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static io.github.hamsteak.youtubetimelapse.config.Constants.MAX_FETCH_COUNT;
-
 @Component
 @RequiredArgsConstructor
 public class BatchVideoCollector {
     private final YoutubeDataApiCaller youtubeDataApiCaller;
+    private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final VideoReader videoReader;
     private final VideoCreator videoCreator;
     private final BatchChannelCollector batchChannelCollector;
@@ -40,10 +42,10 @@ public class BatchVideoCollector {
         }
 
         List<VideoResponse> responses = new ArrayList<>();
-        int fetchCount = (fetchVideoYoutubeIds.size() - 1) / MAX_FETCH_COUNT + 1;
+        int fetchCount = (fetchVideoYoutubeIds.size() - 1) / youtubeDataApiProperties.getMaxFetchCount() + 1;
         for (int i = 0; i < fetchCount; i++) {
-            int fromIndex = i * MAX_FETCH_COUNT;
-            int toIndex = Math.min((i + 1) * MAX_FETCH_COUNT, fetchVideoYoutubeIds.size());
+            int fromIndex = i * youtubeDataApiProperties.getMaxFetchCount();
+            int toIndex = Math.min((i + 1) * youtubeDataApiProperties.getMaxFetchCount(), fetchVideoYoutubeIds.size());
             List<String> subFetchVideoYoutubeIds = fetchVideoYoutubeIds.subList(fromIndex, toIndex);
 
             VideoListResponse videoListResponse = youtubeDataApiCaller.fetchVideos(subFetchVideoYoutubeIds);

@@ -1,6 +1,10 @@
-package io.github.hamsteak.youtubetimelapse.channel.domain;
+package io.github.hamsteak.youtubetimelapse.collector.domain;
 
-import io.github.hamsteak.youtubetimelapse.external.youtube.YoutubeDataApiCaller;
+import io.github.hamsteak.youtubetimelapse.channel.domain.Channel;
+import io.github.hamsteak.youtubetimelapse.channel.domain.ChannelCreator;
+import io.github.hamsteak.youtubetimelapse.channel.domain.ChannelReader;
+import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiCaller;
+import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiProperties;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelListResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelResponse;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static io.github.hamsteak.youtubetimelapse.config.Constants.MAX_FETCH_COUNT;
-
 @Component
 @RequiredArgsConstructor
 public class BatchChannelCollector {
     private final YoutubeDataApiCaller youtubeDataApiCaller;
+    private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final ChannelReader channelReader;
     private final ChannelCreator channelCreator;
 
@@ -34,10 +37,10 @@ public class BatchChannelCollector {
         }
 
         List<ChannelResponse> responses = new ArrayList<>();
-        int fetchCount = (fetchChannelYoutubeIds.size() - 1) / MAX_FETCH_COUNT + 1;
+        int fetchCount = (fetchChannelYoutubeIds.size() - 1) / youtubeDataApiProperties.getMaxFetchCount() + 1;
         for (int i = 0; i < fetchCount; i++) {
-            int fromIndex = i * MAX_FETCH_COUNT;
-            int toIndex = Math.min((i + 1) * MAX_FETCH_COUNT, fetchChannelYoutubeIds.size());
+            int fromIndex = i * youtubeDataApiProperties.getMaxFetchCount();
+            int toIndex = Math.min((i + 1) * youtubeDataApiProperties.getMaxFetchCount(), fetchChannelYoutubeIds.size());
             List<String> subFetchChannelYoutubeIds = fetchChannelYoutubeIds.subList(fromIndex, toIndex);
 
             ChannelListResponse channelListResponse = youtubeDataApiCaller.fetchChannels(subFetchChannelYoutubeIds);

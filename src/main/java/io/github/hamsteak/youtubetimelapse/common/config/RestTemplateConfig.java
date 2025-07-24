@@ -1,4 +1,4 @@
-package io.github.hamsteak.youtubetimelapse.config;
+package io.github.hamsteak.youtubetimelapse.common.config;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

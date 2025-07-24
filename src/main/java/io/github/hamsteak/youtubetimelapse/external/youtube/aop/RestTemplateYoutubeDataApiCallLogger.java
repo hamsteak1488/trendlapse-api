@@ -1,4 +1,4 @@
-package io.github.hamsteak.youtubetimelapse.external.aop;
+package io.github.hamsteak.youtubetimelapse.external.youtube.aop;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class RestTemplateYoutubeDataApiCallLogger {
-    @Before("execution(* io.github.hamsteak.youtubetimelapse.external.youtube.RestTemplateYoutubeDataApiCaller.*(..))")
+    @Before("execution(* io.github.hamsteak.youtubetimelapse.external.youtube.domain.RestTemplateYoutubeDataApiCaller.*(..))")
     public void logBeforeCall(JoinPoint joinPoint) {
         log.info("External API:({}) is called", joinPoint.getSignature());
     }

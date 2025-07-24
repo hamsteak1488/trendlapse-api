@@ -1,4 +1,4 @@
-package io.github.hamsteak.youtubetimelapse.external.youtube;
+package io.github.hamsteak.youtubetimelapse.external.youtube.domain;
 
 import io.github.hamsteak.youtubetimelapse.common.errors.errorcode.CommonErrorCode;
 import io.github.hamsteak.youtubetimelapse.common.errors.exception.RestApiException;
@@ -6,7 +6,7 @@ import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelListRespo
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoListResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoResponse;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -14,24 +14,18 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
+    private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final RestTemplate restTemplate;
-
-    private final String baseUrl = "https://www.googleapis.com/youtube/v3";
-    private final String googleApiKey;
-
-    public RestTemplateYoutubeDataApiCaller(RestTemplate restTemplate, @Value("${google-api-key}") String googleApiKey) {
-        this.restTemplate = restTemplate;
-        this.googleApiKey = googleApiKey;
-    }
 
     @Override
     public ChannelResponse fetchChannel(String channelYoutubeId) {
         String part = String.join(",", List.of("id", "snippet"));
 
-        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+        String requestUrl = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/channels")
-                .queryParam("key", googleApiKey)
+                .queryParam("key", youtubeDataApiProperties.getApiKey())
                 .queryParam("part", part)
                 .queryParam("id", channelYoutubeId)
                 .build().toString();
@@ -49,9 +43,9 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     public ChannelListResponse fetchChannels(List<String> channelYoutubeIds) {
         String part = String.join(",", List.of("id", "snippet"));
 
-        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+        String requestUrl = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/channels")
-                .queryParam("key", googleApiKey)
+                .queryParam("key", youtubeDataApiProperties.getApiKey())
                 .queryParam("part", part)
                 .queryParam("id", String.join(",", channelYoutubeIds))
                 .build().toString();
@@ -69,9 +63,9 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     public VideoResponse fetchVideo(String videoYoutubeId) {
         String part = String.join(",", List.of("id", "snippet"));
 
-        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+        String requestUrl = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/videos")
-                .queryParam("key", googleApiKey)
+                .queryParam("key", youtubeDataApiProperties.getApiKey())
                 .queryParam("part", part)
                 .queryParam("id", videoYoutubeId)
                 .build().toString();
@@ -89,9 +83,9 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     public VideoListResponse fetchVideos(List<String> videoYoutubeIds) {
         String part = String.join(",", List.of("id", "snippet"));
 
-        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+        String requestUrl = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/videos")
-                .queryParam("key", googleApiKey)
+                .queryParam("key", youtubeDataApiProperties.getApiKey())
                 .queryParam("part", part)
                 .queryParam("id", String.join(",", videoYoutubeIds))
                 .build().toString();
@@ -110,9 +104,9 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         String part = "id";
         String chart = "mostPopular";
 
-        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+        String requestUrl = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/videos")
-                .queryParam("key", googleApiKey)
+                .queryParam("key", youtubeDataApiProperties.getApiKey())
                 .queryParam("part", part)
                 .queryParam("chart", chart)
                 .queryParam("maxResults", count)

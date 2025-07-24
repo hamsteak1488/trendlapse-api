@@ -1,4 +1,4 @@
-package io.github.hamsteak.youtubetimelapse.trending.domain;
+package io.github.hamsteak.youtubetimelapse.collector.domain;
 
 import java.time.LocalDateTime;
 

@@ -1,11 +1,12 @@
-package io.github.hamsteak.youtubetimelapse.trending.domain;
+package io.github.hamsteak.youtubetimelapse.collector.domain;
 
-import io.github.hamsteak.youtubetimelapse.external.youtube.YoutubeDataApiCaller;
+import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiCaller;
+import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiProperties;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoListResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.youtubetimelapse.region.domain.Region;
 import io.github.hamsteak.youtubetimelapse.region.domain.RegionReader;
-import io.github.hamsteak.youtubetimelapse.video.domain.BatchVideoCollector;
+import io.github.hamsteak.youtubetimelapse.trending.domain.TrendingCreator;
 import io.github.hamsteak.youtubetimelapse.video.domain.VideoReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -15,8 +16,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
-
-import static io.github.hamsteak.youtubetimelapse.config.Constants.MAX_FETCH_COUNT;
 
 /**
  * Trending 목록 조회 -> (DB에 없는 Video 조회 -> (DB에 없는 Channel 조회 -> 조회한 Channel 하나씩 삽입) -> 조회한 Video 하나씩 삽입) -> 조회한 Trending 하나씩 삽입
@@ -28,6 +27,7 @@ import static io.github.hamsteak.youtubetimelapse.config.Constants.MAX_FETCH_COU
 @RequiredArgsConstructor
 public class BatchTrendingCollector implements TrendingCollector {
     private final YoutubeDataApiCaller youtubeDataApiCaller;
+    private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final BatchVideoCollector batchVideoCollector;
     private final TrendingCreator trendingCreator;
     private final VideoReader videoReader;
@@ -42,9 +42,9 @@ public class BatchTrendingCollector implements TrendingCollector {
         String pageToken = null;
         int remainCount = collectCount;
         while (remainCount > 0) {
-            remainCount -= MAX_FETCH_COUNT;
+            remainCount -= youtubeDataApiProperties.getMaxFetchCount();
 
-            VideoListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(MAX_FETCH_COUNT, region.getRegionCode(), pageToken);
+            VideoListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(youtubeDataApiProperties.getMaxFetchCount(), region.getRegionCode(), pageToken);
             trendingListResponse.getItems().stream()
                     .map(VideoResponse::getId)
                     .forEach(videoYoutubeIds::add);

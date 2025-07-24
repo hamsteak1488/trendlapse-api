@@ -1,33 +1,27 @@
-package io.github.hamsteak.youtubetimelapse.external.youtube;
+package io.github.hamsteak.youtubetimelapse.external.youtube.domain;
 
 import io.github.hamsteak.youtubetimelapse.common.errors.errorcode.CommonErrorCode;
 import io.github.hamsteak.youtubetimelapse.common.errors.exception.RestApiException;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.RegionListResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class RegionApiCaller {
+    private final YoutubeDataApiProperties properties;
     private final RestTemplate restTemplate;
-
-    private final String baseUrl = "https://www.googleapis.com/youtube/v3";
-    private final String googleApiKey;
-
-    public RegionApiCaller(RestTemplate restTemplate, @Value("${google-api-key}") String googleApiKey) {
-        this.restTemplate = restTemplate;
-        this.googleApiKey = googleApiKey;
-    }
 
     public RegionListResponse fetchRegions() {
         String part = "snippet";
 
-        String requestUrl = UriComponentsBuilder.fromUriString(baseUrl)
+        String requestUrl = UriComponentsBuilder.fromUriString(properties.getBaseUrl())
                 .path("/i18nRegions")
-                .queryParam("key", googleApiKey)
+                .queryParam("key", properties.getApiKey())
                 .queryParam("part", part)
                 .build().toString();
 

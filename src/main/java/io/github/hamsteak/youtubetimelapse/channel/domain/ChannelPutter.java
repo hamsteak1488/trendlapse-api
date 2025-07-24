@@ -1,7 +1,7 @@
 package io.github.hamsteak.youtubetimelapse.channel.domain;
 
 import io.github.hamsteak.youtubetimelapse.channel.infrastructure.ChannelRepository;
-import io.github.hamsteak.youtubetimelapse.external.youtube.YoutubeDataApiCaller;
+import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiCaller;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,11 +19,11 @@ public class ChannelPutter {
 
         return channelRepository.findByYoutubeId(youtubeId)
                 .orElseGet(() -> channelRepository.save(
-                        Channel.builder()
-                                .youtubeId(youtubeId)
-                                .title(channelResponse.getSnippet().getTitle())
-                                .thumbnailUrl(channelResponse.getSnippet().getThumbnails().getHigh().getUrl())
-                                .build()
+                                Channel.builder()
+                                        .youtubeId(youtubeId)
+                                        .title(channelResponse.getSnippet().getTitle())
+                                        .thumbnailUrl(channelResponse.getSnippet().getThumbnails().getHigh().getUrl())
+                                        .build()
                         )
                 );
     }

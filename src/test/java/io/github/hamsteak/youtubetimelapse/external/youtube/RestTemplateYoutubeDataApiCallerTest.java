@@ -1,5 +1,7 @@
 package io.github.hamsteak.youtubetimelapse.external.youtube;
 
+import io.github.hamsteak.youtubetimelapse.external.youtube.domain.RestTemplateYoutubeDataApiCaller;
+import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiProperties;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelListResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -26,7 +28,7 @@ class RestTemplateYoutubeDataApiCallerTest {
 
     @BeforeEach
     void setup() {
-        caller = new RestTemplateYoutubeDataApiCaller(restTemplate, "fake-api-key");
+        caller = new RestTemplateYoutubeDataApiCaller(new YoutubeDataApiProperties("https://www.googleapis.com/youtube/v3", "fake-api-key", 50), restTemplate);
     }
 
     @Test

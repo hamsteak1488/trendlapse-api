@@ -1,5 +1,3 @@
-collect-count: 200
-
 spring:
   config:
     import: application-secret.yml
@@ -14,7 +12,7 @@ spring:
     password:
 
   jpa:
-#    show-sql: true
+    #    show-sql: true
     open-in-view: false
     hibernate:
       ddl-auto: create
@@ -29,6 +27,15 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+
+youtube-data-api:
+  base-url: https://www.googleapis.com/youtube/v3
+  max-fetch-count: 50
+
+collect-scheduler:
+  collect-count: 200
+  collect-interval: 900000 # 15m
+
 
 #logging:
 #  level:
