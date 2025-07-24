@@ -1,7 +1,7 @@
 package io.github.hamsteak.youtubetimelapse.region.domain;
 
-import io.github.hamsteak.youtubetimelapse.external.youtube.domain.RegionApiCaller;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.RegionListResponse;
+import io.github.hamsteak.youtubetimelapse.external.youtube.infrastructure.RegionApiCaller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

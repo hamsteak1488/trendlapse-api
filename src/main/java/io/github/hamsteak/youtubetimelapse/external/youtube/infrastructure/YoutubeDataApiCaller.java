@@ -1,4 +1,4 @@
-package io.github.hamsteak.youtubetimelapse.external.youtube.domain;
+package io.github.hamsteak.youtubetimelapse.external.youtube.infrastructure;
 
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelListResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelResponse;

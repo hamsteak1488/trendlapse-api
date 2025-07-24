@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class RestTemplateYoutubeDataApiCallLogger {
-    @Before("execution(* io.github.hamsteak.youtubetimelapse.external.youtube.domain.RestTemplateYoutubeDataApiCaller.*(..))")
+    @Before("execution(* io.github.hamsteak.youtubetimelapse.external.youtube.infrastructure.RestTemplateYoutubeDataApiCaller.*(..))")
     public void logBeforeCall(JoinPoint joinPoint) {
-        log.info("External API:({}) is called", joinPoint.getSignature());
+        log.info("External API:({}) is called", joinPoint.getSignature().toShortString());
     }
 }

@@ -3,10 +3,10 @@ package io.github.hamsteak.youtubetimelapse.collector.domain;
 import io.github.hamsteak.youtubetimelapse.channel.domain.Channel;
 import io.github.hamsteak.youtubetimelapse.channel.domain.ChannelCreator;
 import io.github.hamsteak.youtubetimelapse.channel.domain.ChannelReader;
-import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiCaller;
-import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiProperties;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelListResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelResponse;
+import io.github.hamsteak.youtubetimelapse.external.youtube.infrastructure.YoutubeDataApiCaller;
+import io.github.hamsteak.youtubetimelapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

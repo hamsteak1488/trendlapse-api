@@ -1,9 +1,9 @@
 package io.github.hamsteak.youtubetimelapse.collector.domain;
 
-import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiCaller;
-import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiProperties;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoListResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.VideoResponse;
+import io.github.hamsteak.youtubetimelapse.external.youtube.infrastructure.YoutubeDataApiCaller;
+import io.github.hamsteak.youtubetimelapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import io.github.hamsteak.youtubetimelapse.region.domain.Region;
 import io.github.hamsteak.youtubetimelapse.region.domain.RegionReader;
 import io.github.hamsteak.youtubetimelapse.trending.domain.TrendingCreator;

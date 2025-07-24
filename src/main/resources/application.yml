@@ -42,7 +42,6 @@ collect-scheduler:
   collect-count: 200
   collect-interval: 900000 # 15m
 
-
 #logging:
 #  level:
 #    org.hibernate.SQL: debug

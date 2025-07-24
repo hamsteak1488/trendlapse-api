@@ -1,4 +1,4 @@
-package io.github.hamsteak.youtubetimelapse.external.youtube.domain;
+package io.github.hamsteak.youtubetimelapse.external.youtube.infrastructure;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

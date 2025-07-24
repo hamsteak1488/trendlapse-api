@@ -1,9 +1,9 @@
 package io.github.hamsteak.youtubetimelapse.external.youtube;
 
-import io.github.hamsteak.youtubetimelapse.external.youtube.domain.RestTemplateYoutubeDataApiCaller;
-import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiProperties;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelListResponse;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelResponse;
+import io.github.hamsteak.youtubetimelapse.external.youtube.infrastructure.RestTemplateYoutubeDataApiCaller;
+import io.github.hamsteak.youtubetimelapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

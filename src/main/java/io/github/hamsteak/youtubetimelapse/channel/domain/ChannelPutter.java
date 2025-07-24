@@ -1,8 +1,8 @@
 package io.github.hamsteak.youtubetimelapse.channel.domain;
 
 import io.github.hamsteak.youtubetimelapse.channel.infrastructure.ChannelRepository;
-import io.github.hamsteak.youtubetimelapse.external.youtube.domain.YoutubeDataApiCaller;
 import io.github.hamsteak.youtubetimelapse.external.youtube.dto.ChannelResponse;
+import io.github.hamsteak.youtubetimelapse.external.youtube.infrastructure.YoutubeDataApiCaller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
