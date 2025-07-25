@@ -6,6 +6,7 @@ import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
+import io.micrometer.core.annotation.Counted;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -13,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
+@Counted("youtube.api.call")
 @Component
 @RequiredArgsConstructor
 public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
