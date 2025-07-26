@@ -1,9 +1,6 @@
 package io.github.hamsteak.trendlapse.external.youtube.infrastructure;
 
-import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelListResponse;
-import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelResponse;
-import io.github.hamsteak.trendlapse.external.youtube.dto.VideoListResponse;
-import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
+import io.github.hamsteak.trendlapse.external.youtube.dto.*;
 
 import java.util.List;
 
@@ -16,5 +13,5 @@ public interface YoutubeDataApiCaller {
 
     VideoListResponse fetchVideos(List<String> videoYoutubeId);
 
-    VideoListResponse fetchTrendings(int count, String regionCode, String pageToken);
+    TrendingListResponse fetchTrendings(int count, String regionCode, String pageToken);
 }

@@ -39,7 +39,7 @@ youtube-data-api:
   max-fetch-count: 50
 
 collect-scheduler:
-  collect-count: 200
+  collect-count: 100
   collect-interval: 900000 # 15m
 
 #logging:

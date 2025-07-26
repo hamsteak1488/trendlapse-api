@@ -2,10 +2,7 @@ package io.github.hamsteak.trendlapse.external.youtube.infrastructure;
 
 import io.github.hamsteak.trendlapse.common.errors.errorcode.CommonErrorCode;
 import io.github.hamsteak.trendlapse.common.errors.exception.RestApiException;
-import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelListResponse;
-import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelResponse;
-import io.github.hamsteak.trendlapse.external.youtube.dto.VideoListResponse;
-import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
+import io.github.hamsteak.trendlapse.external.youtube.dto.*;
 import io.micrometer.core.annotation.Counted;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -103,7 +100,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     }
 
     @Override
-    public VideoListResponse fetchTrendings(int count, String regionCode, String pageToken) {
+    public TrendingListResponse fetchTrendings(int count, String regionCode, String pageToken) {
         String part = "id";
         String chart = "mostPopular";
 
@@ -117,7 +114,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
                 .queryParam("pageToken", pageToken)
                 .build().toUri();
 
-        VideoListResponse response = restTemplate.getForObject(requestUri, VideoListResponse.class);
+        TrendingListResponse response = restTemplate.getForObject(requestUri, TrendingListResponse.class);
 
         if (response == null) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get trendings");

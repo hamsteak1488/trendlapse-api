@@ -7,6 +7,7 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public class ChannelListResponse {
-    private final List<ChannelResponse> items;
+public class TrendingListResponse {
+    private final List<VideoResponse> items;
+    private final String nextPageToken;
 }

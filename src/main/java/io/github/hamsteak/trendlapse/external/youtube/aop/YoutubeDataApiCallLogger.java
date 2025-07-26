@@ -13,7 +13,7 @@ import org.springframework.util.StopWatch;
 @Slf4j
 @Aspect
 @Component
-public class RestTemplateYoutubeDataApiCallLogger {
+public class YoutubeDataApiCallLogger {
     @Before("execution(* io.github.hamsteak.trendlapse.external.youtube.infrastructure.RestTemplateYoutubeDataApiCaller.*(..))")
     public void logBeforeApiCall(JoinPoint joinPoint) {
         String methodName = getMethodName(joinPoint);
@@ -21,7 +21,7 @@ public class RestTemplateYoutubeDataApiCallLogger {
 //        log.info("Called External API: {}", methodName);
     }
 
-    @Around("execution(* io.github.hamsteak.trendlapse.external.youtube.infrastructure.RestTemplateYoutubeDataApiCaller.*(..))")
+    @Around("execution(* io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller.*(..))")
     public Object logApiCallTime(ProceedingJoinPoint joinPoint) throws Throwable {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();

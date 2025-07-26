@@ -1,6 +1,6 @@
 package io.github.hamsteak.trendlapse.collector.domain;
 
-import io.github.hamsteak.trendlapse.external.youtube.dto.VideoListResponse;
+import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
@@ -9,8 +9,6 @@ import io.github.hamsteak.trendlapse.region.domain.RegionReader;
 import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
 import io.github.hamsteak.trendlapse.video.domain.VideoReader;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,16 +20,14 @@ import java.util.stream.IntStream;
  * API 호출 횟수: Trending(1) + Video(1) + Channel(1)
  * DB 쿼리 횟수: Trending(select-video:N + insert:N) + Video(select-in:1 + select-channel:N + insert:N) + Channel(select-in:1 + insert:N)
  */
-@Primary
-@Component
 @RequiredArgsConstructor
 public class BatchTrendingCollector implements TrendingCollector {
+    private final RegionReader regionReader;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final BatchVideoCollector batchVideoCollector;
     private final TrendingCreator trendingCreator;
     private final VideoReader videoReader;
-    private final RegionReader regionReader;
 
     @Override
     public void collect(LocalDateTime dateTime, int collectCount, long regionId) {
@@ -44,7 +40,7 @@ public class BatchTrendingCollector implements TrendingCollector {
         while (remainCount > 0) {
             remainCount -= youtubeDataApiProperties.getMaxFetchCount();
 
-            VideoListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(youtubeDataApiProperties.getMaxFetchCount(), region.getRegionCode(), pageToken);
+            TrendingListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(youtubeDataApiProperties.getMaxFetchCount(), region.getRegionCode(), pageToken);
             trendingListResponse.getItems().stream()
                     .map(VideoResponse::getId)
                     .forEach(videoYoutubeIds::add);
