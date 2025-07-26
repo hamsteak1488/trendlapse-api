@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -19,13 +21,13 @@ public class RegionApiCaller {
     public RegionListResponse fetchRegions() {
         String part = "snippet";
 
-        String requestUrl = UriComponentsBuilder.fromUriString(properties.getBaseUrl())
+        URI requestUri = UriComponentsBuilder.fromUriString(properties.getBaseUrl())
                 .path("/i18nRegions")
                 .queryParam("key", properties.getApiKey())
                 .queryParam("part", part)
-                .build().toString();
+                .build().toUri();
 
-        RegionListResponse response = restTemplate.getForObject(requestUrl, RegionListResponse.class);
+        RegionListResponse response = restTemplate.getForObject(requestUri, RegionListResponse.class);
 
         if (response == null) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get channel");

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @Counted("youtube.api.call")
@@ -25,14 +26,14 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     public ChannelResponse fetchChannel(String channelYoutubeId) {
         String part = String.join(",", List.of("id", "snippet"));
 
-        String requestUrl = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
+        URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/channels")
                 .queryParam("key", youtubeDataApiProperties.getApiKey())
                 .queryParam("part", part)
                 .queryParam("id", channelYoutubeId)
-                .build().toString();
+                .build().toUri();
 
-        ChannelListResponse response = restTemplate.getForObject(requestUrl, ChannelListResponse.class);
+        ChannelListResponse response = restTemplate.getForObject(requestUri, ChannelListResponse.class);
 
         if (response == null) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get channel");
@@ -45,14 +46,14 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     public ChannelListResponse fetchChannels(List<String> channelYoutubeIds) {
         String part = String.join(",", List.of("id", "snippet"));
 
-        String requestUrl = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
+        URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/channels")
                 .queryParam("key", youtubeDataApiProperties.getApiKey())
                 .queryParam("part", part)
                 .queryParam("id", String.join(",", channelYoutubeIds))
-                .build().toString();
+                .build().toUri();
 
-        ChannelListResponse response = restTemplate.getForObject(requestUrl, ChannelListResponse.class);
+        ChannelListResponse response = restTemplate.getForObject(requestUri, ChannelListResponse.class);
 
         if (response == null) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get channel");
@@ -65,14 +66,14 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     public VideoResponse fetchVideo(String videoYoutubeId) {
         String part = String.join(",", List.of("id", "snippet"));
 
-        String requestUrl = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
+        URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/videos")
                 .queryParam("key", youtubeDataApiProperties.getApiKey())
                 .queryParam("part", part)
                 .queryParam("id", videoYoutubeId)
-                .build().toString();
+                .build().toUri();
 
-        VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
+        VideoListResponse response = restTemplate.getForObject(requestUri, VideoListResponse.class);
 
         if (response == null) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get video");
@@ -85,14 +86,14 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     public VideoListResponse fetchVideos(List<String> videoYoutubeIds) {
         String part = String.join(",", List.of("id", "snippet"));
 
-        String requestUrl = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
+        URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/videos")
                 .queryParam("key", youtubeDataApiProperties.getApiKey())
                 .queryParam("part", part)
                 .queryParam("id", String.join(",", videoYoutubeIds))
-                .build().toString();
+                .build().toUri();
 
-        VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
+        VideoListResponse response = restTemplate.getForObject(requestUri, VideoListResponse.class);
 
         if (response == null) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get video");
@@ -106,7 +107,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         String part = "id";
         String chart = "mostPopular";
 
-        String requestUrl = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
+        URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/videos")
                 .queryParam("key", youtubeDataApiProperties.getApiKey())
                 .queryParam("part", part)
@@ -114,9 +115,9 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
                 .queryParam("maxResults", count)
                 .queryParam("regionCode", regionCode)
                 .queryParam("pageToken", pageToken)
-                .build().toString();
+                .build().toUri();
 
-        VideoListResponse response = restTemplate.getForObject(requestUrl, VideoListResponse.class);
+        VideoListResponse response = restTemplate.getForObject(requestUri, VideoListResponse.class);
 
         if (response == null) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get trendings");
