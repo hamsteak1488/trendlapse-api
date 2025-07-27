@@ -1,8 +1,8 @@
 package io.github.hamsteak.trendlapse.collector.config;
 
-import io.github.hamsteak.trendlapse.collector.domain.BatchTrendingCollector;
-import io.github.hamsteak.trendlapse.collector.domain.BatchVideoCollector;
 import io.github.hamsteak.trendlapse.collector.domain.TrendingCollector;
+import io.github.hamsteak.trendlapse.collector.domain.v1.BatchTrendingCollector;
+import io.github.hamsteak.trendlapse.collector.domain.v1.BatchVideoCollector;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import io.github.hamsteak.trendlapse.region.domain.RegionReader;
@@ -17,8 +17,9 @@ public class CollectorConfig {
     public TrendingCollector trendingCollector(RegionReader regionReader,
                                                YoutubeDataApiCaller youtubeDataApiCaller,
                                                YoutubeDataApiProperties youtubeDataApiProperties,
-                                               TrendingPutter trendingPutter) {
-        return new OneByOneTrendingCollector(regionReader, youtubeDataApiCaller, youtubeDataApiProperties, trendingPutter);
+                                               TrendingCreator trendingCreator,
+                                               OneByOneVideoCollector oneByOneVideoCollector) {
+        return new OneByOneTrendingCollector(regionReader, youtubeDataApiCaller, youtubeDataApiProperties, trendingCreator, oneByOneVideoCollector);
     }*/
 
     @Bean

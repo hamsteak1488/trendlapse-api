@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.collector.domain;
+package io.github.hamsteak.trendlapse.collector.domain.v1;
 
 import io.github.hamsteak.trendlapse.channel.domain.ChannelReader;
 import io.github.hamsteak.trendlapse.common.errors.errorcode.CommonErrorCode;

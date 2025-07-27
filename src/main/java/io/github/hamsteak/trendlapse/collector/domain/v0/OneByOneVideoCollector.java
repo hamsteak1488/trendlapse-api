@@ -1,9 +1,9 @@
-package io.github.hamsteak.trendlapse.video.domain;
+package io.github.hamsteak.trendlapse.collector.domain.v0;
 
 import io.github.hamsteak.trendlapse.channel.domain.Channel;
-import io.github.hamsteak.trendlapse.channel.domain.ChannelPutter;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
+import io.github.hamsteak.trendlapse.video.domain.Video;
 import io.github.hamsteak.trendlapse.video.infrastructure.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -11,15 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class VideoPutter {
+public class OneByOneVideoCollector {
     private final VideoRepository videoRepository;
-    private final ChannelPutter channelPutter;
+    private final OneByOneChannelCollector oneByOneChannelCollector;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
 
     @Transactional
-    public Video put(String youtubeId) {
+    public Video collect(String youtubeId) {
         VideoResponse videoResponse = youtubeDataApiCaller.fetchVideo(youtubeId);
-        Channel channel = channelPutter.put(videoResponse.getSnippet().getChannelId());
+        Channel channel = oneByOneChannelCollector.collect(videoResponse.getSnippet().getChannelId());
 
         return videoRepository.findByYoutubeId(youtubeId)
                 .orElseGet(() -> videoRepository.save(

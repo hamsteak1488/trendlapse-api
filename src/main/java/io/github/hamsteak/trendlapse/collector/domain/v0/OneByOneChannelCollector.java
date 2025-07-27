@@ -1,5 +1,6 @@
-package io.github.hamsteak.trendlapse.channel.domain;
+package io.github.hamsteak.trendlapse.collector.domain.v0;
 
+import io.github.hamsteak.trendlapse.channel.domain.Channel;
 import io.github.hamsteak.trendlapse.channel.infrastructure.ChannelRepository;
 import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
@@ -9,12 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class ChannelPutter {
+public class OneByOneChannelCollector {
     private final ChannelRepository channelRepository;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
 
     @Transactional
-    public Channel put(String youtubeId) {
+    public Channel collect(String youtubeId) {
         ChannelResponse channelResponse = youtubeDataApiCaller.fetchChannel(youtubeId);
 
         return channelRepository.findByYoutubeId(youtubeId)

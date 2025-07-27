@@ -23,7 +23,7 @@ public class MockYoutubeDataApiCaller implements YoutubeDataApiCaller {
     @Override
     public ChannelResponse fetchChannel(String channelYoutubeId) {
         try {
-            Thread.sleep(100);
+            Thread.sleep(80);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -47,7 +47,7 @@ public class MockYoutubeDataApiCaller implements YoutubeDataApiCaller {
     @Override
     public VideoResponse fetchVideo(String videoYoutubeId) {
         try {
-            Thread.sleep(100);
+            Thread.sleep(80);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -79,10 +79,7 @@ public class MockYoutubeDataApiCaller implements YoutubeDataApiCaller {
         String nextPageToken = pageToken == null ? "page-token" : null;
         int offset = pageToken == null ? 0 : 50;
 
-        if (!regionVisitSet.contains(regionCode)) {
-            regionVisitSet.add(regionCode);
-            putRegionMockData(regionCode);
-        }
+        putRegionMockDataIfAbsent(regionCode);
 
         return new TrendingListResponse(
                 IntStream.range(1 + offset, 51 + offset)
@@ -91,7 +88,13 @@ public class MockYoutubeDataApiCaller implements YoutubeDataApiCaller {
         );
     }
 
-    private void putRegionMockData(String regionCode) {
+    private void putRegionMockDataIfAbsent(String regionCode) {
+        if (regionVisitSet.contains(regionCode)) {
+            return;
+        }
+        regionVisitSet.add(regionCode);
+
+        //
         IntStream.range(1, 101)
                 .forEach(i -> {
                     String channelYoutubeId = regionCode + "-channel-youtube-id-" + i;
