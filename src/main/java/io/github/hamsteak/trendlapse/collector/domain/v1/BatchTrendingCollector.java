@@ -30,8 +30,8 @@ public class BatchTrendingCollector implements TrendingCollector {
     private final VideoReader videoReader;
 
     @Override
-    public void collect(LocalDateTime dateTime, int collectCount) {
-        regionReader.readAll()
+    public void collect(LocalDateTime dateTime, int collectCount, List<Long> regionIds) {
+        regionReader.read(regionIds)
                 .forEach(region -> {
                     List<String> videoYoutubeIds = new ArrayList<>();
 

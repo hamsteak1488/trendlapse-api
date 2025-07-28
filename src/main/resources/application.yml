@@ -35,7 +35,6 @@ management:
         include: "*"
 
 youtube-data-api:
-  base-url: https://www.googleapis.com/youtube/v3
   max-fetch-count: 50
 
 collect-scheduler:

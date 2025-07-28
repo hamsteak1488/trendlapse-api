@@ -21,6 +21,11 @@ public class RegionReader {
     }
 
     @Transactional(readOnly = true)
+    public List<Region> read(List<Long> regionIds) {
+        return regionRepository.findByIdIn(regionIds);
+    }
+
+    @Transactional(readOnly = true)
     public List<Region> readAll() {
         return regionRepository.findAll();
     }

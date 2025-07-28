@@ -11,6 +11,8 @@ public interface RegionRepository extends Repository<Region, Long> {
 
     Optional<Region> findById(long id);
 
+    List<Region> findByIdIn(List<Long> ids);
+
     Optional<Region> findByRegionCode(String regionCode);
 
     List<Region> findAll();

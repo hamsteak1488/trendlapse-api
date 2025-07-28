@@ -5,6 +5,7 @@ import io.github.hamsteak.trendlapse.common.errors.exception.RestApiException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.*;
 import io.micrometer.core.annotation.Counted;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -12,6 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+@Primary
 @Counted("youtube.api.call")
 @Component
 @RequiredArgsConstructor

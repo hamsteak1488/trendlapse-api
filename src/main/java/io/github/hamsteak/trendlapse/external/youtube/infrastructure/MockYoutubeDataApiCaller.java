@@ -2,7 +2,6 @@ package io.github.hamsteak.trendlapse.external.youtube.infrastructure;
 
 import io.github.hamsteak.trendlapse.external.youtube.dto.*;
 import io.micrometer.core.annotation.Timed;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -12,7 +11,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 
-@Primary
 @Timed("youtube.api.call")
 @Component
 public class MockYoutubeDataApiCaller implements YoutubeDataApiCaller {
