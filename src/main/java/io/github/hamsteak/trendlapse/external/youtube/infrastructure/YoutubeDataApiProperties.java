@@ -11,4 +11,5 @@ public class YoutubeDataApiProperties {
     private final String baseUrl;
     private final String apiKey;
     private final int maxFetchCount;
+    private final boolean useLog;
 }

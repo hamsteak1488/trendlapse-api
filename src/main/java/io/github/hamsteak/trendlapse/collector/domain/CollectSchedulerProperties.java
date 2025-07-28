@@ -10,4 +10,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class CollectSchedulerProperties {
     private final int collectCount;
     private final int collectInterval;
+    private final boolean useLog;
 }

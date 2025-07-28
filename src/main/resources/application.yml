@@ -36,12 +36,17 @@ management:
 
 youtube-data-api:
   max-fetch-count: 50
+  use-log: true
 
 collect-scheduler:
   collect-count: 100
-  collect-interval: 900000 # 15m
-  # collect-interval: 60000 # 15m
+  #  collect-interval: 900000 # 15m
+  collect-interval: 600000 # 1m
   initial-delay: 5000
+  use-log: true
+
+collector:
+  use-log: false
 
 #logging:
 #  level:

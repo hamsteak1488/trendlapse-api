@@ -8,12 +8,14 @@ import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BatchChannelCollector {
@@ -54,5 +56,7 @@ public class BatchChannelCollector {
                         channelResponse.getSnippet().getThumbnails().getHigh().getUrl()
                 )
         );
+
+        log.info("end BatchChannelCollector.collect");
     }
 }

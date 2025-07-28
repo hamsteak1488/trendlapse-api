@@ -7,12 +7,14 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
 @Slf4j
 @Aspect
 @Component
+@ConditionalOnProperty(prefix = "youtube-data-api", name = "use-log", havingValue = "true")
 public class YoutubeDataApiCallLogger {
     @Before("execution(* io.github.hamsteak.trendlapse.external.youtube.infrastructure.RestTemplateYoutubeDataApiCaller.*(..))")
     public void logBeforeApiCall(JoinPoint joinPoint) {
@@ -30,7 +32,7 @@ public class YoutubeDataApiCallLogger {
 
         stopWatch.stop();
         String methodName = getMethodName(joinPoint);
-        log.info("time:{}sec: task:{}", String.format("%.3f", stopWatch.lastTaskInfo().getTimeSeconds()), methodName);
+        log.info("task:{}, elapsed {}ms", methodName, stopWatch.lastTaskInfo().getTimeMillis());
 
         return result;
     }

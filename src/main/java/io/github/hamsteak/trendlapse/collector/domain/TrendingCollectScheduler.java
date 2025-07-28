@@ -23,8 +23,6 @@ public class TrendingCollectScheduler {
 
     @Scheduled(initialDelayString = "${collect-scheduler.initial-delay}", fixedRateString = "${collect-scheduler.collect-interval}")
     public void collect() {
-        log.info("Started collecting trendings");
-
         LocalDateTime dateTime = LocalDateTime.now(Clock.systemUTC());
         List<Long> regionsIds = regionReader.readAll().stream()
                 .map(Region::getId)
