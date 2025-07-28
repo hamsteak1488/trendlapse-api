@@ -5,13 +5,11 @@ import io.github.hamsteak.trendlapse.region.domain.RegionFetcher;
 import io.github.hamsteak.trendlapse.region.domain.RegionReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Component
 @RequiredArgsConstructor
 public class TrendingCollectScheduler {
     private final RegionFetcher regionFetcher;

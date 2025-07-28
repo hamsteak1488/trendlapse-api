@@ -9,6 +9,7 @@ import io.github.hamsteak.trendlapse.region.domain.RegionReader;
 import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
 import io.github.hamsteak.trendlapse.video.domain.VideoReader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.stream.IntStream;
  * API 호출 횟수: Trending(1) + Video(1) + Channel(1)
  * DB 쿼리 횟수: Trending(select-video:N + insert:N) + Video(select-in:1 + select-channel:N + insert:N) + Channel(select-in:1 + insert:N)
  */
+@Component
 @RequiredArgsConstructor
 public class BatchTrendingCollector implements TrendingCollector {
     private final RegionReader regionReader;
