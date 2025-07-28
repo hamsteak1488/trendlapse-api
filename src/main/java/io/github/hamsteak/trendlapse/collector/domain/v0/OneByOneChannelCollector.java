@@ -16,16 +16,16 @@ public class OneByOneChannelCollector {
 
     @Transactional
     public Channel collect(String youtubeId) {
-        ChannelResponse channelResponse = youtubeDataApiCaller.fetchChannel(youtubeId);
-
         return channelRepository.findByYoutubeId(youtubeId)
-                .orElseGet(() -> channelRepository.save(
-                                Channel.builder()
-                                        .youtubeId(youtubeId)
-                                        .title(channelResponse.getSnippet().getTitle())
-                                        .thumbnailUrl(channelResponse.getSnippet().getThumbnails().getHigh().getUrl())
-                                        .build()
-                        )
-                );
+                .orElseGet(() -> {
+                    ChannelResponse channelResponse = youtubeDataApiCaller.fetchChannel(youtubeId);
+                    return channelRepository.save(
+                            Channel.builder()
+                                    .youtubeId(youtubeId)
+                                    .title(channelResponse.getSnippet().getTitle())
+                                    .thumbnailUrl(channelResponse.getSnippet().getThumbnails().getHigh().getUrl())
+                                    .build()
+                    );
+                });
     }
 }

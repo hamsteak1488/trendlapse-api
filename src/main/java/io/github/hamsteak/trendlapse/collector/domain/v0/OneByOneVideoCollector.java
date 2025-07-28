@@ -18,18 +18,19 @@ public class OneByOneVideoCollector {
 
     @Transactional
     public Video collect(String youtubeId) {
-        VideoResponse videoResponse = youtubeDataApiCaller.fetchVideo(youtubeId);
-        Channel channel = oneByOneChannelCollector.collect(videoResponse.getSnippet().getChannelId());
-
         return videoRepository.findByYoutubeId(youtubeId)
-                .orElseGet(() -> videoRepository.save(
-                                Video.builder()
-                                        .youtubeId(youtubeId)
-                                        .channel(channel)
-                                        .title(videoResponse.getSnippet().getTitle())
-                                        .thumbnailUrl(videoResponse.getSnippet().getThumbnails().getHigh().getUrl())
-                                        .build()
-                        )
-                );
+                .orElseGet(() -> {
+                    VideoResponse videoResponse = youtubeDataApiCaller.fetchVideo(youtubeId);
+                    Channel channel = oneByOneChannelCollector.collect(videoResponse.getSnippet().getChannelId());
+
+                    return videoRepository.save(
+                            Video.builder()
+                                    .youtubeId(youtubeId)
+                                    .channel(channel)
+                                    .title(videoResponse.getSnippet().getTitle())
+                                    .thumbnailUrl(videoResponse.getSnippet().getThumbnails().getHigh().getUrl())
+                                    .build()
+                    );
+                });
     }
 }
