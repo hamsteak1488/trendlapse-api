@@ -3,7 +3,7 @@ package io.github.hamsteak.trendlapse.external.youtube.infrastructure;
 import io.github.hamsteak.trendlapse.common.errors.errorcode.CommonErrorCode;
 import io.github.hamsteak.trendlapse.common.errors.exception.RestApiException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.*;
-import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import java.net.URI;
 import java.util.List;
 
 @Primary
-@Counted("youtube.api.call")
+@Timed("youtube.api.call")
 @Component
 @RequiredArgsConstructor
 public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {

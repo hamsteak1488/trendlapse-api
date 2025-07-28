@@ -40,6 +40,8 @@ youtube-data-api:
 collect-scheduler:
   collect-count: 100
   collect-interval: 900000 # 15m
+  # collect-interval: 60000 # 15m
+  initial-delay: 5000
 
 #logging:
 #  level:

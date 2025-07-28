@@ -30,7 +30,7 @@ public class YoutubeDataApiCallLogger {
 
         stopWatch.stop();
         String methodName = getMethodName(joinPoint);
-        log.info("time:{}sec: task:{}", stopWatch.lastTaskInfo().getTimeSeconds(), methodName);
+        log.info("time:{}sec: task:{}", String.format("%.3f", stopWatch.lastTaskInfo().getTimeSeconds()), methodName);
 
         return result;
     }
