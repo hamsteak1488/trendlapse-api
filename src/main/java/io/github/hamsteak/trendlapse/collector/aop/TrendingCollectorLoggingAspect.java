@@ -11,9 +11,9 @@ import org.springframework.util.StopWatch;
 @Slf4j
 @Aspect
 @Component
-@ConditionalOnProperty(prefix = "collect-scheduler", name = "use-log", havingValue = "true")
-public class CollectSchedulerLogger {
-    @Around("execution(* io.github.hamsteak.trendlapse.collector.domain.TrendingCollectScheduler.collect(..))")
+@ConditionalOnProperty(prefix = "collector", name = "use-log", havingValue = "true")
+public class TrendingCollectorLoggingAspect {
+    @Around("execution(* io.github.hamsteak.trendlapse.collector.domain.TrendingCollector.collect(..))")
     public Object logApiCallTime(ProceedingJoinPoint joinPoint) throws Throwable {
         log.info("Started scheduled trendings collection task.");
 

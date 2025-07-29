@@ -15,7 +15,7 @@ import org.springframework.util.StopWatch;
 @Aspect
 @Component
 @ConditionalOnProperty(prefix = "youtube-data-api", name = "use-log", havingValue = "true")
-public class YoutubeDataApiCallLogger {
+public class YoutubeDataApiCallLoggingAspect {
     @Before("execution(* io.github.hamsteak.trendlapse.external.youtube.infrastructure.RestTemplateYoutubeDataApiCaller.*(..))")
     public void logBeforeApiCall(JoinPoint joinPoint) {
         String methodName = getMethodName(joinPoint);
