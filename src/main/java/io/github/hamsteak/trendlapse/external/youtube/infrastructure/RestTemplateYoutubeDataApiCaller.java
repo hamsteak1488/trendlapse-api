@@ -4,7 +4,9 @@ import io.github.hamsteak.trendlapse.external.youtube.dto.*;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -13,6 +15,7 @@ import java.util.List;
 
 @Primary
 @Timed("youtube.api.call")
+@Retryable(maxAttempts = 5, retryFor = RestClientException.class)
 @Component
 @RequiredArgsConstructor
 public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {

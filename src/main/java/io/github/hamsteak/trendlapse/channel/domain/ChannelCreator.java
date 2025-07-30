@@ -14,7 +14,9 @@ public class ChannelCreator {
 
     @Transactional
     public Channel create(String youtubeId, String title, String thumbnailUrl) {
-        log.warn("Video thumbnail url is null. (youtubeId={})", youtubeId);
+        if (thumbnailUrl == null) {
+            log.warn("Channel thumbnail url is null. (youtubeId={})", youtubeId);
+        }
 
         return channelRepository.save(
                 Channel.builder()
