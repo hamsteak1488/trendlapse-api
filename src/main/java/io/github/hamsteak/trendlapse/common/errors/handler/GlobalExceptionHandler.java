@@ -3,6 +3,7 @@ package io.github.hamsteak.trendlapse.common.errors.handler;
 import io.github.hamsteak.trendlapse.common.errors.errorcode.CommonErrorCode;
 import io.github.hamsteak.trendlapse.common.errors.errorcode.ErrorCode;
 import io.github.hamsteak.trendlapse.common.errors.exception.RestApiException;
+import io.github.hamsteak.trendlapse.common.errors.exception.YoutubeDataNotFoundException;
 import io.github.hamsteak.trendlapse.common.errors.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -22,17 +23,23 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(RestApiException.class)
-    public ResponseEntity<Object> handleRestApiException(final RestApiException e) {
+    @ExceptionHandler(YoutubeDataNotFoundException.class)
+    public ResponseEntity<Object> handleYoutubeDataNotFoundException(YoutubeDataNotFoundException e) {
         log.warn("RestApiException occurred: {}", e.getMessage(), e);
-        final ErrorCode errorCode = e.getErrorCode();
+        return handleExceptionInternal(CommonErrorCode.RESOURCE_NOT_FOUND);
+    }
+
+    @ExceptionHandler(RestApiException.class)
+    public ResponseEntity<Object> handleRestApiException(RestApiException e) {
+        log.warn("RestApiException occurred: {}", e.getMessage(), e);
+        ErrorCode errorCode = e.getErrorCode();
         return handleExceptionInternal(errorCode);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgument(final IllegalArgumentException e) {
+    public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException e) {
         log.warn("IllegalArgumentException occurred", e);
-        final ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
+        ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
         return handleExceptionInternal(errorCode, e.getMessage());
     }
 
@@ -49,43 +56,43 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<Object> handleAllException(final Exception ex) {
+    public ResponseEntity<Object> handleAllException(Exception ex) {
         log.warn("Exception occurred", ex);
-        final ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
+        ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
         return handleExceptionInternal(errorCode);
     }
 
-    private ResponseEntity<Object> handleExceptionInternal(final ErrorCode errorCode) {
+    private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(makeErrorResponse(errorCode));
     }
 
-    private ErrorResponse makeErrorResponse(final ErrorCode errorCode) {
+    private ErrorResponse makeErrorResponse(ErrorCode errorCode) {
         return ErrorResponse.builder()
                 .code(errorCode.name())
                 .message(errorCode.getMessage())
                 .build();
     }
 
-    private ResponseEntity<Object> handleExceptionInternal(final ErrorCode errorCode, final String message) {
+    private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode, String message) {
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(makeErrorResponse(errorCode, message));
     }
 
-    private ErrorResponse makeErrorResponse(final ErrorCode errorCode, final String message) {
+    private ErrorResponse makeErrorResponse(ErrorCode errorCode, String message) {
         return ErrorResponse.builder()
                 .code(errorCode.name())
                 .message(message)
                 .build();
     }
 
-    private ResponseEntity<Object> handleExceptionInternal(final BindException e, final ErrorCode errorCode) {
+    private ResponseEntity<Object> handleExceptionInternal(BindException e, ErrorCode errorCode) {
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(makeErrorResponse(e, errorCode));
     }
 
     private ErrorResponse makeErrorResponse(BindException e, ErrorCode errorCode) {
-        final List<ErrorResponse.ValidationError> validationErrorList = e.getBindingResult()
+        List<ErrorResponse.ValidationError> validationErrorList = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(ErrorResponse.ValidationError::of)

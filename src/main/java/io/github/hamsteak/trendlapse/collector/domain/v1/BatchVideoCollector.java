@@ -1,8 +1,6 @@
 package io.github.hamsteak.trendlapse.collector.domain.v1;
 
 import io.github.hamsteak.trendlapse.channel.domain.ChannelReader;
-import io.github.hamsteak.trendlapse.common.errors.errorcode.CommonErrorCode;
-import io.github.hamsteak.trendlapse.common.errors.exception.RestApiException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
@@ -65,10 +63,6 @@ public class BatchVideoCollector {
 
         responses.forEach(videoResponse -> {
             long channelId = channelReader.readByYoutubeId(videoResponse.getSnippet().getChannelId()).getId();
-
-            if (videoResponse.getSnippet().getThumbnails().getHigh() == null) {
-                throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to fetch thumbnail of video(id:" + videoResponse.getId() + ")");
-            }
 
             videoCreator.create(
                     videoResponse.getId(),

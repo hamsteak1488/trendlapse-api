@@ -1,8 +1,7 @@
 package io.github.hamsteak.trendlapse.channel.domain;
 
 import io.github.hamsteak.trendlapse.channel.infrastructure.ChannelRepository;
-import io.github.hamsteak.trendlapse.common.errors.errorcode.CommonErrorCode;
-import io.github.hamsteak.trendlapse.common.errors.exception.RestApiException;
+import io.github.hamsteak.trendlapse.common.errors.exception.ChannelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +16,13 @@ public class ChannelReader {
     @Transactional(readOnly = true)
     public Channel read(long channelId) {
         return channelRepository.findById(channelId)
-                .orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND, "Cannot find channel (id:" + channelId + ")"));
+                .orElseThrow(() -> new ChannelNotFoundException("Cannot find channel (id:" + channelId + ")"));
     }
 
     @Transactional(readOnly = true)
     public Channel readByYoutubeId(String youtubeId) {
         return channelRepository.findByYoutubeId(youtubeId)
-                .orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND, "Cannot find channel (youtubeId:" + youtubeId + ")"));
+                .orElseThrow(() -> new ChannelNotFoundException("Cannot find channel (youtubeId:" + youtubeId + ")"));
     }
 
     @Transactional(readOnly = true)

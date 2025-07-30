@@ -1,7 +1,5 @@
 package io.github.hamsteak.trendlapse.external.youtube.infrastructure;
 
-import io.github.hamsteak.trendlapse.common.errors.errorcode.CommonErrorCode;
-import io.github.hamsteak.trendlapse.common.errors.exception.RestApiException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.*;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
@@ -119,7 +117,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         TrendingListResponse response = restTemplate.getForObject(requestUri, TrendingListResponse.class);
 
         if (response == null) {
-            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get trendings");
+            throw new RuntimeException("Failed to get trendings");
         }
 
         return response;

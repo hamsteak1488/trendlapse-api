@@ -12,10 +12,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -24,11 +25,20 @@ class RestTemplateYoutubeDataApiCallerTest {
     @Mock
     private RestTemplate restTemplate;
 
-    private RestTemplateYoutubeDataApiCaller caller;
+    private RestTemplateYoutubeDataApiCaller apiCaller;
 
     @BeforeEach
     void setup() {
-        caller = new RestTemplateYoutubeDataApiCaller(new YoutubeDataApiProperties("https://www.googleapis.com/youtube/v3", "fake-api-key", 50), restTemplate);
+        apiCaller = new RestTemplateYoutubeDataApiCaller(
+                new YoutubeDataApiProperties(
+                        "https://www.googleapis.com/youtube/v3",
+                        "fake-api-key",
+                        50,
+                        false,
+                        0
+                ),
+                restTemplate
+        );
     }
 
     @Test
@@ -49,15 +59,21 @@ class RestTemplateYoutubeDataApiCallerTest {
         String channelTitle = "test-channel-title";
         ChannelResponse mockResponse = new ChannelResponse(
                 channelId,
-                new ChannelResponse.Snippet(channelTitle, new ChannelResponse.Snippet.Thumbnails(new ChannelResponse.Snippet.Thumbnails.Thumbnail("test-thumbnail-url")))
+                new ChannelResponse.Snippet(
+                        channelTitle,
+                        new ChannelResponse.Snippet.Thumbnails(
+                                new ChannelResponse.Snippet.Thumbnails.Thumbnail("test-thumbnail-url")
+                        )
+                )
         );
-        ChannelListResponse mockListResponse = new ChannelListResponse(List.of(mockResponse), "test-page-token");
+        ChannelListResponse mockListResponse = new ChannelListResponse(List.of(mockResponse));
 
-        when(restTemplate.getForObject(anyString(), eq(ChannelListResponse.class)))
+//        when(restTemplate.getForObject(any(), any())).thenReturn(mockListResponse);
+        when(restTemplate.getForObject(any(URI.class), eq(ChannelListResponse.class)))
                 .thenReturn(mockListResponse);
 
         // When
-        ChannelResponse result = caller.fetchChannel(channelId);
+        ChannelResponse result = apiCaller.fetchChannel(channelId);
 
         // Then
         assertThat(result).isNotNull();

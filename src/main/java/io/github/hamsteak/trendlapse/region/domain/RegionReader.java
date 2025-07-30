@@ -1,7 +1,6 @@
 package io.github.hamsteak.trendlapse.region.domain;
 
-import io.github.hamsteak.trendlapse.common.errors.errorcode.CommonErrorCode;
-import io.github.hamsteak.trendlapse.common.errors.exception.RestApiException;
+import io.github.hamsteak.trendlapse.common.errors.exception.RegionNotFoundException;
 import io.github.hamsteak.trendlapse.region.infrastructure.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,7 @@ public class RegionReader {
     @Transactional(readOnly = true)
     public Region read(long regionId) {
         return regionRepository.findById(regionId)
-                .orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND, "Cannot find region (id:" + regionId + ")"));
+                .orElseThrow(() -> new RegionNotFoundException("Cannot find region (id:" + regionId + ")"));
     }
 
     @Transactional(readOnly = true)
