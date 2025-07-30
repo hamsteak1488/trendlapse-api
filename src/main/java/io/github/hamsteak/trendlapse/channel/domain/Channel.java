@@ -22,7 +22,6 @@ public class Channel {
     @NotNull
     private String title;
 
-    @Column
-    @NotNull
+    @Column(nullable = true)
     private String thumbnailUrl;
 }

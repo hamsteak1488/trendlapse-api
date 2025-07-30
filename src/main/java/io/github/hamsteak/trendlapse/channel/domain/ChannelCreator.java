@@ -2,9 +2,11 @@ package io.github.hamsteak.trendlapse.channel.domain;
 
 import io.github.hamsteak.trendlapse.channel.infrastructure.ChannelRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ChannelCreator {
@@ -12,6 +14,8 @@ public class ChannelCreator {
 
     @Transactional
     public Channel create(String youtubeId, String title, String thumbnailUrl) {
+        log.warn("Video thumbnail url is null. (youtubeId={})", youtubeId);
+
         return channelRepository.save(
                 Channel.builder()
                         .youtubeId(youtubeId)

@@ -4,9 +4,11 @@ import io.github.hamsteak.trendlapse.channel.domain.Channel;
 import io.github.hamsteak.trendlapse.channel.domain.ChannelReader;
 import io.github.hamsteak.trendlapse.video.infrastructure.VideoRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class VideoCreator {
@@ -16,6 +18,10 @@ public class VideoCreator {
     @Transactional
     public Video create(String youtubeId, long channelId, String title, String thumbnailUrl) {
         Channel channel = channelReader.read(channelId);
+
+        if (thumbnailUrl == null) {
+            log.warn("Video thumbnail url is null. (youtubeId={})", youtubeId);
+        }
 
         return videoRepository.save(
                 Video.builder()
