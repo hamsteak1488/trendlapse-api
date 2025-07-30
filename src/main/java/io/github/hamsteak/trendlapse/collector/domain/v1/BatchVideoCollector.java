@@ -11,12 +11,14 @@ import io.github.hamsteak.trendlapse.video.domain.Video;
 import io.github.hamsteak.trendlapse.video.domain.VideoCreator;
 import io.github.hamsteak.trendlapse.video.domain.VideoReader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BatchVideoCollector {
@@ -37,6 +39,7 @@ public class BatchVideoCollector {
                 .filter(Predicate.not(existingVideoYoutubeIds::contains))
                 .toList();
 
+        // DB에 이미 Video 데이터가 모두 존재하는 경우.
         if (fetchVideoYoutubeIds.isEmpty()) {
             return;
         }

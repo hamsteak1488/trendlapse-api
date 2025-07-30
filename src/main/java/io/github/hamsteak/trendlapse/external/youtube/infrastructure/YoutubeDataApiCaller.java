@@ -14,4 +14,6 @@ public interface YoutubeDataApiCaller {
     VideoListResponse fetchVideos(List<String> videoYoutubeId);
 
     TrendingListResponse fetchTrendings(int count, String regionCode, String pageToken);
+
+    RegionListResponse fetchRegions();
 }

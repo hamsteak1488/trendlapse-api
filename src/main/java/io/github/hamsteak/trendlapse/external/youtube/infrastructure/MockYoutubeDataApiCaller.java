@@ -86,6 +86,12 @@ public class MockYoutubeDataApiCaller implements YoutubeDataApiCaller {
         );
     }
 
+    @Override
+    public RegionListResponse fetchRegions() {
+        // TODO: Mock Region Fetch 구현 필요
+        return null;
+    }
+
     private void putRegionMockDataIfAbsent(String regionCode) {
         if (regionVisitSet.contains(regionCode)) {
             return;

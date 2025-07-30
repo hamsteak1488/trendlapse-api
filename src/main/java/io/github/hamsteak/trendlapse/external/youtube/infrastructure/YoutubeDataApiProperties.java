@@ -12,4 +12,5 @@ public class YoutubeDataApiProperties {
     private final String apiKey;
     private final int maxFetchCount;
     private final boolean useLog;
+    private final int maxRetryCount;
 }

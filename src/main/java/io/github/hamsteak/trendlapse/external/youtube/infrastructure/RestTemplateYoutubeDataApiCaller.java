@@ -35,7 +35,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         ChannelListResponse response = restTemplate.getForObject(requestUri, ChannelListResponse.class);
 
         if (response == null) {
-            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get channel");
+            throw new RuntimeException("Response object is null.");
         }
 
         return response.getItems().get(0);
@@ -55,7 +55,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         ChannelListResponse response = restTemplate.getForObject(requestUri, ChannelListResponse.class);
 
         if (response == null) {
-            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get channel");
+            throw new RuntimeException("Response object is null.");
         }
 
         return response;
@@ -75,7 +75,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         VideoListResponse response = restTemplate.getForObject(requestUri, VideoListResponse.class);
 
         if (response == null) {
-            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get video");
+            throw new RuntimeException("Response object is null.");
         }
 
         return response.getItems().get(0);
@@ -95,7 +95,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         VideoListResponse response = restTemplate.getForObject(requestUri, VideoListResponse.class);
 
         if (response == null) {
-            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get video");
+            throw new RuntimeException("Response object is null.");
         }
 
         return response;
@@ -120,6 +120,25 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
 
         if (response == null) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR, "Failed to get trendings");
+        }
+
+        return response;
+    }
+
+    @Override
+    public RegionListResponse fetchRegions() {
+        String part = "snippet";
+
+        URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
+                .path("/i18nRegions")
+                .queryParam("key", youtubeDataApiProperties.getApiKey())
+                .queryParam("part", part)
+                .build().toUri();
+
+        RegionListResponse response = restTemplate.getForObject(requestUri, RegionListResponse.class);
+
+        if (response == null) {
+            throw new RuntimeException("Response object is null.");
         }
 
         return response;

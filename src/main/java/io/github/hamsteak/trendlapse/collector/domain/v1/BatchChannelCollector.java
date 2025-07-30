@@ -34,6 +34,7 @@ public class BatchChannelCollector {
                 .filter(Predicate.not(existingChannelYoutubeIds::contains))
                 .toList();
 
+        // DB에 이미 Channel 데이터가 모두 존재하는 경우.
         if (fetchChannelYoutubeIds.isEmpty()) {
             return;
         }
@@ -56,7 +57,5 @@ public class BatchChannelCollector {
                         channelResponse.getSnippet().getThumbnails().getHigh().getUrl()
                 )
         );
-
-        log.info("end BatchChannelCollector.collect");
     }
 }

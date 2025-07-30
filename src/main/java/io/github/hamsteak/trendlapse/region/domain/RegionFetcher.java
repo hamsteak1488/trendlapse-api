@@ -1,18 +1,18 @@
 package io.github.hamsteak.trendlapse.region.domain;
 
 import io.github.hamsteak.trendlapse.external.youtube.dto.RegionListResponse;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.RegionApiCaller;
+import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class RegionFetcher {
-    private final RegionApiCaller regionApiCaller;
+    private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final RegionPutter regionPutter;
 
     public void fetch() {
-        RegionListResponse response = regionApiCaller.fetchRegions();
+        RegionListResponse response = youtubeDataApiCaller.fetchRegions();
 
         response.getItems()
                 .forEach(item ->
