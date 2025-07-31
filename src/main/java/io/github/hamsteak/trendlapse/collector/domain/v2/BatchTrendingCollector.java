@@ -23,7 +23,7 @@ import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
-public class BatchQueueTrendingCollector implements TrendingCollector {
+public class BatchTrendingCollector implements TrendingCollector {
     private final RegionReader regionReader;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final YoutubeDataApiProperties youtubeDataApiProperties;

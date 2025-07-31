@@ -13,7 +13,7 @@ public class CollectorConfig {
     @Bean
     public TrendingCollectScheduler trendingCollectScheduler(
             RegionReader regionReader,
-            @Qualifier("batchQueueTrendingCollector") TrendingCollector trendingCollector,
+            @Qualifier("batchTrendingCollector") TrendingCollector trendingCollector,
             CollectSchedulerProperties collectSchedulerProperties
     ) {
         return new TrendingCollectScheduler(regionReader, trendingCollector, collectSchedulerProperties);
