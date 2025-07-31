@@ -39,14 +39,14 @@ management:
         include: "*"
 
 youtube-data-api:
+  base-url: https://www.googleapis.com/youtube/v3
   max-fetch-count: 50
   use-log: true
   max-retry-count: 5
 
 collect-scheduler:
   collect-count: 100
-  #  collect-interval: 900000 # 15m
-  collect-interval: 60000 # 1m
+  collect-interval: 900000 # 15m
   initial-delay: 5000
   use-log: true
 
@@ -57,3 +57,16 @@ collector:
 #  level:
 #    org.hibernate.SQL: debug
 #    org.hibernate.orm.jdbc.bind: trace
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: fake-api
+
+collect-scheduler:
+  collect-interval: 30000 # 1m
+
+youtube-data-api:
+  base-url: http://localhost:8085/youtube/v3

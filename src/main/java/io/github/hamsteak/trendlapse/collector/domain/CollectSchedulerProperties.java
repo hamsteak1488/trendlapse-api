@@ -15,7 +15,7 @@ public class CollectSchedulerProperties {
     @Range(min = 0, max = 200)
     private final int collectCount;
 
-    @Min(60 * 1000)
+    @Min(30 * 1000)
     private final int collectInterval;
 
     private final boolean useLog;
