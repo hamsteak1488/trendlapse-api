@@ -1,5 +1,6 @@
 package io.github.hamsteak.trendlapse.external.youtube.infrastructure;
 
+import io.github.hamsteak.trendlapse.common.errors.exception.YoutubeNullResponseException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.*;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @Primary
 @Timed("youtube.api.call")
-@Retryable(maxAttempts = 5, retryFor = RestClientException.class)
+@Retryable(maxAttempts = 20, retryFor = {RestClientException.class, YoutubeNullResponseException.class}, listeners = "retryWarnLogger")
 @Component
 @RequiredArgsConstructor
 public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
@@ -36,7 +37,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         ChannelListResponse response = restTemplate.getForObject(requestUri, ChannelListResponse.class);
 
         if (response == null) {
-            throw new RuntimeException("Response object is null.");
+            throw new YoutubeNullResponseException("Response result of fetching channel is null.");
         }
 
         return response.getItems().get(0);
@@ -56,7 +57,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         ChannelListResponse response = restTemplate.getForObject(requestUri, ChannelListResponse.class);
 
         if (response == null) {
-            throw new RuntimeException("Response object is null.");
+            throw new YoutubeNullResponseException("Response result of fetching channels is null.");
         }
 
         return response;
@@ -76,7 +77,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         VideoListResponse response = restTemplate.getForObject(requestUri, VideoListResponse.class);
 
         if (response == null) {
-            throw new RuntimeException("Response object is null.");
+            throw new YoutubeNullResponseException("Response result of fetching video is null.");
         }
 
         return response.getItems().get(0);
@@ -96,7 +97,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         VideoListResponse response = restTemplate.getForObject(requestUri, VideoListResponse.class);
 
         if (response == null) {
-            throw new RuntimeException("Response object is null.");
+            throw new YoutubeNullResponseException("Response result of fetching videos is null.");
         }
 
         return response;
@@ -120,7 +121,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         TrendingListResponse response = restTemplate.getForObject(requestUri, TrendingListResponse.class);
 
         if (response == null) {
-            throw new RuntimeException("Failed to get trendings");
+            throw new YoutubeNullResponseException("Response result of fetching trendings is null.");
         }
 
         return response;
@@ -139,7 +140,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         RegionListResponse response = restTemplate.getForObject(requestUri, RegionListResponse.class);
 
         if (response == null) {
-            throw new RuntimeException("Response object is null.");
+            throw new YoutubeNullResponseException("Response result of fetching regions is null.");
         }
 
         return response;
