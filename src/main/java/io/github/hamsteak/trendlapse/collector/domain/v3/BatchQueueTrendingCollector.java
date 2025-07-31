@@ -1,39 +1,32 @@
-package io.github.hamsteak.trendlapse.collector.domain.v2;
+package io.github.hamsteak.trendlapse.collector.domain.v3;
 
 import io.github.hamsteak.trendlapse.collector.domain.TrendingCollector;
-import io.github.hamsteak.trendlapse.collector.domain.v1.BatchVideoCollector;
 import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import io.github.hamsteak.trendlapse.region.domain.RegionReader;
 import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
-import io.github.hamsteak.trendlapse.video.domain.VideoReader;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class BatchTrendingCollector implements TrendingCollector {
+public class BatchQueueTrendingCollector implements TrendingCollector {
     private final RegionReader regionReader;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final YoutubeDataApiProperties youtubeDataApiProperties;
-    private final BatchVideoCollector batchVideoCollector;
+    private final VideoUncollectedTrendingQueue videoUncollectedTrendingQueue;
+    private final BatchQueueVideoCollector batchQueueVideoCollector;
+    private final VideoCollectedTrendingQueue videoCollectedTrendingQueue;
     private final TrendingCreator trendingCreator;
-    private final VideoReader videoReader;
-
-    @Value(value = "${only-korea-region:false}")
-    private boolean onlyKoreaRegion;
 
     @Override
     public void collect(LocalDateTime dateTime, int collectCount, List<Long> regionIds) {
-        Map<Long, List<String>> videoYoutubeIds = new HashMap<>();
-
         regionReader.read(regionIds)
                 .forEach(region -> {
                     List<String> regionVideoYoutubeIds = new ArrayList<>();
@@ -56,21 +49,18 @@ public class BatchTrendingCollector implements TrendingCollector {
                         pageToken = trendingListResponse.getNextPageToken();
                     }
 
-                    videoYoutubeIds.put(region.getId(), regionVideoYoutubeIds);
+                    for (int i = 0; i < regionVideoYoutubeIds.size(); i++) {
+                        int rank = i + 1;
+                        String videoYoutubeId = regionVideoYoutubeIds.get(i);
+                        videoUncollectedTrendingQueue.add(region.getId(), rank, videoYoutubeId);
+                    }
                 });
 
-        batchVideoCollector.collect(
-                videoYoutubeIds.values().stream()
-                        .flatMap(Collection::stream).toList()
-        );
+        batchQueueVideoCollector.collect();
 
-        videoYoutubeIds.forEach(
-                (regionId, regionVideoYoutubeIds) -> IntStream.range(0, regionVideoYoutubeIds.size())
-                        .forEach(i -> {
-                            long videoId = videoReader.readByYoutubeId(regionVideoYoutubeIds.get(i)).getId();
-                            trendingCreator.create(dateTime, videoId, i + 1, regionId);
-                        })
-        );
-
+        while (!videoCollectedTrendingQueue.isEmpty()) {
+            VideoCollectedTrendingQueue.RegionTrendingItem collectedItem = videoCollectedTrendingQueue.poll();
+            trendingCreator.create(dateTime, collectedItem.getVideoId(), collectedItem.getRank(), collectedItem.getRegionId());
+        }
     }
 }
