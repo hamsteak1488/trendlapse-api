@@ -26,7 +26,7 @@ public class TrendingCreator {
         trendingRepository.save(Trending.builder()
                 .dateTime(dateTime)
                 .video(video)
-                .rank(rank)
+                .rankValue(rank)
                 .region(region)
                 .build());
     }

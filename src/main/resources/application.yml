@@ -6,7 +6,7 @@ spring:
     name: "trendlapse"
 
   datasource:
-    driver-class-name: org.h2.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     #    show-sql: true

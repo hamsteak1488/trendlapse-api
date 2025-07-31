@@ -29,7 +29,7 @@ public class Trending {
 
     @Column
     @NotNull
-    private Integer rank;
+    private Integer rankValue;
 
     @ManyToOne
     @JoinColumn(name = "region_id")

@@ -29,7 +29,7 @@ public class TrendingDetailReader {
 
         return TrendingDetail.builder()
                 .dateTime(trending.getDateTime())
-                .rank(trending.getRank())
+                .rank(trending.getRankValue())
                 .videoDetail(videoDetail)
                 .channelDetail(channelDetail)
                 .build();
