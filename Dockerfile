@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-alpine
+FROM eclipse-temurin:17-jre-alpine-3.20
 LABEL authors="hamsteak"
 
 WORKDIR /app
