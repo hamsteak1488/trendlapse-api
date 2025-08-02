@@ -7,13 +7,4 @@ services:
       - "{PORT}:8080"
     environment:
       - TZ=Asia/Seoul
-    networks:
-      - default_network
-
-networks:
-  default_network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.24.0.0/16
-          gateway: 172.24.0.1
+    network_mode: bridge
