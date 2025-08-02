@@ -1,6 +1,7 @@
 services:
   trendlapse-api-{COLOR}:
     image: trendlapse:latest
+    container_name: trendlapse-container-{COLOR}
     ports:
       - "{PORT}:8080"
     environment:
