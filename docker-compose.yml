@@ -6,4 +6,6 @@ services:
       - "{PORT}:8080"
     environment:
       - TZ=Asia/Seoul
+    env_file:
+      - .env.runtime
     network_mode: bridge
