@@ -33,7 +33,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: prometheus, health
 
 youtube-data-api:
   base-url: https://www.googleapis.com/youtube/v3
