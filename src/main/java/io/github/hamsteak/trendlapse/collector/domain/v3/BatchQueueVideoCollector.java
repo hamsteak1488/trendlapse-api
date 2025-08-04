@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @ConditionalOnBean(BatchQueueTrendingCollector.class)
 @Component
@@ -25,12 +25,26 @@ public class BatchQueueVideoCollector {
         int availableVideoChannelToken = 10000;
 
         while (availableVideoChannelToken > 0 && !videoUncollectedTrendingQueue.isEmpty()) {
-            int videoChannelFetchCount = Math.min(youtubeDataApiProperties.getMaxFetchCount(),
-                    Math.min(availableVideoChannelToken / 2, videoUncollectedTrendingQueue.size()));
+            int videoChannelFetchCount = Math.min(youtubeDataApiProperties.getMaxFetchCount(), availableVideoChannelToken / 2);
 
-            List<VideoUncollectedTrendingQueue.RegionTrendingItem> frontRegionTrendingItems = IntStream.range(0, videoChannelFetchCount)
-                    .mapToObj(i -> videoUncollectedTrendingQueue.poll())
-                    .toList();
+            List<VideoUncollectedTrendingQueue.RegionTrendingItem> frontRegionTrendingItems = new ArrayList<>();
+            while (!videoUncollectedTrendingQueue.isEmpty() && frontRegionTrendingItems.size() < videoChannelFetchCount) {
+                List<VideoUncollectedTrendingQueue.RegionTrendingItem> regionTrendingItems = new ArrayList<>();
+
+                for (int i = 0; i < videoChannelFetchCount - frontRegionTrendingItems.size(); i++) {
+                    regionTrendingItems.add(videoUncollectedTrendingQueue.poll());
+                }
+
+                List<String> videoYoutubeIds = regionTrendingItems.stream()
+                        .map(VideoUncollectedTrendingQueue.RegionTrendingItem::getVideoYoutubeId)
+                        .toList();
+
+                List<String> existingVideoYoutubeIds = videoReader.readByYoutubeIds(videoYoutubeIds).stream().map(Video::getYoutubeId).toList();
+
+                frontRegionTrendingItems.addAll(regionTrendingItems.stream()
+                        .filter(regionTrendingItem -> !existingVideoYoutubeIds.contains(regionTrendingItem.getVideoYoutubeId()))
+                        .toList());
+            }
 
             List<String> videoYoutubeIds = frontRegionTrendingItems.stream()
                     .map(VideoUncollectedTrendingQueue.RegionTrendingItem::getVideoYoutubeId)
