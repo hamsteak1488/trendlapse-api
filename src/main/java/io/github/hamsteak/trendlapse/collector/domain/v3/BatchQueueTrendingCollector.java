@@ -7,6 +7,7 @@ import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeData
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import io.github.hamsteak.trendlapse.region.domain.RegionReader;
 import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
+import io.github.hamsteak.trendlapse.video.domain.VideoReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,7 @@ public class BatchQueueTrendingCollector implements TrendingCollector {
     private final BatchQueueVideoCollector batchQueueVideoCollector;
     private final VideoCollectedTrendingQueue videoCollectedTrendingQueue;
     private final TrendingCreator trendingCreator;
+    private final VideoReader videoReader;
 
     @Override
     public void collect(LocalDateTime dateTime, int collectCount, List<Long> regionIds) {
@@ -59,8 +61,10 @@ public class BatchQueueTrendingCollector implements TrendingCollector {
         batchQueueVideoCollector.collect();
 
         while (!videoCollectedTrendingQueue.isEmpty()) {
-            VideoCollectedTrendingQueue.RegionTrendingItem collectedItem = videoCollectedTrendingQueue.poll();
-            trendingCreator.create(dateTime, collectedItem.getVideoId(), collectedItem.getRank(), collectedItem.getRegionId());
+            RegionTrendingItem collectedItem = videoCollectedTrendingQueue.poll();
+            long videoId = videoReader.readByYoutubeId(collectedItem.getVideoYoutubeId()).getId();
+
+            trendingCreator.create(dateTime, videoId, collectedItem.getRank(), collectedItem.getRegionId());
         }
     }
 }

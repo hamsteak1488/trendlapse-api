@@ -27,43 +27,36 @@ public class BatchQueueVideoCollector {
         while (availableVideoChannelToken > 0 && !videoUncollectedTrendingQueue.isEmpty()) {
             int videoChannelFetchCount = Math.min(youtubeDataApiProperties.getMaxFetchCount(), availableVideoChannelToken / 2);
 
-            List<VideoUncollectedTrendingQueue.RegionTrendingItem> frontRegionTrendingItems = new ArrayList<>();
+            List<RegionTrendingItem> frontRegionTrendingItems = new ArrayList<>();
             while (!videoUncollectedTrendingQueue.isEmpty() && frontRegionTrendingItems.size() < videoChannelFetchCount) {
-                List<VideoUncollectedTrendingQueue.RegionTrendingItem> regionTrendingItems = new ArrayList<>();
+                List<RegionTrendingItem> regionTrendingItems = new ArrayList<>();
 
                 for (int i = 0; i < videoChannelFetchCount - frontRegionTrendingItems.size(); i++) {
                     regionTrendingItems.add(videoUncollectedTrendingQueue.poll());
                 }
 
                 List<String> videoYoutubeIds = regionTrendingItems.stream()
-                        .map(VideoUncollectedTrendingQueue.RegionTrendingItem::getVideoYoutubeId)
+                        .map(RegionTrendingItem::getVideoYoutubeId)
                         .toList();
 
                 List<String> existingVideoYoutubeIds = videoReader.readByYoutubeIds(videoYoutubeIds).stream().map(Video::getYoutubeId).toList();
 
-                frontRegionTrendingItems.addAll(regionTrendingItems.stream()
-                        .filter(regionTrendingItem -> !existingVideoYoutubeIds.contains(regionTrendingItem.getVideoYoutubeId()))
-                        .toList());
+                regionTrendingItems.forEach(regionTrendingItem -> {
+                    if (existingVideoYoutubeIds.contains(regionTrendingItem.getVideoYoutubeId())) {
+                        videoCollectedTrendingQueue.add(regionTrendingItem);
+                    } else {
+                        frontRegionTrendingItems.add(regionTrendingItem);
+                    }
+                });
             }
 
             List<String> videoYoutubeIds = frontRegionTrendingItems.stream()
-                    .map(VideoUncollectedTrendingQueue.RegionTrendingItem::getVideoYoutubeId)
+                    .map(RegionTrendingItem::getVideoYoutubeId)
                     .toList();
 
             batchVideoCollector.collect(videoYoutubeIds);
 
-            List<Long> videoIds = videoReader.readByYoutubeIds(videoYoutubeIds).stream().map(Video::getId).toList();
-
-            for (int i = 0; i < frontRegionTrendingItems.size(); i++) {
-                VideoUncollectedTrendingQueue.RegionTrendingItem regionTrendingItem = frontRegionTrendingItems.get(i);
-                long videoId = videoIds.get(i);
-
-                videoCollectedTrendingQueue.add(
-                        regionTrendingItem.getRegionId(),
-                        regionTrendingItem.getRank(),
-                        videoId
-                );
-            }
+            frontRegionTrendingItems.forEach(videoCollectedTrendingQueue::add);
         }
     }
 }
