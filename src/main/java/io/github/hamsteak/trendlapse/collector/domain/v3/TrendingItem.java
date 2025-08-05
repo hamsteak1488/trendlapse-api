@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class RegionTrendingItem {
+public class TrendingItem {
     private final long regionId;
     private final int rank;
     private final String videoYoutubeId;

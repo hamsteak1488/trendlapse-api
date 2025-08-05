@@ -63,7 +63,7 @@ spring:
       on-profile: fake-api
 
 collect-scheduler:
-  collect-interval: 30000 # 1m
+  collect-interval: 30000 # 30sec
 
 youtube-data-api:
   base-url: http://localhost:8085/youtube/v3

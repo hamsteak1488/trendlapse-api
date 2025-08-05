@@ -54,14 +54,14 @@ public class BatchQueueTrendingCollector implements TrendingCollector {
                     for (int i = 0; i < regionVideoYoutubeIds.size(); i++) {
                         int rank = i + 1;
                         String videoYoutubeId = regionVideoYoutubeIds.get(i);
-                        videoUncollectedTrendingQueue.add(region.getId(), rank, videoYoutubeId);
+                        videoUncollectedTrendingQueue.add(new TrendingItem(region.getId(), rank, videoYoutubeId));
                     }
                 });
 
         batchQueueVideoCollector.collect();
 
         while (!videoCollectedTrendingQueue.isEmpty()) {
-            RegionTrendingItem collectedItem = videoCollectedTrendingQueue.poll();
+            TrendingItem collectedItem = videoCollectedTrendingQueue.poll();
             long videoId = videoReader.readByYoutubeId(collectedItem.getVideoYoutubeId()).getId();
 
             trendingCreator.create(dateTime, videoId, collectedItem.getRank(), collectedItem.getRegionId());

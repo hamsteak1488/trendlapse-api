@@ -2,14 +2,14 @@ package io.github.hamsteak.trendlapse.collector.domain.v3;
 
 import io.github.hamsteak.trendlapse.collector.domain.v1.BatchVideoCollector;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
-import io.github.hamsteak.trendlapse.video.domain.Video;
-import io.github.hamsteak.trendlapse.video.domain.VideoReader;
+import io.github.hamsteak.trendlapse.video.domain.VideoFinder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @ConditionalOnBean(BatchQueueTrendingCollector.class)
 @Component
@@ -19,44 +19,44 @@ public class BatchQueueVideoCollector {
     private final VideoCollectedTrendingQueue videoCollectedTrendingQueue;
     private final BatchVideoCollector batchVideoCollector;
     private final YoutubeDataApiProperties youtubeDataApiProperties;
-    private final VideoReader videoReader;
+    private final VideoFinder videoFinder;
 
     public void collect() {
         int availableVideoChannelToken = 10000;
 
+        // 제외한 여분 토큰이 있고 미수집 TredingItem이 있을 경우, 반복적으로 수집 작업 진행.
         while (availableVideoChannelToken > 0 && !videoUncollectedTrendingQueue.isEmpty()) {
             int videoChannelFetchCount = Math.min(youtubeDataApiProperties.getMaxFetchCount(), availableVideoChannelToken / 2);
 
-            List<RegionTrendingItem> frontRegionTrendingItems = new ArrayList<>();
-            while (!videoUncollectedTrendingQueue.isEmpty() && frontRegionTrendingItems.size() < videoChannelFetchCount) {
-                List<RegionTrendingItem> regionTrendingItems = new ArrayList<>();
+            List<TrendingItem> trendingItemsToFetches = new ArrayList<>();
 
-                for (int i = 0; i < videoChannelFetchCount - frontRegionTrendingItems.size(); i++) {
-                    regionTrendingItems.add(videoUncollectedTrendingQueue.poll());
-                }
+            // 수집 요청할 목록이 다 채워지지 않았을 경우, 미수집 큐에서 꺼내오기
+            while (!videoUncollectedTrendingQueue.isEmpty() && trendingItemsToFetches.size() < fetchCount) {
+                List<TrendingItem> frontTrendingItems = new ArrayList<>();
 
-                List<String> videoYoutubeIds = regionTrendingItems.stream()
-                        .map(RegionTrendingItem::getVideoYoutubeId)
-                        .toList();
+                IntStream.range(0, fetchCount - trendingItemsToFetches.size())
+                        .forEach(i -> frontTrendingItems.add(videoUncollectedTrendingQueue.poll()));
 
-                List<String> existingVideoYoutubeIds = videoReader.readByYoutubeIds(videoYoutubeIds).stream().map(Video::getYoutubeId).toList();
+                List<String> missingVideoYoutubeIds = videoFinder.findMissingVideoYoutubeIds(
+                        frontTrendingItems.stream()
+                                .map(TrendingItem::getVideoYoutubeId)
+                                .toList());
 
-                regionTrendingItems.forEach(regionTrendingItem -> {
-                    if (existingVideoYoutubeIds.contains(regionTrendingItem.getVideoYoutubeId())) {
-                        videoCollectedTrendingQueue.add(regionTrendingItem);
+                // DB 존재 여부에 따라 'Fetch 목록' 혹은 '수집 완료 Queue'에 추가.
+                frontTrendingItems.forEach(trendingItem -> {
+                    if (missingVideoYoutubeIds.contains(trendingItem.getVideoYoutubeId())) {
+                        trendingItemsToFetches.add(trendingItem);
                     } else {
-                        frontRegionTrendingItems.add(regionTrendingItem);
+                        videoCollectedTrendingQueue.add(trendingItem);
                     }
                 });
             }
 
-            List<String> videoYoutubeIds = frontRegionTrendingItems.stream()
-                    .map(RegionTrendingItem::getVideoYoutubeId)
-                    .toList();
+            batchVideoCollector.collect(trendingItemsToFetches.stream()
+                    .map(TrendingItem::getVideoYoutubeId)
+                    .toList());
 
-            batchVideoCollector.collect(videoYoutubeIds);
-
-            frontRegionTrendingItems.forEach(videoCollectedTrendingQueue::add);
+            trendingItemsToFetches.forEach(videoCollectedTrendingQueue::add);
         }
     }
 }

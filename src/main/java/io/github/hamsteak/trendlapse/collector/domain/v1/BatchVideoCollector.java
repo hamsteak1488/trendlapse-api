@@ -5,16 +5,14 @@ import io.github.hamsteak.trendlapse.external.youtube.dto.VideoListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
-import io.github.hamsteak.trendlapse.video.domain.Video;
 import io.github.hamsteak.trendlapse.video.domain.VideoCreator;
-import io.github.hamsteak.trendlapse.video.domain.VideoReader;
+import io.github.hamsteak.trendlapse.video.domain.VideoFinder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 @Slf4j
 @Component
@@ -22,32 +20,25 @@ import java.util.function.Predicate;
 public class BatchVideoCollector {
     private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final YoutubeDataApiProperties youtubeDataApiProperties;
-    private final VideoReader videoReader;
+    private final VideoFinder videoFinder;
     private final VideoCreator videoCreator;
     private final BatchChannelCollector batchChannelCollector;
     private final ChannelReader channelReader;
 
     public void collect(List<String> videoYoutubeIds) {
-        List<String> existingVideoYoutubeIds = videoReader.readByYoutubeIds(videoYoutubeIds)
-                .stream()
-                .map(Video::getYoutubeId)
-                .toList();
-
-        List<String> fetchVideoYoutubeIds = videoYoutubeIds.stream()
-                .filter(Predicate.not(existingVideoYoutubeIds::contains))
-                .toList();
+        List<String> missingVideoYoutubeIds = videoFinder.findMissingVideoYoutubeIds(videoYoutubeIds);
 
         // DB에 이미 Video 데이터가 모두 존재하는 경우.
-        if (fetchVideoYoutubeIds.isEmpty()) {
+        if (missingVideoYoutubeIds.isEmpty()) {
             return;
         }
 
         List<VideoResponse> responses = new ArrayList<>();
-        int fetchCount = (fetchVideoYoutubeIds.size() - 1) / youtubeDataApiProperties.getMaxFetchCount() + 1;
+        int fetchCount = (missingVideoYoutubeIds.size() - 1) / youtubeDataApiProperties.getMaxFetchCount() + 1;
         for (int i = 0; i < fetchCount; i++) {
             int fromIndex = i * youtubeDataApiProperties.getMaxFetchCount();
-            int toIndex = Math.min((i + 1) * youtubeDataApiProperties.getMaxFetchCount(), fetchVideoYoutubeIds.size());
-            List<String> subFetchVideoYoutubeIds = fetchVideoYoutubeIds.subList(fromIndex, toIndex);
+            int toIndex = Math.min((i + 1) * youtubeDataApiProperties.getMaxFetchCount(), missingVideoYoutubeIds.size());
+            List<String> subFetchVideoYoutubeIds = missingVideoYoutubeIds.subList(fromIndex, toIndex);
 
             VideoListResponse videoListResponse = youtubeDataApiCaller.fetchVideos(subFetchVideoYoutubeIds);
             responses.addAll(videoListResponse.getItems());
