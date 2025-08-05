@@ -28,11 +28,10 @@ public class BatchQueueVideoCollector {
 
         // 제외한 여분 토큰이 있고 미수집 TredingItem이 있을 경우, 반복적으로 수집 작업 진행.
         while (availableVideoChannelToken > 0 && !videoUncollectedTrendingQueue.isEmpty()) {
-            int fetchCount = Math.min(availableVideoChannelToken / 2,
-                    Math.min(youtubeDataApiProperties.getMaxFetchCount(), videoUncollectedTrendingQueue.size()));
+            int fetchCount = Math.min(availableVideoChannelToken / 2, youtubeDataApiProperties.getMaxFetchCount());
 
-            log.debug("fetchCount={} (Minimum value among token=({}), maxFetchCount({}), uncollectedQueueSize({}))",
-                    fetchCount, availableVideoChannelToken, youtubeDataApiProperties.getMaxFetchCount(), videoUncollectedTrendingQueue.size());
+            log.debug("fetchCount={} (Minimum value among token / 2=({}), maxFetchCount({}))",
+                    fetchCount, availableVideoChannelToken / 2, youtubeDataApiProperties.getMaxFetchCount());
 
             List<TrendingItem> trendingItemsToFetches = new ArrayList<>();
 
@@ -40,10 +39,11 @@ public class BatchQueueVideoCollector {
             while (!videoUncollectedTrendingQueue.isEmpty() && trendingItemsToFetches.size() < fetchCount) {
                 List<TrendingItem> frontTrendingItems = new ArrayList<>();
 
-                log.debug("There will be {} poll tasks (fetchCount({}) - trendingItemsToFetches.size({}))",
-                        fetchCount - trendingItemsToFetches.size(), fetchCount, trendingItemsToFetches.size());
+                int pollCount = Math.min(videoUncollectedTrendingQueue.size(), fetchCount - trendingItemsToFetches.size());
+                log.debug("There will be {} poll tasks. (Minimum value among videoUncollectedTrendingQueue.size({}), fetchCount({}) - trendingItemsToFetches.size({}))",
+                        pollCount, videoUncollectedTrendingQueue.size(), fetchCount, trendingItemsToFetches.size());
 
-                IntStream.range(0, fetchCount - trendingItemsToFetches.size())
+                IntStream.range(0, pollCount)
                         .forEach(i -> frontTrendingItems.add(videoUncollectedTrendingQueue.poll()));
 
                 List<String> missingVideoYoutubeIds = videoFinder.findMissingVideoYoutubeIds(
