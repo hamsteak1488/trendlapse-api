@@ -4,6 +4,7 @@ import io.github.hamsteak.trendlapse.collector.domain.v1.BatchVideoCollector;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import io.github.hamsteak.trendlapse.video.domain.VideoFinder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+@Slf4j
 @ConditionalOnBean(BatchQueueTrendingCollector.class)
 @Component
 @RequiredArgsConstructor
@@ -29,11 +31,17 @@ public class BatchQueueVideoCollector {
             int fetchCount = Math.min(availableVideoChannelToken / 2,
                     Math.min(youtubeDataApiProperties.getMaxFetchCount(), videoUncollectedTrendingQueue.size()));
 
+            log.debug("fetchCount={} (Minimum value among token=({}), maxFetchCount({}), uncollectedQueueSize({}))",
+                    fetchCount, availableVideoChannelToken, youtubeDataApiProperties.getMaxFetchCount(), videoUncollectedTrendingQueue.size());
+
             List<TrendingItem> trendingItemsToFetches = new ArrayList<>();
 
             // 수집 요청할 목록이 다 채워지지 않았을 경우, 미수집 큐에서 꺼내오기
             while (!videoUncollectedTrendingQueue.isEmpty() && trendingItemsToFetches.size() < fetchCount) {
                 List<TrendingItem> frontTrendingItems = new ArrayList<>();
+
+                log.debug("There will be {} poll tasks (fetchCount({}) - trendingItemsToFetches.size({}))",
+                        fetchCount - trendingItemsToFetches.size(), fetchCount, trendingItemsToFetches.size());
 
                 IntStream.range(0, fetchCount - trendingItemsToFetches.size())
                         .forEach(i -> frontTrendingItems.add(videoUncollectedTrendingQueue.poll()));
