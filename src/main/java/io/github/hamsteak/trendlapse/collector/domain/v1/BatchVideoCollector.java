@@ -33,6 +33,13 @@ public class BatchVideoCollector {
             return;
         }
 
+        List<String> distinctMissingVideoYoutubeIds = missingVideoYoutubeIds.stream().distinct().toList();
+
+        if (distinctMissingVideoYoutubeIds.size() != missingVideoYoutubeIds.size()) {
+            log.warn("There are two or more identical YoutubeIds in the collection request list. {}", missingVideoYoutubeIds);
+            missingVideoYoutubeIds = distinctMissingVideoYoutubeIds;
+        }
+
         List<VideoResponse> responses = new ArrayList<>();
         int fetchCount = (missingVideoYoutubeIds.size() - 1) / youtubeDataApiProperties.getMaxFetchCount() + 1;
         for (int i = 0; i < fetchCount; i++) {
