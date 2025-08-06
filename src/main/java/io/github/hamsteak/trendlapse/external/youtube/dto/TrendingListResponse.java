@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+/**
+ * nextPageToken: Trending page offset 역할.
+ */
 @Getter
 @RequiredArgsConstructor
 public class TrendingListResponse {

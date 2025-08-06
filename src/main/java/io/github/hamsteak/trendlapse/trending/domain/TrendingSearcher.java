@@ -21,7 +21,7 @@ public class TrendingSearcher {
 
     @Transactional(readOnly = true)
     public List<DateTimeTrendingDetailList> search(TrendingSearchFilter filter) {
-        return trendingRepository.findByDateTimeBetween(filter.getStartDateTime(), filter.getEndDateTime()).stream()
+        return trendingRepository.findByRegionAndDateTime(filter.getRegionCode(), filter.getStartDateTime(), filter.getEndDateTime()).stream()
                 .map(Trending::getId)
                 .map(trendingDetailReader::read)
                 .collect(Collectors.groupingBy(TrendingDetail::getDateTime, LinkedHashMap::new, Collectors.toList()))

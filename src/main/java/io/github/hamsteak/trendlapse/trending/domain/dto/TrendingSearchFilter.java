@@ -1,9 +1,6 @@
 package io.github.hamsteak.trendlapse.trending.domain.dto;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +8,12 @@ import java.time.LocalDateTime;
 @Builder
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class TrendingSearchFilter {
+    @NonNull
+    private final String regionCode;
+
+    @NonNull
     private final LocalDateTime startDateTime;
+
+    @NonNull
     private final LocalDateTime endDateTime;
 }

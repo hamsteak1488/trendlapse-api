@@ -1,6 +1,7 @@
 package io.github.hamsteak.trendlapse.trending.infrastructure;
 
 import io.github.hamsteak.trendlapse.trending.domain.Trending;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
 import java.time.LocalDateTime;
@@ -14,5 +15,6 @@ public interface TrendingRepository extends Repository<Trending, Long> {
 
     List<Trending> findByDateTime(LocalDateTime dateTime);
 
-    List<Trending> findByDateTimeBetween(LocalDateTime startDateTime, LocalDateTime endDateTime);
+    @Query("select t from Trending t where t.region.regionCode = :regionCode and t.dateTime between :startDateTime and :endDateTime")
+    List<Trending> findByRegionAndDateTime(String regionCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
 }
