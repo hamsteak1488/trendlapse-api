@@ -28,10 +28,10 @@ public class BatchQueueVideoCollector {
 
         // 제외한 여분 토큰이 있고 미수집 TredingItem이 있을 경우, 반복적으로 수집 작업 진행.
         while (availableVideoChannelToken > 0 && !videoUncollectedTrendingQueue.isEmpty()) {
-            int fetchCount = Math.min(availableVideoChannelToken / 2, youtubeDataApiProperties.getMaxFetchCount());
+            int fetchCount = Math.min(availableVideoChannelToken / 2, youtubeDataApiProperties.getMaxResultCount());
 
             log.debug("fetchCount={} (Minimum value among token / 2=({}), maxFetchCount({}))",
-                    fetchCount, availableVideoChannelToken / 2, youtubeDataApiProperties.getMaxFetchCount());
+                    fetchCount, availableVideoChannelToken / 2, youtubeDataApiProperties.getMaxResultCount());
 
             List<TrendingItem> trendingItemsToFetches = new ArrayList<>();
 

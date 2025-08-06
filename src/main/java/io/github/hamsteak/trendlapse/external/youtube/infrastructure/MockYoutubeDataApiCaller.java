@@ -67,7 +67,7 @@ public class MockYoutubeDataApiCaller implements YoutubeDataApiCaller {
     }
 
     @Override
-    public TrendingListResponse fetchTrendings(int count, String regionCode, String pageToken) {
+    public TrendingListResponse fetchTrendings(int maxResultCount, String regionCode, String pageToken) {
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {

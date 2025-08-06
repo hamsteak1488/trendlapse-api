@@ -40,9 +40,9 @@ public class BatchByRegionTrendingCollector implements TrendingCollector {
                     String pageToken = null;
                     int remainCount = collectCount;
                     while (remainCount > 0) {
-                        remainCount -= youtubeDataApiProperties.getMaxFetchCount();
+                        remainCount -= youtubeDataApiProperties.getMaxResultCount();
 
-                        TrendingListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(youtubeDataApiProperties.getMaxFetchCount(), region.getRegionCode(), pageToken);
+                        TrendingListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(youtubeDataApiProperties.getMaxResultCount(), region.getRegionCode(), pageToken);
                         trendingListResponse.getItems().stream()
                                 .map(VideoResponse::getId)
                                 .forEach(videoYoutubeIds::add);

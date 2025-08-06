@@ -1,5 +1,6 @@
 package io.github.hamsteak.trendlapse.external.youtube.infrastructure;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Range;
@@ -15,10 +16,11 @@ public class YoutubeDataApiProperties {
     @URL
     private final String baseUrl;
 
+    @NotEmpty
     private final String apiKey;
 
     @Range(min = 1, max = 50)
-    private final int maxFetchCount;
+    private final int maxResultCount;
 
     private final boolean useLog;
 

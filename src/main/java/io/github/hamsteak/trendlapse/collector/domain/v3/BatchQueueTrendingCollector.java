@@ -34,11 +34,11 @@ public class BatchQueueTrendingCollector implements TrendingCollector {
                     List<String> regionVideoYoutubeIds = new ArrayList<>();
 
                     String pageToken = null;
-                    int remainCount = collectCount;
-                    while (remainCount > 0) {
-                        remainCount -= youtubeDataApiProperties.getMaxFetchCount();
+                    int remainCollectCount = collectCount;
+                    while (remainCollectCount > 0) {
+                        int maxResultCount = Math.min(remainCollectCount, youtubeDataApiProperties.getMaxResultCount());
 
-                        TrendingListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(youtubeDataApiProperties.getMaxFetchCount(), region.getRegionCode(), pageToken);
+                        TrendingListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(maxResultCount, region.getRegionCode(), pageToken);
                         regionVideoYoutubeIds.addAll(
                                 trendingListResponse.getItems().stream()
                                         .map(VideoResponse::getId)
@@ -49,6 +49,8 @@ public class BatchQueueTrendingCollector implements TrendingCollector {
                             break;
                         }
                         pageToken = trendingListResponse.getNextPageToken();
+
+                        remainCollectCount -= maxResultCount;
                     }
 
                     for (int i = 0; i < regionVideoYoutubeIds.size(); i++) {

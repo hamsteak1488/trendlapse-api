@@ -43,7 +43,7 @@ class BatchQueueVideoCollectorTest {
                 videoFinder
         );
 
-        when(youtubeDataApiProperties.getMaxFetchCount())
+        when(youtubeDataApiProperties.getMaxResultCount())
                 .thenReturn(2);
 
         when(videoFinder.findMissingVideoYoutubeIds(anyList()))
@@ -73,7 +73,7 @@ class BatchQueueVideoCollectorTest {
         IntStream.range(0, videoYoutubeIds.size())
                 .forEach(i -> videoUncollectedTrendingQueue.add(new TrendingItem(1, i + 1, videoYoutubeIds.get(i))));
 
-        when(youtubeDataApiProperties.getMaxFetchCount())
+        when(youtubeDataApiProperties.getMaxResultCount())
                 .thenReturn(2);
 
         when(videoFinder.findMissingVideoYoutubeIds(anyList()))

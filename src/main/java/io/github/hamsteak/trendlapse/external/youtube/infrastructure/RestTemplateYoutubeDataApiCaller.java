@@ -104,7 +104,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     }
 
     @Override
-    public TrendingListResponse fetchTrendings(int count, String regionCode, String pageToken) {
+    public TrendingListResponse fetchTrendings(int maxResultCount, String regionCode, String pageToken) {
         String part = "id";
         String chart = "mostPopular";
 
@@ -113,7 +113,7 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
                 .queryParam("key", youtubeDataApiProperties.getApiKey())
                 .queryParam("part", part)
                 .queryParam("chart", chart)
-                .queryParam("maxResults", count)
+                .queryParam("maxResults", maxResultCount)
                 .queryParam("regionCode", regionCode)
                 .queryParam("pageToken", pageToken)
                 .build().toUri();

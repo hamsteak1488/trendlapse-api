@@ -41,10 +41,10 @@ public class BatchVideoCollector {
         }
 
         List<VideoResponse> responses = new ArrayList<>();
-        int fetchCount = (missingVideoYoutubeIds.size() - 1) / youtubeDataApiProperties.getMaxFetchCount() + 1;
+        int fetchCount = (missingVideoYoutubeIds.size() - 1) / youtubeDataApiProperties.getMaxResultCount() + 1;
         for (int i = 0; i < fetchCount; i++) {
-            int fromIndex = i * youtubeDataApiProperties.getMaxFetchCount();
-            int toIndex = Math.min((i + 1) * youtubeDataApiProperties.getMaxFetchCount(), missingVideoYoutubeIds.size());
+            int fromIndex = i * youtubeDataApiProperties.getMaxResultCount();
+            int toIndex = Math.min((i + 1) * youtubeDataApiProperties.getMaxResultCount(), missingVideoYoutubeIds.size());
             List<String> subFetchVideoYoutubeIds = missingVideoYoutubeIds.subList(fromIndex, toIndex);
 
             VideoListResponse videoListResponse = youtubeDataApiCaller.fetchVideos(subFetchVideoYoutubeIds);

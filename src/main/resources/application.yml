@@ -37,7 +37,7 @@ management:
 
 youtube-data-api:
   base-url: https://www.googleapis.com/youtube/v3
-  max-fetch-count: 50
+  max-result-count: 50
   use-log: true
   max-retry-count: 5
 

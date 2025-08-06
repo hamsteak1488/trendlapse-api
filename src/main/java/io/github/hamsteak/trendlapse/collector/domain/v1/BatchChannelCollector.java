@@ -40,10 +40,10 @@ public class BatchChannelCollector {
         }
 
         List<ChannelResponse> responses = new ArrayList<>();
-        int fetchCount = (fetchChannelYoutubeIds.size() - 1) / youtubeDataApiProperties.getMaxFetchCount() + 1;
+        int fetchCount = (fetchChannelYoutubeIds.size() - 1) / youtubeDataApiProperties.getMaxResultCount() + 1;
         for (int i = 0; i < fetchCount; i++) {
-            int fromIndex = i * youtubeDataApiProperties.getMaxFetchCount();
-            int toIndex = Math.min((i + 1) * youtubeDataApiProperties.getMaxFetchCount(), fetchChannelYoutubeIds.size());
+            int fromIndex = i * youtubeDataApiProperties.getMaxResultCount();
+            int toIndex = Math.min((i + 1) * youtubeDataApiProperties.getMaxResultCount(), fetchChannelYoutubeIds.size());
             List<String> subFetchChannelYoutubeIds = fetchChannelYoutubeIds.subList(fromIndex, toIndex);
 
             ChannelListResponse channelListResponse = youtubeDataApiCaller.fetchChannels(subFetchChannelYoutubeIds);
