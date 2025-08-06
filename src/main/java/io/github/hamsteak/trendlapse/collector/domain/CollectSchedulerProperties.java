@@ -1,6 +1,5 @@
 package io.github.hamsteak.trendlapse.collector.domain;
 
-import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Range;
@@ -14,9 +13,6 @@ import org.springframework.validation.annotation.Validated;
 public class CollectSchedulerProperties {
     @Range(min = 0, max = 200)
     private final int collectCount;
-
-    @Min(30 * 1000)
-    private final int collectInterval;
 
     private final boolean useLog;
 }

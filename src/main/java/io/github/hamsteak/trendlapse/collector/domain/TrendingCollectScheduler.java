@@ -21,7 +21,7 @@ public class TrendingCollectScheduler {
     @Value("${only-korea-region:false}")
     private boolean onlyKoreaRegion;
 
-    @Scheduled(initialDelayString = "${collect-scheduler.initial-delay}", fixedRateString = "${collect-scheduler.collect-interval}")
+    @Scheduled(cron = "${collect-scheduler.collect-cron}", zone = "UTC")
     public void collect() {
         LocalDateTime dateTime = LocalDateTime.now(Clock.systemUTC());
         List<Long> regionsIds = regionReader.readAll().stream()
