@@ -48,6 +48,11 @@ public class BatchChannelCollector {
             responses.addAll(channelListResponse.getItems());
         }
 
+        if (responses.size() != missingChannelYoutubeIds.size()) {
+            log.warn("The length of the list of channels to fetch and the length of the list of channels in response are different. (channels to fetch={}, channels in response={}",
+                    missingChannelYoutubeIds, responses.stream().map(ChannelResponse::getId).toList());
+        }
+
         responses.forEach(channelResponse ->
                 channelCreator.create(
                         channelResponse.getId(),

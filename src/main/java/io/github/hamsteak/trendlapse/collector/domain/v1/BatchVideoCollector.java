@@ -52,6 +52,11 @@ public class BatchVideoCollector {
             responses.addAll(videoListResponse.getItems());
         }
 
+        if (responses.size() != missingVideoYoutubeIds.size()) {
+            log.warn("The length of the list of videos to fetch and the length of the list of videos in response are different. (videos to fetch={}, videos in response={}",
+                    missingVideoYoutubeIds, responses.stream().map(VideoResponse::getId).toList());
+        }
+
         List<String> channelYoutubeIds = responses.stream()
                 .map(VideoResponse::getSnippet)
                 .map(VideoResponse.Snippet::getChannelId)
@@ -71,7 +76,7 @@ public class BatchVideoCollector {
                         videoResponse.getSnippet().getThumbnails().getHigh().getUrl()
                 );
             } catch (ChannelNotFoundException ex) {
-                log.error("Cannot find channel despite channel collection tasks. (Video Youtube Id={}, Channel Youtube Id={})", videoResponse.getId(), channelYoutubeId, ex);
+                log.warn("Cannot find channel despite channel collection tasks. (Video Youtube Id={}, Channel Youtube Id={})", videoResponse.getId(), channelYoutubeId, ex);
             }
         });
     }

@@ -72,7 +72,7 @@ public class BatchQueueTrendingCollector implements TrendingCollector {
                 long videoId = videoReader.readByYoutubeId(videoYoutubeId).getId();
                 trendingCreator.create(dateTime, videoId, collectedItem.getRank(), collectedItem.getRegionId());
             } catch (VideoNotFoundException ex) {
-                log.error("Cannot find video despite video collection tasks. (Trending={}, Video Youtube Id={})", collectedItem, videoYoutubeId, ex);
+                log.warn("Cannot find video despite video collection tasks. (Trending={}, Video Youtube Id={})", collectedItem, videoYoutubeId, ex);
             }
         }
     }
