@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Component
 @RequiredArgsConstructor
 public class ChannelReader {
@@ -23,10 +21,5 @@ public class ChannelReader {
     public Channel readByYoutubeId(String youtubeId) {
         return channelRepository.findByYoutubeId(youtubeId)
                 .orElseThrow(() -> new ChannelNotFoundException("Cannot find channel (youtubeId:" + youtubeId + ")"));
-    }
-
-    @Transactional(readOnly = true)
-    public List<Channel> readByYoutubeIds(List<String> youtubeIds) {
-        return channelRepository.findByYoutubeIdIn(youtubeIds);
     }
 }

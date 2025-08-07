@@ -30,7 +30,7 @@ public class BatchQueueVideoCollector {
         while (availableVideoChannelToken > 0 && !videoUncollectedTrendingQueue.isEmpty()) {
             int fetchCount = Math.min(availableVideoChannelToken / 2, youtubeDataApiProperties.getMaxResultCount());
 
-            log.debug("fetchCount={} (Minimum value among token / 2=({}), maxFetchCount({}))",
+            log.debug("fetchCount={} (Minimum value among token/2=({}), maxFetchCount({}))",
                     fetchCount, availableVideoChannelToken / 2, youtubeDataApiProperties.getMaxResultCount());
 
             List<TrendingItem> trendingItemsToFetches = new ArrayList<>();

@@ -1,6 +1,7 @@
 package io.github.hamsteak.trendlapse.collector.domain.v3;
 
 import io.github.hamsteak.trendlapse.collector.domain.TrendingCollector;
+import io.github.hamsteak.trendlapse.common.errors.exception.VideoNotFoundException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
@@ -9,12 +10,14 @@ import io.github.hamsteak.trendlapse.region.domain.RegionReader;
 import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
 import io.github.hamsteak.trendlapse.video.domain.VideoReader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BatchQueueTrendingCollector implements TrendingCollector {
@@ -64,9 +67,13 @@ public class BatchQueueTrendingCollector implements TrendingCollector {
 
         while (!videoCollectedTrendingQueue.isEmpty()) {
             TrendingItem collectedItem = videoCollectedTrendingQueue.poll();
-            long videoId = videoReader.readByYoutubeId(collectedItem.getVideoYoutubeId()).getId();
-
-            trendingCreator.create(dateTime, videoId, collectedItem.getRank(), collectedItem.getRegionId());
+            String videoYoutubeId = collectedItem.getVideoYoutubeId();
+            try {
+                long videoId = videoReader.readByYoutubeId(videoYoutubeId).getId();
+                trendingCreator.create(dateTime, videoId, collectedItem.getRank(), collectedItem.getRegionId());
+            } catch (VideoNotFoundException ex) {
+                log.error("Cannot find video despite video collection tasks. (Trending={}, Video Youtube Id={})", collectedItem, videoYoutubeId, ex);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package io.github.hamsteak.trendlapse.collector.domain.v1;
 
 import io.github.hamsteak.trendlapse.channel.domain.ChannelReader;
+import io.github.hamsteak.trendlapse.common.errors.exception.ChannelNotFoundException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
@@ -60,14 +61,18 @@ public class BatchVideoCollector {
         batchChannelCollector.collect(channelYoutubeIds);
 
         responses.forEach(videoResponse -> {
-            long channelId = channelReader.readByYoutubeId(videoResponse.getSnippet().getChannelId()).getId();
-
-            videoCreator.create(
-                    videoResponse.getId(),
-                    channelId,
-                    videoResponse.getSnippet().getTitle(),
-                    videoResponse.getSnippet().getThumbnails().getHigh().getUrl()
-            );
+            String channelYoutubeId = videoResponse.getSnippet().getChannelId();
+            try {
+                long channelId = channelReader.readByYoutubeId(channelYoutubeId).getId();
+                videoCreator.create(
+                        videoResponse.getId(),
+                        channelId,
+                        videoResponse.getSnippet().getTitle(),
+                        videoResponse.getSnippet().getThumbnails().getHigh().getUrl()
+                );
+            } catch (ChannelNotFoundException ex) {
+                log.error("Cannot find channel despite channel collection tasks. (Video Youtube Id={}, Channel Youtube Id={})", videoResponse.getId(), channelYoutubeId, ex);
+            }
         });
     }
 }
