@@ -7,6 +7,14 @@ services:
       - "{PORT}:8080"
     environment:
       - TZ=Asia/Seoul
+      - OTEL_SERVICE_NAME=trendlapse-api
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTLP_ENDPOINT}
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_METRICS_EXPORTER=none
+      - OTEL_LOGS_EXPORTER=none
+      - OTEL_TRACES_SAMPLER=parentbased_traceidratio
+      - OTEL_TRACES_SAMPLER_ARG=1.0
+      - JAVA_TOOL_OPTIONS=-javaagent:/otel/opentelemetry-javaagent.jar
     env_file:
       - .env.runtime
     network_mode: bridge
