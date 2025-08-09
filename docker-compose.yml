@@ -17,4 +17,8 @@ services:
       - JAVA_TOOL_OPTIONS=-javaagent:/otel/opentelemetry-javaagent.jar
     env_file:
       - .env.runtime
-    network_mode: bridge
+
+networks:
+  default:
+    external: true
+    name: hamsteak-net
