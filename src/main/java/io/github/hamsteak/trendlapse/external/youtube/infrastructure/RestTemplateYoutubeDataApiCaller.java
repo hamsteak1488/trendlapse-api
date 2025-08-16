@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @Primary
@@ -60,6 +61,11 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
             throw new YoutubeNullResponseException("Response result of fetching channels is null.");
         }
 
+        if (response.getItems() == null) {
+            // 요청한 채널이 비공개 혹은 정지당한 채널일 경우 items가 null이 되는데, 이 때 NullPointerException을 예방하기 위해 빈 리스트가 들어있는 응답으로 대체.
+            response = new ChannelListResponse(new ArrayList<>());
+        }
+
         return response;
     }
 
@@ -98,6 +104,11 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
 
         if (response == null) {
             throw new YoutubeNullResponseException("Response result of fetching videos is null.");
+        }
+
+        if (response.getItems() == null) {
+            // 요청한 영상이 비공개 혹은 정지당한 영상일 경우 items가 null이 되는데, 이 때 NullPointerException을 예방하기 위해 빈 리스트가 들어있는 응답으로 대체.
+            response = new VideoListResponse(new ArrayList<>());
         }
 
         return response;
