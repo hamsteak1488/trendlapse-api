@@ -78,7 +78,7 @@ public class BatchTrendingCollector implements TrendingCollector {
                 trendingCreator.create(dateTime, videoYoutubeId, rank, regionCode);
                 storedCount++;
             } catch (VideoNotFoundException ex) {
-                log.warn("Cannot find video despite video collection tasks. (region={}, rank={}, videoYoutubeId={})",
+                log.info("Skipping trending record creation: No matching video found (region={}, rank={}, videoYoutubeId={}).",
                         regionCode, rank, videoYoutubeId);
             }
         }

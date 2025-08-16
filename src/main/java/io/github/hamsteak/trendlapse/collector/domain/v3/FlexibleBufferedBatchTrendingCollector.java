@@ -28,6 +28,7 @@ public class FlexibleBufferedBatchTrendingCollector implements TrendingCollector
 
     @Override
     public int collect(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
+        int pushedCount = 0;
         for (String regionCode : regionCodes) {
             List<VideoResponse> trendingVideoResponses = fetchTrendings(collectSize, regionCode);
 
@@ -35,14 +36,22 @@ public class FlexibleBufferedBatchTrendingCollector implements TrendingCollector
                 int rank = i + 1;
                 String videoYoutubeId = trendingVideoResponses.get(i).getId();
                 flexibleTrendingBuffer.pushTrendingItem(new TrendingItem(dateTime, regionCode, rank, videoYoutubeId));
+                pushedCount++;
             }
         }
+        log.info("Pushed {} trending items.", pushedCount);
 
-        List<TrendingItem> lists = flexibleTrendingBuffer.pollTrendingVideoYoutubeIds(5000);
+        int availableTokenCountForVideoAndChannel = 5000;
+        List<TrendingItem> polledTrendingItems = flexibleTrendingBuffer.pollTrendingItems(
+                availableTokenCountForVideoAndChannel * youtubeDataApiProperties.getMaxResultCount());
+        log.info("Polled {} trending items.", polledTrendingItems.size());
 
-        batchVideoCollector.collect(lists.stream().map(TrendingItem::getVideoYoutubeId).toList());
+        batchVideoCollector.collect(polledTrendingItems.stream().map(TrendingItem::getVideoYoutubeId).toList());
 
-        return storeFromTrendingItems(lists);
+        int storedCount = storeFromTrendingItems(polledTrendingItems);
+        log.info("Stored {} trendings.", storedCount);
+
+        return storedCount;
     }
 
     private List<VideoResponse> fetchTrendings(int collectSize, String regionCode) {
@@ -81,7 +90,7 @@ public class FlexibleBufferedBatchTrendingCollector implements TrendingCollector
                 trendingCreator.create(dateTime, videoYoutubeId, rank, regionCode);
                 storedCount++;
             } catch (VideoNotFoundException ex) {
-                log.warn("Cannot find video despite video collection tasks. (region={}, rank={}, videoYoutubeId={})",
+                log.info("Skipping trending record creation: No matching video found (region={}, rank={}, videoYoutubeId={}).",
                         regionCode, rank, videoYoutubeId);
             }
         }

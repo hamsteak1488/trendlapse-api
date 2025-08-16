@@ -21,19 +21,24 @@ public class FlexibleTrendingBuffer {
         uncollectedTrendingItemQueue.add(item);
     }
 
-    public List<TrendingItem> pollTrendingVideoYoutubeIds(int maxVideoFetchCount) {
+    public List<TrendingItem> pollTrendingItems(int maxPollCount) {
         List<TrendingItem> polledTrendingItems = new ArrayList<>();
 
-        int missingVideoCount = 0;
-        while (!uncollectedTrendingItemQueue.isEmpty() && missingVideoCount < maxVideoFetchCount) {
+        log.info("Starting to poll trending items from uncollected queue. (Max video poll count: {})", maxPollCount);
+
+        int missingCount = 0;
+        while (!uncollectedTrendingItemQueue.isEmpty() && missingCount < maxPollCount) {
             TrendingItem polledTrendingItem = uncollectedTrendingItemQueue.poll();
 
             if (!videoFinder.existsByYoutubeId(polledTrendingItem.getVideoYoutubeId())) {
-                missingVideoCount++;
+                missingCount++;
             }
 
             polledTrendingItems.add(polledTrendingItem);
         }
+
+        log.info("Polled {} trending items from uncollected queue. {} items require video and channel data fetch.",
+                polledTrendingItems.size(), missingCount);
 
         return polledTrendingItems;
     }

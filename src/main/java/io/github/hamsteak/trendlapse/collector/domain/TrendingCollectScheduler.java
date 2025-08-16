@@ -27,7 +27,7 @@ public class TrendingCollectScheduler {
         List<String> regionCodes = regionReader.readAll().stream().map(Region::getRegionCode).toList();
 
         if (regionCodes.size() < 110) {
-            log.warn("The length of the region list is less than 110.");
+            log.warn("Region list contains fewer than 110 items. This may cause incomplete processing.");
         }
 
         if (onlyKoreaRegion) {

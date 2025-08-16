@@ -28,12 +28,18 @@ public class BatchVideoCollector implements VideoCollector {
     public int collect(List<String> videoYoutubeIds) {
         videoYoutubeIds = videoFinder.findMissingVideoYoutubeIds(videoYoutubeIds.stream().distinct().toList());
 
+        log.info("Found {} missing videos.", videoYoutubeIds.size());
+
         List<VideoResponse> videoResponses = fetchVideos(videoYoutubeIds);
 
         List<String> channelYoutubeIds = videoResponses.stream().map(VideoResponse::getChannelYoutubeId).distinct().toList();
         batchChannelCollector.collect(channelYoutubeIds);
 
-        return storeFromResponses(videoResponses);
+        int storedCount = storeFromResponses(videoResponses);
+
+        log.info("Stored {} videos.", storedCount);
+
+        return storedCount;
     }
 
     private List<VideoResponse> fetchVideos(List<String> videoYoutubeIds) {
@@ -53,7 +59,7 @@ public class BatchVideoCollector implements VideoCollector {
         if (responses.size() != videoYoutubeIds.size()) {
             List<String> videoYoutubeIdsInResponses = responses.stream().map(VideoResponse::getId).toList();
             List<String> diff = videoYoutubeIds.stream().filter(videoYoutubeId -> !videoYoutubeIdsInResponses.contains(videoYoutubeId)).toList();
-            log.info("The length of the list of videos to fetch and the length of the list of videos in response are different. diff={}", diff);
+            log.info("Expected {} videos, but only {} returned. Difference: {}", videoYoutubeIds.size(), videoYoutubeIdsInResponses.size(), diff);
         }
 
         return responses;
@@ -75,7 +81,8 @@ public class BatchVideoCollector implements VideoCollector {
                 );
                 storedCount++;
             } catch (ChannelNotFoundException ex) {
-                log.info("Cannot find channel despite channel collection tasks. (videoYoutubeId={}, channelYoutubeId={})", videoYoutubeId, channelYoutubeId);
+                log.info("Skipping video record creation: No matching channel found (videoYoutubeId={}, channelYoutubeId={}).",
+                        videoYoutubeId, channelYoutubeId);
             }
         }
 

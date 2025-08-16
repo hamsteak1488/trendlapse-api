@@ -26,9 +26,15 @@ public class BatchChannelCollector implements ChannelCollector {
     public int collect(List<String> channelYoutubeIds) {
         channelYoutubeIds = channelFinder.findMissingChannelYoutubeIds(channelYoutubeIds.stream().distinct().toList());
 
+        log.info("Found {} missing channels.", channelYoutubeIds.size());
+
         List<ChannelResponse> channelResponses = fetchChannels(channelYoutubeIds);
 
-        return storeFromResponses(channelResponses);
+        int storedCount = storeFromResponses(channelResponses);
+
+        log.info("Stored {} channels.", storedCount);
+
+        return storedCount;
     }
 
     private List<ChannelResponse> fetchChannels(List<String> channelYoutubeIds) {
@@ -48,7 +54,7 @@ public class BatchChannelCollector implements ChannelCollector {
         if (responses.size() != channelYoutubeIds.size()) {
             List<String> channelYoutubeIdsInResponses = responses.stream().map(ChannelResponse::getId).toList();
             List<String> diff = channelYoutubeIds.stream().filter(channelYoutubeId -> !channelYoutubeIdsInResponses.contains(channelYoutubeId)).toList();
-            log.info("The length of the list of channels to fetch and the length of the list of channels in response are different. diff={}", diff);
+            log.info("Expected {} channels, but only {} returned. Difference: {}", channelYoutubeIds.size(), channelYoutubeIdsInResponses.size(), diff);
         }
 
         return responses;

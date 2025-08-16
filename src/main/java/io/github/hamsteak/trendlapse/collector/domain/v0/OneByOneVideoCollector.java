@@ -57,7 +57,7 @@ public class OneByOneVideoCollector implements VideoCollector {
                 );
                 storedCount++;
             } catch (ChannelNotFoundException ex) {
-                log.info("Cannot find channel despite channel collection tasks. (videoYoutubeId={}, channelYoutubeId={})", videoYoutubeId, channelYoutubeId);
+                log.info("Skipping video record creation: No matching channel found (videoYoutubeId={}, channelYoutubeId={}).", videoYoutubeId, channelYoutubeId);
             }
         }
 
