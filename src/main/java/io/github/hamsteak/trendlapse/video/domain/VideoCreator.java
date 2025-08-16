@@ -16,8 +16,8 @@ public class VideoCreator {
     private final ChannelReader channelReader;
 
     @Transactional
-    public Video create(String youtubeId, long channelId, String title, String thumbnailUrl) {
-        Channel channel = channelReader.read(channelId);
+    public Video create(String youtubeId, String channelYoutubeId, String title, String thumbnailUrl) {
+        Channel channel = channelReader.readByYoutubeId(channelYoutubeId);
 
         if (thumbnailUrl == null) {
             log.warn("Video thumbnail url is null. (youtubeId={})", youtubeId);

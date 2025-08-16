@@ -4,5 +4,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TrendingCollector {
-    void collect(LocalDateTime dateTime, int collectCount, List<Long> regionIds);
+    int collect(LocalDateTime dateTime, int collectSize, List<String> regionCodes);
 }

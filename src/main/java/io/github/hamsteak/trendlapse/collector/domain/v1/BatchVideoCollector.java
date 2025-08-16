@@ -1,6 +1,6 @@
 package io.github.hamsteak.trendlapse.collector.domain.v1;
 
-import io.github.hamsteak.trendlapse.channel.domain.ChannelReader;
+import io.github.hamsteak.trendlapse.collector.domain.VideoCollector;
 import io.github.hamsteak.trendlapse.common.errors.exception.ChannelNotFoundException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
@@ -18,66 +18,67 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class BatchVideoCollector {
-    private final YoutubeDataApiCaller youtubeDataApiCaller;
-    private final YoutubeDataApiProperties youtubeDataApiProperties;
-    private final VideoFinder videoFinder;
-    private final VideoCreator videoCreator;
+public class BatchVideoCollector implements VideoCollector {
     private final BatchChannelCollector batchChannelCollector;
-    private final ChannelReader channelReader;
+    private final VideoFinder videoFinder;
+    private final YoutubeDataApiProperties youtubeDataApiProperties;
+    private final YoutubeDataApiCaller youtubeDataApiCaller;
+    private final VideoCreator videoCreator;
 
-    public void collect(List<String> videoYoutubeIds) {
-        List<String> missingVideoYoutubeIds = videoFinder.findMissingVideoYoutubeIds(videoYoutubeIds);
+    public int collect(List<String> videoYoutubeIds) {
+        videoYoutubeIds = videoFinder.findMissingVideoYoutubeIds(videoYoutubeIds.stream().distinct().toList());
 
-        // DB에 이미 Video 데이터가 모두 존재하는 경우.
-        if (missingVideoYoutubeIds.isEmpty()) {
-            return;
-        }
+        List<VideoResponse> videoResponses = fetchVideos(videoYoutubeIds);
 
-        List<String> distinctMissingVideoYoutubeIds = missingVideoYoutubeIds.stream().distinct().toList();
+        List<String> channelYoutubeIds = videoResponses.stream().map(VideoResponse::getChannelYoutubeId).distinct().toList();
+        batchChannelCollector.collect(channelYoutubeIds);
 
-        if (distinctMissingVideoYoutubeIds.size() != missingVideoYoutubeIds.size()) {
-            log.warn("There are two or more identical YoutubeIds in the collection request list. {}", missingVideoYoutubeIds);
-            missingVideoYoutubeIds = distinctMissingVideoYoutubeIds;
-        }
+        return storeFromResponses(videoResponses);
+    }
 
+    private List<VideoResponse> fetchVideos(List<String> videoYoutubeIds) {
         List<VideoResponse> responses = new ArrayList<>();
-        int fetchCount = (missingVideoYoutubeIds.size() - 1) / youtubeDataApiProperties.getMaxResultCount() + 1;
-        for (int i = 0; i < fetchCount; i++) {
-            int fromIndex = i * youtubeDataApiProperties.getMaxResultCount();
-            int toIndex = Math.min((i + 1) * youtubeDataApiProperties.getMaxResultCount(), missingVideoYoutubeIds.size());
-            List<String> subFetchVideoYoutubeIds = missingVideoYoutubeIds.subList(fromIndex, toIndex);
+
+        int startIndex = 0;
+        while (startIndex < videoYoutubeIds.size()) {
+            int endIndex = Math.min(startIndex + youtubeDataApiProperties.getMaxResultCount(), videoYoutubeIds.size());
+            List<String> subFetchVideoYoutubeIds = videoYoutubeIds.subList(startIndex, endIndex);
 
             VideoListResponse videoListResponse = youtubeDataApiCaller.fetchVideos(subFetchVideoYoutubeIds);
             responses.addAll(videoListResponse.getItems());
+
+            startIndex += youtubeDataApiProperties.getMaxResultCount();
         }
 
-        if (responses.size() != missingVideoYoutubeIds.size()) {
-            log.warn("The length of the list of videos to fetch and the length of the list of videos in response are different. (videos to fetch={}, videos in response={}",
-                    missingVideoYoutubeIds, responses.stream().map(VideoResponse::getId).toList());
+        if (responses.size() != videoYoutubeIds.size()) {
+            List<String> videoYoutubeIdsInResponses = responses.stream().map(VideoResponse::getId).toList();
+            List<String> diff = videoYoutubeIds.stream().filter(videoYoutubeId -> !videoYoutubeIdsInResponses.contains(videoYoutubeId)).toList();
+            log.info("The length of the list of videos to fetch and the length of the list of videos in response are different. diff={}", diff);
         }
 
-        List<String> channelYoutubeIds = responses.stream()
-                .map(VideoResponse::getSnippet)
-                .map(VideoResponse.Snippet::getChannelId)
-                .distinct()
-                .toList();
+        return responses;
+    }
 
-        batchChannelCollector.collect(channelYoutubeIds);
+    private int storeFromResponses(List<VideoResponse> videoResponses) {
+        int storedCount = 0;
 
-        responses.forEach(videoResponse -> {
+        for (VideoResponse videoResponse : videoResponses) {
+            String videoYoutubeId = videoResponse.getId();
             String channelYoutubeId = videoResponse.getSnippet().getChannelId();
+
             try {
-                long channelId = channelReader.readByYoutubeId(channelYoutubeId).getId();
                 videoCreator.create(
-                        videoResponse.getId(),
-                        channelId,
+                        videoYoutubeId,
+                        channelYoutubeId,
                         videoResponse.getSnippet().getTitle(),
                         videoResponse.getSnippet().getThumbnails().getHigh().getUrl()
                 );
+                storedCount++;
             } catch (ChannelNotFoundException ex) {
-                log.warn("Cannot find channel despite channel collection tasks. (Video Youtube Id={}, Channel Youtube Id={})", videoResponse.getId(), channelYoutubeId, ex);
+                log.info("Cannot find channel despite channel collection tasks. (videoYoutubeId={}, channelYoutubeId={})", videoYoutubeId, channelYoutubeId);
             }
-        });
+        }
+
+        return storedCount;
     }
 }

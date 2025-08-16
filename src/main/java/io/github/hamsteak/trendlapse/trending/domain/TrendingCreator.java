@@ -19,9 +19,9 @@ public class TrendingCreator {
     private final RegionReader regionReader;
 
     @Transactional
-    public void create(LocalDateTime dateTime, long videoId, int rank, long regionId) {
-        Video video = videoReader.read(videoId);
-        Region region = regionReader.read(regionId);
+    public void create(LocalDateTime dateTime, String videoYoutubeId, int rank, String regionCode) {
+        Video video = videoReader.readByYoutubeId(videoYoutubeId);
+        Region region = regionReader.readByRegionCode(regionCode);
 
         trendingRepository.save(Trending.builder()
                 .dateTime(dateTime)

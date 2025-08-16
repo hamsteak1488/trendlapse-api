@@ -28,4 +28,8 @@ public class VideoResponse {
             }
         }
     }
+
+    public String getChannelYoutubeId() {
+        return snippet.getChannelId();
+    }
 }

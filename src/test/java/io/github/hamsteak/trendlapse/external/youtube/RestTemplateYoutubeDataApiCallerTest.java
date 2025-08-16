@@ -73,7 +73,7 @@ class RestTemplateYoutubeDataApiCallerTest {
                 .thenReturn(mockListResponse);
 
         // When
-        ChannelResponse result = apiCaller.fetchChannel(channelId);
+        ChannelResponse result = apiCaller.fetchChannels(List.of(channelId)).getItems().get(0);
 
         // Then
         assertThat(result).isNotNull();

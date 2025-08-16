@@ -2,6 +2,7 @@ package io.github.hamsteak.trendlapse.collector.domain.v1;
 
 import io.github.hamsteak.trendlapse.channel.domain.ChannelCreator;
 import io.github.hamsteak.trendlapse.channel.domain.ChannelFinder;
+import io.github.hamsteak.trendlapse.collector.domain.ChannelCollector;
 import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
@@ -16,49 +17,54 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class BatchChannelCollector {
-    private final YoutubeDataApiCaller youtubeDataApiCaller;
+public class BatchChannelCollector implements ChannelCollector {
     private final YoutubeDataApiProperties youtubeDataApiProperties;
+    private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final ChannelFinder channelFinder;
     private final ChannelCreator channelCreator;
 
-    public void collect(List<String> channelYoutubeIds) {
-        List<String> missingChannelYoutubeIds = channelFinder.findMissingChannelYoutubeIds(channelYoutubeIds);
+    public int collect(List<String> channelYoutubeIds) {
+        channelYoutubeIds = channelFinder.findMissingChannelYoutubeIds(channelYoutubeIds.stream().distinct().toList());
 
-        // DB에 이미 Channel 데이터가 모두 존재하는 경우.
-        if (missingChannelYoutubeIds.isEmpty()) {
-            return;
-        }
+        List<ChannelResponse> channelResponses = fetchChannels(channelYoutubeIds);
 
-        List<String> distinctMissingChannelYoutubeIds = missingChannelYoutubeIds.stream().distinct().toList();
+        return storeFromResponses(channelResponses);
+    }
 
-        if (distinctMissingChannelYoutubeIds.size() != missingChannelYoutubeIds.size()) {
-            log.warn("There are two or more identical YoutubeIds in the collection request list. {}", missingChannelYoutubeIds);
-            missingChannelYoutubeIds = distinctMissingChannelYoutubeIds;
-        }
-
+    private List<ChannelResponse> fetchChannels(List<String> channelYoutubeIds) {
         List<ChannelResponse> responses = new ArrayList<>();
-        int fetchCount = (missingChannelYoutubeIds.size() - 1) / youtubeDataApiProperties.getMaxResultCount() + 1;
-        for (int i = 0; i < fetchCount; i++) {
-            int fromIndex = i * youtubeDataApiProperties.getMaxResultCount();
-            int toIndex = Math.min((i + 1) * youtubeDataApiProperties.getMaxResultCount(), missingChannelYoutubeIds.size());
-            List<String> subFetchChannelYoutubeIds = missingChannelYoutubeIds.subList(fromIndex, toIndex);
+
+        int startIndex = 0;
+        while (startIndex < channelYoutubeIds.size()) {
+            int endIndex = Math.min(startIndex + youtubeDataApiProperties.getMaxResultCount(), channelYoutubeIds.size());
+            List<String> subFetchChannelYoutubeIds = channelYoutubeIds.subList(startIndex, endIndex);
 
             ChannelListResponse channelListResponse = youtubeDataApiCaller.fetchChannels(subFetchChannelYoutubeIds);
             responses.addAll(channelListResponse.getItems());
+
+            startIndex += youtubeDataApiProperties.getMaxResultCount();
         }
 
-        if (responses.size() != missingChannelYoutubeIds.size()) {
-            log.warn("The length of the list of channels to fetch and the length of the list of channels in response are different. (channels to fetch={}, channels in response={}",
-                    missingChannelYoutubeIds, responses.stream().map(ChannelResponse::getId).toList());
+        if (responses.size() != channelYoutubeIds.size()) {
+            List<String> channelYoutubeIdsInResponses = responses.stream().map(ChannelResponse::getId).toList();
+            List<String> diff = channelYoutubeIds.stream().filter(channelYoutubeId -> !channelYoutubeIdsInResponses.contains(channelYoutubeId)).toList();
+            log.info("The length of the list of channels to fetch and the length of the list of channels in response are different. diff={}", diff);
         }
 
-        responses.forEach(channelResponse ->
-                channelCreator.create(
-                        channelResponse.getId(),
-                        channelResponse.getSnippet().getTitle(),
-                        channelResponse.getSnippet().getThumbnails().getHigh().getUrl()
-                )
-        );
+        return responses;
+    }
+
+    private int storeFromResponses(List<ChannelResponse> channelResponses) {
+        int storedCount = 0;
+
+        for (ChannelResponse channelResponse : channelResponses) {
+            String channelYoutubeId = channelResponse.getId();
+
+            channelCreator.create(channelYoutubeId, channelResponse.getSnippet().getTitle(), channelResponse.getSnippet().getThumbnails().getHigh().getUrl());
+
+            storedCount++;
+        }
+
+        return storedCount;
     }
 }

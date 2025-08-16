@@ -1,31 +1,50 @@
 package io.github.hamsteak.trendlapse.collector.domain.v0;
 
-import io.github.hamsteak.trendlapse.channel.domain.Channel;
-import io.github.hamsteak.trendlapse.channel.infrastructure.ChannelRepository;
+import io.github.hamsteak.trendlapse.channel.domain.ChannelCreator;
+import io.github.hamsteak.trendlapse.channel.domain.ChannelFinder;
+import io.github.hamsteak.trendlapse.collector.domain.ChannelCollector;
 import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class OneByOneChannelCollector {
-    private final ChannelRepository channelRepository;
+public class OneByOneChannelCollector implements ChannelCollector {
     private final YoutubeDataApiCaller youtubeDataApiCaller;
+    private final ChannelFinder channelFinder;
+    private final ChannelCreator channelCreator;
 
-    @Transactional
-    public Channel collect(String youtubeId) {
-        return channelRepository.findByYoutubeId(youtubeId)
-                .orElseGet(() -> {
-                    ChannelResponse channelResponse = youtubeDataApiCaller.fetchChannel(youtubeId);
-                    return channelRepository.save(
-                            Channel.builder()
-                                    .youtubeId(youtubeId)
-                                    .title(channelResponse.getSnippet().getTitle())
-                                    .thumbnailUrl(channelResponse.getSnippet().getThumbnails().getHigh().getUrl())
-                                    .build()
-                    );
-                });
+    @Override
+    public int collect(List<String> channelYoutubeIds) {
+        channelYoutubeIds = channelFinder.findMissingChannelYoutubeIds(channelYoutubeIds.stream().distinct().toList());
+
+        List<ChannelResponse> channelResponses = fetchChannels(channelYoutubeIds);
+
+        return storeFromResponses(channelResponses);
+    }
+
+    private List<ChannelResponse> fetchChannels(List<String> channelYoutubeIds) {
+        return channelYoutubeIds.stream()
+                .map(channelYoutubeId -> youtubeDataApiCaller.fetchChannels(List.of(channelYoutubeId)))
+                .filter(channelListResponse -> !channelListResponse.getItems().isEmpty())
+                .map(channelListResponse -> channelListResponse.getItems().get(0))
+                .toList();
+    }
+
+    private int storeFromResponses(List<ChannelResponse> channelResponses) {
+        int storedCount = 0;
+
+        for (ChannelResponse channelResponse : channelResponses) {
+            String channelYoutubeId = channelResponse.getId();
+
+            channelCreator.create(channelYoutubeId, channelResponse.getSnippet().getTitle(), channelResponse.getSnippet().getThumbnails().getHigh().getUrl());
+
+            storedCount++;
+        }
+
+        return storedCount;
     }
 }

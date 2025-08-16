@@ -1,7 +1,10 @@
 package io.github.hamsteak.trendlapse.external.youtube.infrastructure;
 
 import io.github.hamsteak.trendlapse.common.errors.exception.YoutubeNullResponseException;
-import io.github.hamsteak.trendlapse.external.youtube.dto.*;
+import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelListResponse;
+import io.github.hamsteak.trendlapse.external.youtube.dto.RegionListResponse;
+import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
+import io.github.hamsteak.trendlapse.external.youtube.dto.VideoListResponse;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -23,26 +26,6 @@ import java.util.List;
 public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
     private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final RestTemplate restTemplate;
-
-    @Override
-    public ChannelResponse fetchChannel(String channelYoutubeId) {
-        String part = String.join(",", List.of("id", "snippet"));
-
-        URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
-                .path("/channels")
-                .queryParam("key", youtubeDataApiProperties.getApiKey())
-                .queryParam("part", part)
-                .queryParam("id", channelYoutubeId)
-                .build().toUri();
-
-        ChannelListResponse response = restTemplate.getForObject(requestUri, ChannelListResponse.class);
-
-        if (response == null) {
-            throw new YoutubeNullResponseException("Response result of fetching channel is null.");
-        }
-
-        return response.getItems().get(0);
-    }
 
     @Override
     public ChannelListResponse fetchChannels(List<String> channelYoutubeIds) {
@@ -67,26 +50,6 @@ public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
         }
 
         return response;
-    }
-
-    @Override
-    public VideoResponse fetchVideo(String videoYoutubeId) {
-        String part = String.join(",", List.of("id", "snippet"));
-
-        URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
-                .path("/videos")
-                .queryParam("key", youtubeDataApiProperties.getApiKey())
-                .queryParam("part", part)
-                .queryParam("id", videoYoutubeId)
-                .build().toUri();
-
-        VideoListResponse response = restTemplate.getForObject(requestUri, VideoListResponse.class);
-
-        if (response == null) {
-            throw new YoutubeNullResponseException("Response result of fetching video is null.");
-        }
-
-        return response.getItems().get(0);
     }
 
     @Override

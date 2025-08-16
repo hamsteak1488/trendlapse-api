@@ -1,6 +1,7 @@
-package io.github.hamsteak.trendlapse.collector.domain.v0;
+package io.github.hamsteak.trendlapse.collector.domain.v2;
 
 import io.github.hamsteak.trendlapse.collector.domain.TrendingCollector;
+import io.github.hamsteak.trendlapse.collector.domain.v1.BatchVideoCollector;
 import io.github.hamsteak.trendlapse.common.errors.exception.VideoNotFoundException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
@@ -12,41 +13,44 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-/**
- * Trending 목록 조회 -> Trending 하나씩 삽입 (Trending 만드는데 Video 없다면 생성 (Video 만드는데 Channel 없다면 생성) )
- * API 호출 횟수: Trending(1) + Video(N) + Channel(N)
- * DB 쿼리 횟수: Trending(insert:N) + Video(select:N + insert:N) + Channel(select:N + insert:N)
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class OneByOneTrendingCollector implements TrendingCollector {
-    private final OneByOneVideoCollector oneByOneVideoCollector;
+public class BufferedBatchTrendingCollector implements TrendingCollector {
+    private final BatchVideoCollector batchVideoCollector;
     private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final TrendingCreator trendingCreator;
 
     @Override
     public int collect(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
-        int collectedCount = 0;
+        int storedCount = 0;
 
+        Map<String, List<VideoResponse>> trendingVideoResponseBufferMap = new HashMap<>();
         for (String regionCode : regionCodes) {
-            List<VideoResponse> trendingVideoResponses = fetchTrendings(collectSize, regionCode);
-
-            List<String> trendingVideoYoutubeIds = trendingVideoResponses.stream().map(VideoResponse::getId).toList();
-            oneByOneVideoCollector.collect(trendingVideoYoutubeIds);
-
-            collectedCount += storeFromResponses(dateTime, regionCode, trendingVideoResponses);
+            trendingVideoResponseBufferMap.put(regionCode, fetchTrendings(collectSize, regionCode));
         }
 
-        return collectedCount;
+        batchVideoCollector.collect(
+                trendingVideoResponseBufferMap.values().stream()
+                        .flatMap(Collection::stream)
+                        .map(VideoResponse::getId).toList()
+        );
+
+        for (Map.Entry<String, List<VideoResponse>> entry : trendingVideoResponseBufferMap.entrySet()) {
+            String regionCode = entry.getKey();
+            List<VideoResponse> trendingVideoResponseBuffer = entry.getValue();
+
+            storedCount += storeFromResponses(dateTime, regionCode, trendingVideoResponseBuffer);
+        }
+
+        return storedCount;
     }
 
     private List<VideoResponse> fetchTrendings(int collectSize, String regionCode) {
-        List<VideoResponse> trendingVideoResponses = new ArrayList<>();
+        List<VideoResponse> responses = new ArrayList<>();
 
         String pageToken = null;
         int remainingCount = collectSize;
@@ -54,7 +58,7 @@ public class OneByOneTrendingCollector implements TrendingCollector {
             int maxResultCount = Math.min(remainingCount, youtubeDataApiProperties.getMaxResultCount());
 
             TrendingListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(maxResultCount, regionCode, pageToken);
-            trendingVideoResponses.addAll(trendingListResponse.getItems());
+            responses.addAll(trendingListResponse.getItems());
 
             if (trendingListResponse.getNextPageToken() == null) {
                 break;
@@ -64,7 +68,7 @@ public class OneByOneTrendingCollector implements TrendingCollector {
             remainingCount -= youtubeDataApiProperties.getMaxResultCount();
         }
 
-        return trendingVideoResponses;
+        return responses;
     }
 
     private int storeFromResponses(LocalDateTime dateTime, String regionCode, List<VideoResponse> trendingVideoResponses) {

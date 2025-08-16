@@ -13,5 +13,7 @@ public interface VideoRepository extends Repository<Video, Long> {
 
     Optional<Video> findByYoutubeId(String youtubeId);
 
+    boolean existsByYoutubeId(String youtubeId);
+
     List<Video> findByYoutubeIdIn(List<String> youtubeIds);
 }

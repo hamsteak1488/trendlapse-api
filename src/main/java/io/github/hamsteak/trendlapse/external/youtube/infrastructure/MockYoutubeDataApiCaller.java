@@ -19,17 +19,6 @@ public class MockYoutubeDataApiCaller implements YoutubeDataApiCaller {
     private final Set<String> regionVisitSet = new HashSet<>();
 
     @Override
-    public ChannelResponse fetchChannel(String channelYoutubeId) {
-        try {
-            Thread.sleep(80);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        return channelResponseMap.get(channelYoutubeId);
-    }
-
-    @Override
     public ChannelListResponse fetchChannels(List<String> channelYoutubeIds) {
         try {
             Thread.sleep(100);
@@ -40,17 +29,6 @@ public class MockYoutubeDataApiCaller implements YoutubeDataApiCaller {
         return new ChannelListResponse(channelYoutubeIds.stream()
                 .map(channelResponseMap::get)
                 .toList());
-    }
-
-    @Override
-    public VideoResponse fetchVideo(String videoYoutubeId) {
-        try {
-            Thread.sleep(80);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        return videoResponseMap.get(videoYoutubeId);
     }
 
     @Override

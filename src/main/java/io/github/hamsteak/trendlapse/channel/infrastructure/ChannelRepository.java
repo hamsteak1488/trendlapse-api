@@ -13,5 +13,7 @@ public interface ChannelRepository extends Repository<Channel, Long> {
 
     Optional<Channel> findByYoutubeId(String youtubeId);
 
+    boolean existsByYoutubeId(String youtubeId);
+
     List<Channel> findByYoutubeIdIn(List<String> youtubeIds);
 }

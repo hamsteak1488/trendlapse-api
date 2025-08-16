@@ -19,7 +19,7 @@ public class YoutubeDataApiProperties {
     @NotEmpty
     private final String apiKey;
 
-    @Range(min = 1, max = 50)
+    @Range(min = 1, max = 150)
     private final int maxResultCount;
 
     private final boolean useLog;

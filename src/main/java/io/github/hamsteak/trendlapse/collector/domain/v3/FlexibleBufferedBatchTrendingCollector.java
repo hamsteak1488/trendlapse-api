@@ -1,6 +1,7 @@
-package io.github.hamsteak.trendlapse.collector.domain.v0;
+package io.github.hamsteak.trendlapse.collector.domain.v3;
 
 import io.github.hamsteak.trendlapse.collector.domain.TrendingCollector;
+import io.github.hamsteak.trendlapse.collector.domain.v1.BatchVideoCollector;
 import io.github.hamsteak.trendlapse.common.errors.exception.VideoNotFoundException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
@@ -15,64 +16,66 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Trending 목록 조회 -> Trending 하나씩 삽입 (Trending 만드는데 Video 없다면 생성 (Video 만드는데 Channel 없다면 생성) )
- * API 호출 횟수: Trending(1) + Video(N) + Channel(N)
- * DB 쿼리 횟수: Trending(insert:N) + Video(select:N + insert:N) + Channel(select:N + insert:N)
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class OneByOneTrendingCollector implements TrendingCollector {
-    private final OneByOneVideoCollector oneByOneVideoCollector;
+public class FlexibleBufferedBatchTrendingCollector implements TrendingCollector {
+    private final BatchVideoCollector batchVideoCollector;
     private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final TrendingCreator trendingCreator;
+    private final FlexibleTrendingBuffer flexibleTrendingBuffer;
 
     @Override
     public int collect(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
-        int collectedCount = 0;
-
         for (String regionCode : regionCodes) {
             List<VideoResponse> trendingVideoResponses = fetchTrendings(collectSize, regionCode);
 
-            List<String> trendingVideoYoutubeIds = trendingVideoResponses.stream().map(VideoResponse::getId).toList();
-            oneByOneVideoCollector.collect(trendingVideoYoutubeIds);
-
-            collectedCount += storeFromResponses(dateTime, regionCode, trendingVideoResponses);
+            for (int i = 0; i < trendingVideoResponses.size(); i++) {
+                int rank = i + 1;
+                String videoYoutubeId = trendingVideoResponses.get(i).getId();
+                flexibleTrendingBuffer.pushTrendingItem(new TrendingItem(dateTime, regionCode, rank, videoYoutubeId));
+            }
         }
 
-        return collectedCount;
+        List<TrendingItem> lists = flexibleTrendingBuffer.pollTrendingVideoYoutubeIds(5000);
+
+        batchVideoCollector.collect(lists.stream().map(TrendingItem::getVideoYoutubeId).toList());
+
+        return storeFromTrendingItems(lists);
     }
 
     private List<VideoResponse> fetchTrendings(int collectSize, String regionCode) {
-        List<VideoResponse> trendingVideoResponses = new ArrayList<>();
+        List<VideoResponse> responses = new ArrayList<>();
 
         String pageToken = null;
-        int remainingCount = collectSize;
-        while (remainingCount > 0) {
-            int maxResultCount = Math.min(remainingCount, youtubeDataApiProperties.getMaxResultCount());
+        int remainCollectCount = collectSize;
+        while (remainCollectCount > 0) {
+            int maxResultCount = Math.min(remainCollectCount, youtubeDataApiProperties.getMaxResultCount());
 
             TrendingListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(maxResultCount, regionCode, pageToken);
-            trendingVideoResponses.addAll(trendingListResponse.getItems());
+            responses.addAll(trendingListResponse.getItems());
 
             if (trendingListResponse.getNextPageToken() == null) {
                 break;
             }
             pageToken = trendingListResponse.getNextPageToken();
 
-            remainingCount -= youtubeDataApiProperties.getMaxResultCount();
+            remainCollectCount -= maxResultCount;
         }
 
-        return trendingVideoResponses;
+        return responses;
     }
 
-    private int storeFromResponses(LocalDateTime dateTime, String regionCode, List<VideoResponse> trendingVideoResponses) {
+    private int storeFromTrendingItems(List<TrendingItem> trendingItems) {
         int storedCount = 0;
 
-        for (int i = 0; i < trendingVideoResponses.size(); i++) {
-            int rank = i + 1;
-            String videoYoutubeId = trendingVideoResponses.get(i).getId();
+        for (TrendingItem trendingItem : trendingItems) {
+
+            LocalDateTime dateTime = trendingItem.getDateTime();
+            String videoYoutubeId = trendingItem.getVideoYoutubeId();
+            int rank = trendingItem.getRank();
+            String regionCode = trendingItem.getRegionCode();
 
             try {
                 trendingCreator.create(dateTime, videoYoutubeId, rank, regionCode);

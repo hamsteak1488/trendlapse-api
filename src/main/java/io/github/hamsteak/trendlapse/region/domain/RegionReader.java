@@ -20,6 +20,12 @@ public class RegionReader {
     }
 
     @Transactional(readOnly = true)
+    public Region readByRegionCode(String regionCode) {
+        return regionRepository.findByRegionCode(regionCode)
+                .orElseThrow(() -> new RegionNotFoundException("Cannot find region (regionCode:" + regionCode + ")"));
+    }
+
+    @Transactional(readOnly = true)
     public List<Region> read(List<Long> regionIds) {
         return regionRepository.findByIdIn(regionIds);
     }

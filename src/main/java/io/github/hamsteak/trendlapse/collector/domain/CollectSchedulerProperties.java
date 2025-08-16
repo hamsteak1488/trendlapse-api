@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @RequiredArgsConstructor
 public class CollectSchedulerProperties {
     @Range(min = 0, max = 200)
-    private final int collectCount;
+    private final int collectSize;
 
     private final boolean useLog;
 }

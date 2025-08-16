@@ -42,7 +42,7 @@ youtube-data-api:
   max-retry-count: 5
 
 collect-scheduler:
-  collect-count: 100
+  collect-size: 100
   collect-cron: '0 20 * * * *'
   initial-delay: 5000
   use-log: true

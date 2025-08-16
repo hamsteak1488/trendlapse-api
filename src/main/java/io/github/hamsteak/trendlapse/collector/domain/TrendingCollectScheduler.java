@@ -24,19 +24,16 @@ public class TrendingCollectScheduler {
     @Scheduled(cron = "${collect-scheduler.collect-cron}", zone = "UTC")
     public void collect() {
         LocalDateTime dateTime = LocalDateTime.now(Clock.systemUTC());
-        List<Long> regionsIds = regionReader.readAll().stream()
-                .map(Region::getId)
-                .toList();
+        List<String> regionCodes = regionReader.readAll().stream().map(Region::getRegionCode).toList();
 
-        if (regionsIds.size() < 110) {
+        if (regionCodes.size() < 110) {
             log.warn("The length of the region list is less than 110.");
         }
 
         if (onlyKoreaRegion) {
-            final long KOREA_REGION_ID = 77L;
-            regionsIds = List.of(KOREA_REGION_ID);
+            regionCodes = regionCodes.stream().filter(regionCode -> regionCode.equals("KR")).toList();
         }
 
-        trendingCollector.collect(dateTime, collectSchedulerProperties.getCollectCount(), regionsIds);
+        trendingCollector.collect(dateTime, collectSchedulerProperties.getCollectSize(), regionCodes);
     }
 }
