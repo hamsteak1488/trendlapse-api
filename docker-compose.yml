@@ -7,6 +7,14 @@ services:
       - "{PORT}:8080"
     environment:
       - TZ=Asia/Seoul
+
+      - LOGGING_FILE_NAME=/var/log/trendlapse/trendlapse.log
+      - LOGGING_LOGBACK_ROLLINGPOLICY_FILE_NAME_PATTERN=/var/log/trendlapse/trendlapse.log.%d{yyyy-MM-dd}.%i.gz
+      - LOGGING_LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE=50MB
+      - LOGGING_LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP=2GB
+      - LOGGING_LOGBACK_ROLLINGPOLICY_MAX_HISTORY=30
+      - LOGGING_LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START=true
+
       - OTEL_SERVICE_NAME=trendlapse-api
       - OTEL_EXPORTER_OTLP_ENDPOINT=${OTLP_ENDPOINT}
       - OTEL_TRACES_EXPORTER=otlp
