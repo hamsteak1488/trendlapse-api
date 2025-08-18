@@ -1,5 +1,6 @@
 package io.github.hamsteak.trendlapse.collector.domain.v0;
 
+import io.github.hamsteak.trendlapse.collector.domain.ChannelCollector;
 import io.github.hamsteak.trendlapse.collector.domain.VideoCollector;
 import io.github.hamsteak.trendlapse.common.errors.exception.ChannelNotFoundException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
@@ -8,15 +9,17 @@ import io.github.hamsteak.trendlapse.video.domain.VideoCreator;
 import io.github.hamsteak.trendlapse.video.domain.VideoFinder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@ConditionalOnProperty(prefix = "collector", name = "video-strategy", havingValue = "one-by-one")
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class OneByOneVideoCollector implements VideoCollector {
-    private final OneByOneChannelCollector oneByOneChannelCollector;
+    private final ChannelCollector channelCollector;
     private final VideoFinder videoFinder;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final VideoCreator videoCreator;
@@ -28,7 +31,7 @@ public class OneByOneVideoCollector implements VideoCollector {
         List<VideoResponse> videoResponses = fetchVideos(videoYoutubeIds);
 
         List<String> channelYoutubeIds = videoResponses.stream().map(VideoResponse::getChannelYoutubeId).toList();
-        oneByOneChannelCollector.collect(channelYoutubeIds);
+        channelCollector.collect(channelYoutubeIds);
 
         return storeFromResponses(videoResponses);
     }

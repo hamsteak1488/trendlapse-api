@@ -9,11 +9,13 @@ import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeData
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@ConditionalOnProperty(prefix = "collector", name = "channel-strategy", havingValue = "batch", matchIfMissing = true)
 @Slf4j
 @Component
 @RequiredArgsConstructor

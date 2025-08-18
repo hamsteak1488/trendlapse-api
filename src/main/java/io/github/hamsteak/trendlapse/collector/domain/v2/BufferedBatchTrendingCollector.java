@@ -1,7 +1,7 @@
 package io.github.hamsteak.trendlapse.collector.domain.v2;
 
 import io.github.hamsteak.trendlapse.collector.domain.TrendingCollector;
-import io.github.hamsteak.trendlapse.collector.domain.v1.BatchVideoCollector;
+import io.github.hamsteak.trendlapse.collector.domain.VideoCollector;
 import io.github.hamsteak.trendlapse.common.errors.exception.VideoNotFoundException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
@@ -10,16 +10,18 @@ import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeData
 import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
+@ConditionalOnProperty(prefix = "collector", name = "trending-strategy", havingValue = "buffered-batch")
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class BufferedBatchTrendingCollector implements TrendingCollector {
-    private final BatchVideoCollector batchVideoCollector;
+    private final VideoCollector videoCollector;
     private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final TrendingCreator trendingCreator;
@@ -33,7 +35,7 @@ public class BufferedBatchTrendingCollector implements TrendingCollector {
             trendingVideoResponseBufferMap.put(regionCode, fetchTrendings(collectSize, regionCode));
         }
 
-        batchVideoCollector.collect(
+        videoCollector.collect(
                 trendingVideoResponseBufferMap.values().stream()
                         .flatMap(Collection::stream)
                         .map(VideoResponse::getId).toList()

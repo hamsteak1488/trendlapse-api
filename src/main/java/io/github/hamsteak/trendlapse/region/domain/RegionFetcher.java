@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class RegionFetcher {
     private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final RegionPutter regionPutter;
+    private final RegionReader regionReader;
 
     public void fetch() {
         RegionListResponse response = youtubeDataApiCaller.fetchRegions();
@@ -18,5 +19,7 @@ public class RegionFetcher {
                 .forEach(item ->
                         regionPutter.put(item.getId(), item.getSnippet().getName(), item.getSnippet().getGl())
                 );
+
+        regionReader.setReady(true);
     }
 }

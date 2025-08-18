@@ -1,6 +1,7 @@
 package io.github.hamsteak.trendlapse.collector.domain.v0;
 
 import io.github.hamsteak.trendlapse.collector.domain.TrendingCollector;
+import io.github.hamsteak.trendlapse.collector.domain.VideoCollector;
 import io.github.hamsteak.trendlapse.common.errors.exception.VideoNotFoundException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
@@ -8,6 +9,7 @@ import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeData
 import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -19,11 +21,12 @@ import java.util.List;
  * API 호출 횟수: Trending(1) + Video(N) + Channel(N)
  * DB 쿼리 횟수: Trending(insert:N) + Video(select:N + insert:N) + Channel(select:N + insert:N)
  */
+@ConditionalOnProperty(prefix = "collector", name = "trending-strategy", havingValue = "one-by-one")
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class OneByOneTrendingCollector implements TrendingCollector {
-    private final OneByOneVideoCollector oneByOneVideoCollector;
+    private final VideoCollector videoCollector;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final TrendingCreator trendingCreator;
 
@@ -35,7 +38,7 @@ public class OneByOneTrendingCollector implements TrendingCollector {
             List<VideoResponse> trendingVideoResponses = fetchTrendings(collectSize, regionCode);
 
             List<String> trendingVideoYoutubeIds = trendingVideoResponses.stream().map(VideoResponse::getId).toList();
-            oneByOneVideoCollector.collect(trendingVideoYoutubeIds);
+            videoCollector.collect(trendingVideoYoutubeIds);
 
             collectedCount += storeFromResponses(dateTime, regionCode, trendingVideoResponses);
         }

@@ -1,6 +1,7 @@
 package io.github.hamsteak.trendlapse.collector.domain.v1;
 
 import io.github.hamsteak.trendlapse.collector.domain.TrendingCollector;
+import io.github.hamsteak.trendlapse.collector.domain.VideoCollector;
 import io.github.hamsteak.trendlapse.common.errors.exception.VideoNotFoundException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
@@ -9,6 +10,7 @@ import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeData
 import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -20,11 +22,12 @@ import java.util.List;
  * API 호출 횟수: Trending(1) + Video(1) + Channel(1)
  * DB 쿼리 횟수: Trending(select-video:N + insert:N) + Video(select-in:1 + select-channel:N + insert:N) + Channel(select-in:1 + insert:N)
  */
+@ConditionalOnProperty(prefix = "collector", name = "trending-strategy", havingValue = "batch")
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class BatchTrendingCollector implements TrendingCollector {
-    private final BatchVideoCollector batchVideoCollector;
+    private final VideoCollector videoCollector;
     private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final TrendingCreator trendingCreator;
@@ -37,7 +40,7 @@ public class BatchTrendingCollector implements TrendingCollector {
             List<VideoResponse> trendingVideoResponses = fetchTrendings(collectSize, regionCode);
 
             List<String> videoYoutubeIds = trendingVideoResponses.stream().map(VideoResponse::getId).toList();
-            batchVideoCollector.collect(videoYoutubeIds);
+            videoCollector.collect(videoYoutubeIds);
 
             storedCount += storeFromResponses(dateTime, regionCode, trendingVideoResponses);
         }

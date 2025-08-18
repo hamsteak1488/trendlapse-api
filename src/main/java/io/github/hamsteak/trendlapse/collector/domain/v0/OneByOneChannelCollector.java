@@ -6,10 +6,12 @@ import io.github.hamsteak.trendlapse.collector.domain.ChannelCollector;
 import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@ConditionalOnProperty(prefix = "collector", name = "channel-strategy", havingValue = "one-by-one")
 @Component
 @RequiredArgsConstructor
 public class OneByOneChannelCollector implements ChannelCollector {
