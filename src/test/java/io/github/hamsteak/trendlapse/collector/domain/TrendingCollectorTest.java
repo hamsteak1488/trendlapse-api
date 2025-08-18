@@ -72,7 +72,6 @@ class TrendingCollectorTest {
                 Named.of("OneByOneTrendingCollector",
                         fix -> new OneByOneTrendingCollector(
                                 mock(OneByOneVideoCollector.class),
-                                fix.youtubeDataApiProperties,
                                 fix.youtubeDataApiCaller,
                                 fix.trendingCreator
                         )
@@ -180,6 +179,17 @@ class TrendingCollectorTest {
                                 defaultTrending(3, "RG2"),
                                 defaultTrending(4, "RG2"),
                                 defaultTrending(5, "RG2")
+                        ))
+                        .build(),
+                Case.builder()
+                        .name("collectSize가 maxResult보다 작을 때")
+                        .collectSize(3)
+                        .maxResultCount(10)
+                        .regionCodes(List.of("RG1"))
+                        .expectedCreatedTrendings(List.of(
+                                defaultTrending(1, "RG1"),
+                                defaultTrending(2, "RG1"),
+                                defaultTrending(3, "RG1")
                         ))
                         .build()
         );
