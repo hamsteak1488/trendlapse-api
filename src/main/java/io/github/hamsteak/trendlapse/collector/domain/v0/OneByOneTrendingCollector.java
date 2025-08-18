@@ -5,7 +5,6 @@ import io.github.hamsteak.trendlapse.common.errors.exception.VideoNotFoundExcept
 import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +24,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OneByOneTrendingCollector implements TrendingCollector {
     private final OneByOneVideoCollector oneByOneVideoCollector;
-    private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
     private final TrendingCreator trendingCreator;
 
@@ -49,20 +47,11 @@ public class OneByOneTrendingCollector implements TrendingCollector {
         List<VideoResponse> trendingVideoResponses = new ArrayList<>();
 
         String pageToken = null;
-        int remainingCount = collectSize;
-        while (remainingCount > 0) {
-            int maxResultCount = Math.min(remainingCount, youtubeDataApiProperties.getMaxResultCount());
-
-            TrendingListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(maxResultCount, regionCode, pageToken);
-            trendingVideoResponses.addAll(trendingListResponse.getItems());
-
-            if (trendingListResponse.getNextPageToken() == null) {
-                break;
-            }
+        do {
+            TrendingListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(1, regionCode, pageToken);
+            trendingVideoResponses.add(trendingListResponse.getItems().get(0));
             pageToken = trendingListResponse.getNextPageToken();
-
-            remainingCount -= youtubeDataApiProperties.getMaxResultCount();
-        }
+        } while (pageToken != null && --collectSize > 0);
 
         return trendingVideoResponses;
     }
