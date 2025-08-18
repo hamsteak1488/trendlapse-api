@@ -25,6 +25,11 @@ public class TrendingCollectScheduler {
 
     @Scheduled(cron = "${collect-scheduler.collect-cron}", zone = "UTC")
     public void collect() {
+        if (!regionReader.isReady()) {
+            log.info("RegionReader is not ready yet. Skipping scheduled task.");
+            return;
+        }
+
         LocalDateTime dateTime = LocalDateTime.now(Clock.systemUTC());
         List<String> regionCodes = regionReader.readAll().stream().map(Region::getRegionCode).toList();
 
