@@ -1,0 +1,50 @@
+@startuml
+title "BatchVideoCollector Sequence Diagram (Clarity on Exception)"
+
+actor "Caller" as caller
+participant "collector: BatchVideoCollector" as collector
+participant "finder: VideoFinder" as finder
+participant "api: YoutubeDataApiCaller" as api
+participant "channelCollector: BatchChannelCollector" as channelCollector
+participant "creator: VideoCreator" as creator
+
+caller -> collector : collect(videoYoutubeIds)
+activate collector
+
+collector -> finder : findMissingVideoYoutubeIds(videoYoutubeIds)
+activate finder
+finder --> collector : missingVideoYoutubeIds
+deactivate finder
+
+note right of collector
+  Instead of one API call per video,
+  IDs are grouped into batches to reduce API calls.
+  (Approx. N / 50 calls instead of N calls)
+end note
+loop while startIndex < videoYoutubeIds.size()
+    collector -> api : fetchVideos(subFetchVideoYoutubeIds)
+    activate api
+    api --> collector : videoListResponse
+    deactivate api
+end
+
+collector -> channelCollector : collect(channelYoutubeIds)
+activate channelCollector
+channelCollector --> collector
+deactivate channelCollector
+
+loop for each videoResponse
+    group try [Create Video Record]
+        collector -> creator : create(videoId, channelId, title, thumbnailUrl)
+        activate creator
+        creator --> collector
+        deactivate creator
+    else catch [ChannelNotFoundException]
+        note over collector : Log exception and continue loop
+    end
+end
+
+collector --> caller : storedCount
+deactivate collector
+
+@enduml

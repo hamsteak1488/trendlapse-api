@@ -1,0 +1,53 @@
+@startuml
+title "BufferedBatchTrendingCollector Sequence Diagram (Clarity on Exception)"
+
+actor "Caller" as caller
+participant "collector: BufferedBatchTrendingCollector" as collector
+participant "api: YoutubeDataApiCaller" as api
+participant "videoCollector: BatchVideoCollector" as videoCollector
+participant "creator: TrendingCreator" as creator
+
+caller -> collector : collect(dateTime, collectSize, regionCodes)
+activate collector
+
+loop for each regionCode
+    note right of collector
+        Fetches trending videos page by page
+        until 'collectSize' is reached.
+        (Approx. collectSize / 50 API calls per region)
+    end note
+    collector -> collector : fetchTrendings(collectSize, regionCode)
+    activate collector
+    loop while remainingCount > 0
+        collector -> api : fetchTrendings(maxResultCount, regionCode, pageToken)
+        activate api
+        api --> collector : trendingListResponse
+        deactivate api
+    end
+    collector --> collector : trendingVideoResponses
+    deactivate collector
+    note right of collector : Buffer responses in a map
+end
+
+collector -> videoCollector : collect(allVideoYoutubeIds)
+activate videoCollector
+videoCollector --> collector
+deactivate videoCollector
+
+loop for each entry in trendingVideoResponseBufferMap
+    loop for each trendingVideoResponse
+        group try [Create Trending Record]
+            collector -> creator : create(dateTime, videoYoutubeId, rank, regionCode)
+            activate creator
+            creator --> collector
+            deactivate creator
+        else catch [VideoNotFoundException]
+            note over collector : Log exception and continue loop
+        end
+    end
+end
+
+collector --> caller : storedCount
+deactivate collector
+
+@enduml

@@ -1,0 +1,39 @@
+@startuml
+title "OneByOneChannelCollector Sequence Diagram (Clarity on Fetch)"
+
+actor "Caller" as caller
+participant "collector: OneByOneChannelCollector" as collector
+participant "finder: ChannelFinder" as finder
+participant "api: YoutubeDataApiCaller" as api
+participant "creator: ChannelCreator" as creator
+
+caller -> collector : collect(channelYoutubeIds)
+activate collector
+
+collector -> finder : findMissingChannelYoutubeIds(channelYoutubeIds)
+activate finder
+finder --> collector : missingChannelYoutubeIds
+deactivate finder
+
+note right of collector
+    Fetches channel details one by one
+    for each missing channel ID.
+end note
+loop for each channelYoutubeId in missingChannelYoutubeIds
+    collector -> api : fetchChannels(List.of(channelYoutubeId))
+    activate api
+    api --> collector : channelListResponse
+    deactivate api
+end
+
+loop for each channelResponse in channelResponses
+    collector -> creator : create(id, title, thumbnailUrl)
+    activate creator
+    creator --> collector
+    deactivate creator
+end
+
+collector --> caller : storedCount
+deactivate collector
+
+@enduml

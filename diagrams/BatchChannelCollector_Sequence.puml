@@ -1,0 +1,40 @@
+@startuml
+title "BatchChannelCollector Sequence Diagram (Refined)"
+
+actor "Caller" as caller
+participant "collector: BatchChannelCollector" as collector
+participant "finder: ChannelFinder" as finder
+participant "api: YoutubeDataApiCaller" as api
+participant "creator: ChannelCreator" as creator
+
+caller -> collector : collect(channelYoutubeIds)
+activate collector
+
+collector -> finder : findMissingChannelYoutubeIds(channelYoutubeIds)
+activate finder
+finder --> collector : missingChannelYoutubeIds
+deactivate finder
+
+note right of collector
+  Instead of one API call per channel,
+  IDs are grouped into batches to reduce API calls.
+  (Approx. N / 50 calls instead of N calls)
+end note
+loop while startIndex < channelYoutubeIds.size()
+    collector -> api : fetchChannels(subFetchChannelYoutubeIds)
+    activate api
+    api --> collector : channelListResponse
+    deactivate api
+end
+
+loop for each channelResponse in channelResponses
+    collector -> creator : create(id, title, thumbnailUrl)
+    activate creator
+    creator --> collector
+    deactivate creator
+end
+
+collector --> caller : storedCount
+deactivate collector
+
+@enduml
