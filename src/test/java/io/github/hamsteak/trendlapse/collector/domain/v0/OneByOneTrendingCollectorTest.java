@@ -3,9 +3,7 @@ package io.github.hamsteak.trendlapse.collector.domain.v0;
 import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
-import io.github.hamsteak.trendlapse.video.domain.VideoReader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -25,13 +23,9 @@ class OneByOneTrendingCollectorTest {
     @Mock
     YoutubeDataApiCaller youtubeDataApiCaller;
     @Mock
-    YoutubeDataApiProperties youtubeDataApiProperties;
-    @Mock
     OneByOneVideoCollector oneByOneVideoCollector;
     @Mock
     TrendingCreator trendingCreator;
-    @Mock
-    VideoReader videoReader;
     @InjectMocks
     OneByOneTrendingCollector sut;
 
@@ -59,10 +53,8 @@ class OneByOneTrendingCollectorTest {
     void collect_maps_response_to_entity_fields() {
         // given
         LocalDateTime dateTime = LocalDateTime.of(1, 1, 1, 1, 1);
-        int maxResultCount = 0;
 
-        when(youtubeDataApiProperties.getMaxResultCount()).thenReturn(maxResultCount);
-        when(youtubeDataApiCaller.fetchTrendings(maxResultCount, "RG1", null))
+        when(youtubeDataApiCaller.fetchTrendings(1, "RG1", null))
                 .thenReturn(list(null, video("Z", "channelZ", "Z-Title", "https://thumb/z.jpg")));
 
         ArgumentCaptor<LocalDateTime> dateTimeArgumentCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
