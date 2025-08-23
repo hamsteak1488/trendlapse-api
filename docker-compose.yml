@@ -26,6 +26,9 @@ services:
     env_file:
       - .env.runtime
 
+    volumes:
+      - /var/log/trendlapse:/var/log/trendlapse
+
 networks:
   default:
     external: true
