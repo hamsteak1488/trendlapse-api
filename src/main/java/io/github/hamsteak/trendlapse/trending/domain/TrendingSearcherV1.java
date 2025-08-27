@@ -3,7 +3,6 @@ package io.github.hamsteak.trendlapse.trending.domain;
 import io.github.hamsteak.trendlapse.trending.domain.dto.TrendingSearchFilter;
 import io.github.hamsteak.trendlapse.trending.infrastructure.TrendingRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +13,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Primary
 @Component
 @RequiredArgsConstructor
 public class TrendingSearcherV1 implements TrendingSearcher {
