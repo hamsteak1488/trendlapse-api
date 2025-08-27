@@ -1,10 +1,13 @@
 package io.github.hamsteak.trendlapse.channel.domain;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @Builder
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class ChannelDetail {
     @NonNull
     private final Long id;
