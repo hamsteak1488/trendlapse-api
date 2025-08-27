@@ -9,10 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,18 +25,17 @@ public class TrendingSearcherV2 implements TrendingSearcher {
         List<DateTimeTrendingDetailList> dateTimeTrendingDetailLists = new ArrayList<>();
         List<LocalDateTime> dateTimes = trendingRepository.findDateTimes(filter.getRegionCode(), filter.getStartDateTime(), filter.getEndDateTime());
 
-        LocalDateTime nextDayOfStartDateTime = filter.getStartDateTime().plusDays(1).withHour(0).withMinute(0);
-        LocalDateTime prevDayOfEndDateTime = filter.getEndDateTime().minusDays(1).withHour(23).withMinute(59);
+        TreeMap<LocalDate, List<LocalDateTime>> dayDateTimesMap = dateTimes.stream()
+                .collect(Collectors.groupingBy(LocalDateTime::toLocalDate, TreeMap::new, Collectors.toList()));
 
-        Map<LocalDate, List<LocalDateTime>> dayDateTimesMap = dateTimes.stream()
-                .filter(dateTime -> !dateTime.isBefore(nextDayOfStartDateTime) && !dateTime.isAfter(prevDayOfEndDateTime))
-                .collect(Collectors.groupingBy(LocalDateTime::toLocalDate));
+        LocalDate firstDate = dayDateTimesMap.firstKey();
+        LocalDate lastDate = dayDateTimesMap.lastKey();
 
         for (Map.Entry<LocalDate, List<LocalDateTime>> dayDateTimesEntry : dayDateTimesMap.entrySet()) {
             LocalDate dayDate = dayDateTimesEntry.getKey();
             List<LocalDateTime> dayDateTimes = dayDateTimesEntry.getValue();
 
-            if (dayDateTimes.size() == 24) {
+            if (!dayDate.equals(firstDate) && !dayDate.equals(lastDate)) {
                 List<DateTimeTrendingDetailList> dayDateTimeTrendingDetailLists = cacheDateTimeTrendingDetailListFinder.find(filter.getRegionCode(), dayDate, dayDateTimes);
                 dateTimeTrendingDetailLists.addAll(dayDateTimeTrendingDetailLists);
             } else {
