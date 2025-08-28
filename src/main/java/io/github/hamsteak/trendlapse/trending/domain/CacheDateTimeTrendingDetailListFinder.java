@@ -19,8 +19,6 @@ public class CacheDateTimeTrendingDetailListFinder {
 
     @Cacheable(value = "trendingsByDay", key = "#regionCode + ':' + #dayDate")
     public List<DateTimeTrendingDetailList> find(String regionCode, LocalDate dayDate, List<LocalDateTime> dayDateTimes) {
-        log.info("CacheDateTimeTrendingDetailListFinder.find({}, {})", regionCode, dayDate);
-
         List<DateTimeTrendingDetailList> dayDateTimeTrendingDetailLists = new ArrayList<>();
 
         for (LocalDateTime dateTime : dayDateTimes) {
