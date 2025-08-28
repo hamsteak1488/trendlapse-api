@@ -32,7 +32,7 @@ public class YoutubeDataApiCallLoggingAspect {
 
         stopWatch.stop();
         String methodName = getMethodName(joinPoint);
-        log.info("task:{}, elapsed {}ms", methodName, stopWatch.lastTaskInfo().getTimeMillis());
+        log.debug("API Call:{}, elapsed {}ms", methodName, stopWatch.lastTaskInfo().getTimeMillis());
 
         return result;
     }
