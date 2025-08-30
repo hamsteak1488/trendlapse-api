@@ -25,29 +25,47 @@ public class TrendingSearcherV2 implements TrendingSearcher {
         List<DateTimeTrendingDetailList> dateTimeTrendingDetailLists = new ArrayList<>();
         List<LocalDateTime> dateTimes = trendingRepository.findDateTimes(filter.getRegionCode(), filter.getStartDateTime(), filter.getEndDateTime());
 
+        if (dateTimes.isEmpty()) {
+            return List.of();
+        }
+
         TreeMap<LocalDate, List<LocalDateTime>> dayDateTimesMap = dateTimes.stream()
                 .collect(Collectors.groupingBy(LocalDateTime::toLocalDate, TreeMap::new, Collectors.toList()));
 
         LocalDate firstDate = dayDateTimesMap.firstKey();
         LocalDate lastDate = dayDateTimesMap.lastKey();
 
+        // first date
+        List<LocalDateTime> firstDayDateTimes = dayDateTimesMap.get(firstDate);
+        dateTimeTrendingDetailLists.addAll(getDateTimeTrendingDetailLists(filter.getRegionCode(), firstDayDateTimes.get(0), firstDate.atTime(23, 59, 59)));
+
+        if (!lastDate.equals(firstDate)) {
+            List<LocalDateTime> lastDayDateTimes = dayDateTimesMap.get(lastDate);
+            dateTimeTrendingDetailLists.addAll(getDateTimeTrendingDetailLists(filter.getRegionCode(), lastDate.atTime(0, 0), lastDayDateTimes.get(lastDayDateTimes.size() - 1)));
+        }
+
         for (Map.Entry<LocalDate, List<LocalDateTime>> dayDateTimesEntry : dayDateTimesMap.entrySet()) {
             LocalDate dayDate = dayDateTimesEntry.getKey();
             List<LocalDateTime> dayDateTimes = dayDateTimesEntry.getValue();
 
-            if (!dayDate.equals(firstDate) && !dayDate.equals(lastDate)) {
-                List<DateTimeTrendingDetailList> dayDateTimeTrendingDetailLists = cacheDateTimeTrendingDetailListFinder.find(filter.getRegionCode(), dayDate, dayDateTimes);
-                dateTimeTrendingDetailLists.addAll(dayDateTimeTrendingDetailLists);
-            } else {
-                dateTimeTrendingDetailLists.addAll(trendingRepository.findDetailByRegionAndDateTime(filter.getRegionCode(), filter.getStartDateTime(), filter.getEndDateTime()).stream()
-                        .collect(Collectors.groupingBy(TrendingDetail::getDateTime, LinkedHashMap::new, Collectors.toList()))
-                        .entrySet().stream()
-                        .map(mapFromTrendingDetailMapToDateTimeTrendingDetailList())
-                        .toList());
+            if (dayDate.equals(firstDate) || dayDate.equals(lastDate)) {
+                continue;
             }
+
+            List<DateTimeTrendingDetailList> dayDateTimeTrendingDetailLists = cacheDateTimeTrendingDetailListFinder.find(filter.getRegionCode(), dayDate, dayDateTimes);
+            dateTimeTrendingDetailLists.addAll(dayDateTimeTrendingDetailLists);
+
         }
 
         return dateTimeTrendingDetailLists;
+    }
+
+    private List<DateTimeTrendingDetailList> getDateTimeTrendingDetailLists(String regionCode, LocalDateTime left, LocalDateTime right) {
+        return trendingRepository.findDetailByRegionAndDateTimeBetween(regionCode, left, right).stream()
+                .collect(Collectors.groupingBy(TrendingDetail::getDateTime, LinkedHashMap::new, Collectors.toList()))
+                .entrySet().stream()
+                .map(mapFromTrendingDetailMapToDateTimeTrendingDetailList())
+                .toList();
     }
 
     private Function<Map.Entry<LocalDateTime, List<TrendingDetail>>, DateTimeTrendingDetailList> mapFromTrendingDetailMapToDateTimeTrendingDetailList() {

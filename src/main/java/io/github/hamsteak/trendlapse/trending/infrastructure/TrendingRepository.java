@@ -48,7 +48,7 @@ public interface TrendingRepository extends Repository<Trending, Long> {
                     where t.region.regionCode = :regionCode and t.dateTime between :startDateTime and :endDateTime
                     """
     )
-    List<TrendingDetail> findDetailByRegionAndDateTime(String regionCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
+    List<TrendingDetail> findDetailByRegionAndDateTimeBetween(String regionCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
 
     @Query(
