@@ -1,17 +1,20 @@
 package io.github.hamsteak.trendlapse.trending.domain;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Builder
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class DateTimeTrendingDetailList {
     @NonNull
     private final LocalDateTime dateTime;
 
     @NonNull
-    List<TrendingDetail> items;
+    private final List<TrendingDetail> items;
 }

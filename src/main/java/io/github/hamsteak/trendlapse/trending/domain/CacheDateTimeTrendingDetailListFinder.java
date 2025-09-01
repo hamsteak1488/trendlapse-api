@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -19,17 +19,10 @@ public class CacheDateTimeTrendingDetailListFinder {
 
     @Cacheable(value = "trendingsByDay", key = "#regionCode + ':' + #dayDate")
     public List<DateTimeTrendingDetailList> find(String regionCode, LocalDate dayDate, List<LocalDateTime> dayDateTimes) {
-        List<DateTimeTrendingDetailList> dayDateTimeTrendingDetailLists = new ArrayList<>();
 
-        for (LocalDateTime dateTime : dayDateTimes) {
-            List<TrendingDetail> trendingDetails = trendingRepository.findDetailByRegionAndDateTime(regionCode, dateTime);
-
-            dayDateTimeTrendingDetailLists.add(DateTimeTrendingDetailList.builder()
-                    .dateTime(dateTime)
-                    .items(trendingDetails)
-                    .build());
-        }
-
-        return dayDateTimeTrendingDetailLists;
+        return trendingRepository.findDetailByRegionAndDateTimeBetween(regionCode, dayDateTimes.get(0), dayDateTimes.get(dayDateTimes.size() - 1)).stream()
+                .collect(Collectors.groupingBy(TrendingDetail::getDateTime)).entrySet().stream()
+                .map(entry -> new DateTimeTrendingDetailList(entry.getKey(), entry.getValue()))
+                .toList();
     }
 }

@@ -54,8 +54,9 @@ public class TrendingSearcherV2 implements TrendingSearcher {
 
             List<DateTimeTrendingDetailList> dayDateTimeTrendingDetailLists = cacheDateTimeTrendingDetailListFinder.find(filter.getRegionCode(), dayDate, dayDateTimes);
             dateTimeTrendingDetailLists.addAll(dayDateTimeTrendingDetailLists);
-
         }
+
+        dateTimeTrendingDetailLists.sort(Comparator.comparing(DateTimeTrendingDetailList::getDateTime));
 
         return dateTimeTrendingDetailLists;
     }
