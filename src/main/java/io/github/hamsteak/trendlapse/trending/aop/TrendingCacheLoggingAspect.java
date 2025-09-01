@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.trending.domain;
+package io.github.hamsteak.trendlapse.trending.aop;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
