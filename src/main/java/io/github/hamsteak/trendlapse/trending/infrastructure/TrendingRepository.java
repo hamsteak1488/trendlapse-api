@@ -2,8 +2,10 @@ package io.github.hamsteak.trendlapse.trending.infrastructure;
 
 import io.github.hamsteak.trendlapse.trending.domain.Trending;
 import io.github.hamsteak.trendlapse.trending.domain.TrendingDetail;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -78,4 +80,24 @@ public interface TrendingRepository extends Repository<Trending, Long> {
                     """
     )
     List<TrendingDetail> findDetailByRegionAndDateTime(String regionCode, LocalDateTime dateTime);
+
+    /*
+        H2 does not support ORDER BY in DELETE statements,
+        so the query is designed to work with both MySQL and H2 though it's a bit more complex.
+    */
+    @Modifying
+    @Transactional
+    @Query(value = """
+            delete from trending
+            where id in (
+                select id from (
+                    select id
+                    from trending
+                    where date_time < :dateTime
+                    order by date_time
+                    limit :count
+                ) t
+            )
+            """, nativeQuery = true)
+    int deleteByDateTimeBefore(LocalDateTime dateTime, int count);
 }

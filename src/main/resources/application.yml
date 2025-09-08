@@ -44,11 +44,16 @@ youtube-data-api:
 collect-scheduler:
   collect-size: 100
   collect-cron: '0 20 * * * *'
-  initial-delay: 5000
   use-log: true
 
 collector:
   use-log: false
+
+purge-scheduler:
+  expiration-period: 30d
+  purge-cron: '0 0 0 * * *'
+  batch-size: 1000
+  use-log: true
 
 #logging:
 #  level:
