@@ -21,7 +21,7 @@ public class DateTimeTrendingDetailListFinderCacheInvalidator {
     private final CacheManager cacheManager;
     private final CacheInvalidationConfig cacheInvalidationConfig;
 
-    @Before("execution(* io.github.hamsteak.trendlapse.trending.domain.CacheDateTimeTrendingDetailListFinder.find(..)) && @annotation(cacheable)")
+    @Before("execution(* io.github.hamsteak.trendlapse.trending.domain.CacheByDayDateTimeTrendingDetailListFinder.find(..)) && @annotation(cacheable)")
     public void invalidateCache(JoinPoint joinPoint, Cacheable cacheable) {
         if (!cacheInvalidationConfig.isAlwaysInvalidateCache()) {
             return;

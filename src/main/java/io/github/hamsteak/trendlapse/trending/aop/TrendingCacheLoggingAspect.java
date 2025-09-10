@@ -22,8 +22,8 @@ import java.util.List;
 public class TrendingCacheLoggingAspect {
     private final CacheManager cacheManager;
 
-    @Before("execution(* io.github.hamsteak.trendlapse.trending.domain.CacheDateTimeTrendingDetailListFinder.find(..)) && @annotation(cacheable)")
-    public void logTrendingCache(JoinPoint joinPoint, Cacheable cacheable) {
+    @Before("execution(* io.github.hamsteak.trendlapse.trending.domain.CacheByDayDateTimeTrendingDetailListFinder.find(..)) && @annotation(cacheable)")
+    public void logTrendingCacheByDay(JoinPoint joinPoint, Cacheable cacheable) {
         String cacheName = cacheable.value()[0];
         List<String> stringArgs = Arrays.stream(joinPoint.getArgs()).map(Object::toString).toList().subList(0, 2);
         String key = String.join(":", stringArgs);

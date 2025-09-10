@@ -3,7 +3,6 @@ package io.github.hamsteak.trendlapse.trending.domain;
 import io.github.hamsteak.trendlapse.trending.domain.dto.TrendingSearchFilter;
 import io.github.hamsteak.trendlapse.trending.infrastructure.TrendingRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,12 +12,11 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Primary
 @Component
 @RequiredArgsConstructor
 public class TrendingSearcherV2 implements TrendingSearcher {
     private final TrendingRepository trendingRepository;
-    private final CacheDateTimeTrendingDetailListFinder cacheDateTimeTrendingDetailListFinder;
+    private final CacheByDayDateTimeTrendingDetailListFinder cacheByDayDateTimeTrendingDetailListFinder;
 
     @Transactional(readOnly = true)
     public List<DateTimeTrendingDetailList> search(TrendingSearchFilter filter) {
@@ -52,7 +50,7 @@ public class TrendingSearcherV2 implements TrendingSearcher {
                 continue;
             }
 
-            List<DateTimeTrendingDetailList> dayDateTimeTrendingDetailLists = cacheDateTimeTrendingDetailListFinder.find(filter.getRegionCode(), dayDate, dayDateTimes);
+            List<DateTimeTrendingDetailList> dayDateTimeTrendingDetailLists = cacheByDayDateTimeTrendingDetailListFinder.find(filter.getRegionCode(), dayDate, dayDateTimes);
             dateTimeTrendingDetailLists.addAll(dayDateTimeTrendingDetailLists);
         }
 

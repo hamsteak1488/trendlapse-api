@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CacheDateTimeTrendingDetailListFinder {
+public class CacheByDayDateTimeTrendingDetailListFinder {
     private final TrendingRepository trendingRepository;
 
     @Cacheable(value = "trendingsByDay", key = "#regionCode + ':' + #dayDate")
