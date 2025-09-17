@@ -1,9 +1,11 @@
 package io.github.hamsteak.trendlapse.collector.domain.v0;
 
+import io.github.hamsteak.trendlapse.collector.domain.TrendingItem;
+import io.github.hamsteak.trendlapse.collector.domain.VideoCollector;
+import io.github.hamsteak.trendlapse.collector.fetcher.TrendingFetcher;
+import io.github.hamsteak.trendlapse.collector.storer.TrendingStorer;
 import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
-import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -14,18 +16,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OneByOneTrendingCollectorTest {
     @Mock
-    YoutubeDataApiCaller youtubeDataApiCaller;
+    TrendingFetcher trendingFetcher;
     @Mock
-    OneByOneVideoCollector oneByOneVideoCollector;
+    TrendingStorer trendingStorer;
     @Mock
-    TrendingCreator trendingCreator;
+    VideoCollector videoCollector;
     @InjectMocks
     OneByOneTrendingCollector sut;
 
@@ -54,8 +54,9 @@ class OneByOneTrendingCollectorTest {
         // given
         LocalDateTime dateTime = LocalDateTime.of(1, 1, 1, 1, 1);
 
-        when(youtubeDataApiCaller.fetchTrendings(1, "RG1", null))
-                .thenReturn(list(null, video("Z", "channelZ", "Z-Title", "https://thumb/z.jpg")));
+        TrendingItem trendingItem = new TrendingItem(dateTime, "RG1", 1, "video-youtube-id");
+        when(trendingFetcher.fetch(dateTime, 1, "RG1"))
+                .thenReturn(List.of(trendingItem));
 
         ArgumentCaptor<LocalDateTime> dateTimeArgumentCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
         ArgumentCaptor<String> videoYoutubeIdCapture = ArgumentCaptor.forClass(String.class);
@@ -63,14 +64,9 @@ class OneByOneTrendingCollectorTest {
         ArgumentCaptor<String> regionCodeCapture = ArgumentCaptor.forClass(String.class);
 
         // when
-        int saved = sut.collect(dateTime, 1, List.of("RG1"));
+        sut.collect(dateTime, 1, List.of("RG1"));
 
         // then
-        verify(trendingCreator).create(dateTimeArgumentCaptor.capture(), videoYoutubeIdCapture.capture(), rankCapture.capture(), regionCodeCapture.capture());
-        assertThat(dateTimeArgumentCaptor.getValue()).isEqualTo(dateTime);
-        assertThat(videoYoutubeIdCapture.getValue()).isEqualTo("Z");
-        assertThat(rankCapture.getValue()).isEqualTo(1);
-        assertThat(regionCodeCapture.getValue()).isEqualTo("RG1");
-        assertThat(saved).isEqualTo(1);
+        verify(trendingStorer, times(1)).store(List.of(trendingItem));
     }
 }
