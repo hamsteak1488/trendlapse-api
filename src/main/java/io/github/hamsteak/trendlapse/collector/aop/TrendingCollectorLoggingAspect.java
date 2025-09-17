@@ -15,7 +15,7 @@ import org.springframework.util.StopWatch;
 public class TrendingCollectorLoggingAspect {
     @Around("execution(* io.github.hamsteak.trendlapse.collector.domain.TrendingCollector.collect(..))")
     public Object logApiCallTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        log.info("Started scheduled trendings collection task.");
+        log.info("Started trendings collection task.");
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -24,7 +24,7 @@ public class TrendingCollectorLoggingAspect {
 
         stopWatch.stop();
 
-        log.info("Finished scheduled trendings collection task. (elapsed {}ms)", stopWatch.lastTaskInfo().getTimeMillis());
+        log.info("Finished trendings collection task. (elapsed {}ms)", stopWatch.lastTaskInfo().getTimeMillis());
 
         return result;
     }

@@ -1,20 +1,16 @@
 package io.github.hamsteak.trendlapse.collector.domain.v1;
 
 import io.github.hamsteak.trendlapse.collector.domain.TrendingCollector;
+import io.github.hamsteak.trendlapse.collector.domain.TrendingItem;
 import io.github.hamsteak.trendlapse.collector.domain.VideoCollector;
-import io.github.hamsteak.trendlapse.common.errors.exception.VideoNotFoundException;
-import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
-import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
-import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
+import io.github.hamsteak.trendlapse.collector.fetcher.TrendingFetcher;
+import io.github.hamsteak.trendlapse.collector.storer.TrendingStorer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,65 +23,18 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class BatchTrendingCollector implements TrendingCollector {
+    private final TrendingFetcher trendingFetcher;
+    private final TrendingStorer trendingStorer;
     private final VideoCollector videoCollector;
-    private final YoutubeDataApiProperties youtubeDataApiProperties;
-    private final YoutubeDataApiCaller youtubeDataApiCaller;
-    private final TrendingCreator trendingCreator;
 
     @Override
-    public int collect(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
-        int storedCount = 0;
-
+    public void collect(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
         for (String regionCode : regionCodes) {
-            List<VideoResponse> trendingVideoResponses = fetchTrendings(collectSize, regionCode);
+            List<TrendingItem> fetchedTrendingItems = trendingFetcher.fetch(dateTime, collectSize, regionCode);
+            List<String> videoYoutubeIds = fetchedTrendingItems.stream().map(TrendingItem::getVideoYoutubeId).toList();
 
-            List<String> videoYoutubeIds = trendingVideoResponses.stream().map(VideoResponse::getId).toList();
             videoCollector.collect(videoYoutubeIds);
-
-            storedCount += storeFromResponses(dateTime, regionCode, trendingVideoResponses);
+            trendingStorer.store(fetchedTrendingItems);
         }
-
-        return storedCount;
-    }
-
-    private List<VideoResponse> fetchTrendings(int collectSize, String regionCode) {
-        List<VideoResponse> responses = new ArrayList<>();
-
-        String pageToken = null;
-        int remainingCount = collectSize;
-        while (remainingCount > 0) {
-            int maxResultCount = Math.min(remainingCount, youtubeDataApiProperties.getMaxResultCount());
-
-            TrendingListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(maxResultCount, regionCode, pageToken);
-            responses.addAll(trendingListResponse.getItems());
-
-            if (trendingListResponse.getNextPageToken() == null) {
-                break;
-            }
-            pageToken = trendingListResponse.getNextPageToken();
-
-            remainingCount -= youtubeDataApiProperties.getMaxResultCount();
-        }
-
-        return responses;
-    }
-
-    private int storeFromResponses(LocalDateTime dateTime, String regionCode, List<VideoResponse> trendingVideoResponses) {
-        int storedCount = 0;
-
-        for (int i = 0; i < trendingVideoResponses.size(); i++) {
-            int rank = i + 1;
-            String videoYoutubeId = trendingVideoResponses.get(i).getId();
-
-            try {
-                trendingCreator.create(dateTime, videoYoutubeId, rank, regionCode);
-                storedCount++;
-            } catch (VideoNotFoundException ex) {
-                log.info("Skipping trending record creation: No matching video found (region={}, rank={}, videoYoutubeId={}).",
-                        regionCode, rank, videoYoutubeId);
-            }
-        }
-
-        return storedCount;
     }
 }
