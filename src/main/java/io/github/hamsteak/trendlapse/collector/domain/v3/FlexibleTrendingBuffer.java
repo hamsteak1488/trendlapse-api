@@ -1,5 +1,6 @@
 package io.github.hamsteak.trendlapse.collector.domain.v3;
 
+import io.github.hamsteak.trendlapse.collector.domain.TrendingItem;
 import io.github.hamsteak.trendlapse.video.domain.VideoFinder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,10 @@ public class FlexibleTrendingBuffer {
 
     public void pushTrendingItem(TrendingItem item) {
         uncollectedTrendingItemQueue.add(item);
+    }
+
+    public void pushTrendingItems(List<TrendingItem> items) {
+        uncollectedTrendingItemQueue.addAll(items);
     }
 
     public List<TrendingItem> pollTrendingItems(int maxPollCount) {

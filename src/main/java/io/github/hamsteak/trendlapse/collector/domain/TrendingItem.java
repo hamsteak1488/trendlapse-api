@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.collector.domain.v3;
+package io.github.hamsteak.trendlapse.collector.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

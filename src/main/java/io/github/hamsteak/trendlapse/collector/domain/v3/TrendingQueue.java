@@ -1,6 +1,7 @@
 package io.github.hamsteak.trendlapse.collector.domain.v3;
 
 
+import io.github.hamsteak.trendlapse.collector.domain.TrendingItem;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayDeque;
