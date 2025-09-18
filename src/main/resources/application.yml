@@ -47,7 +47,7 @@ collect-scheduler:
   use-log: true
 
 collector:
-  use-log: false
+  use-log: true
 
 purge-scheduler:
   expiration-period: 30d

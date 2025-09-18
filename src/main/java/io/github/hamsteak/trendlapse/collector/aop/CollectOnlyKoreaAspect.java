@@ -16,7 +16,8 @@ import java.util.List;
 public class CollectOnlyKoreaAspect {
     @Around("execution(* io.github.hamsteak.trendlapse.collector.domain.TrendingCollector.collect(..))")
     public Object logApiCallTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        joinPoint.getArgs()[2] = List.of("KR");
-        return joinPoint.proceed();
+        Object[] args = joinPoint.getArgs();
+        args[2] = List.of("KR");
+        return joinPoint.proceed(args);
     }
 }
