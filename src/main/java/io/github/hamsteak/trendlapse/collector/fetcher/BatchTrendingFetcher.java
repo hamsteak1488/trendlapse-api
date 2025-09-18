@@ -22,16 +22,20 @@ public class BatchTrendingFetcher implements TrendingFetcher {
     private final YoutubeDataApiCaller youtubeDataApiCaller;
 
     @Override
-    public List<TrendingItem> fetch(LocalDateTime dateTime, int collectSize, String regionCode) {
-        List<VideoResponse> responses = fetchTrendings(collectSize, regionCode);
+    public List<TrendingItem> fetch(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
+        List<TrendingItem> trendingItems = new ArrayList<>();
+        for (String regionCode : regionCodes) {
+            List<VideoResponse> responses = fetchTrendings(collectSize, regionCode);
+            trendingItems.addAll(IntStream.range(0, responses.size())
+                    .mapToObj(i -> {
+                        int rank = i + 1;
+                        String videoYoutubeId = responses.get(i).getId();
+                        return new TrendingItem(dateTime, regionCode, rank, videoYoutubeId);
+                    })
+                    .toList());
+        }
 
-        return IntStream.range(0, responses.size())
-                .mapToObj(i -> {
-                    int rank = i + 1;
-                    String videoYoutubeId = responses.get(i).getId();
-                    return new TrendingItem(dateTime, regionCode, rank, videoYoutubeId);
-                })
-                .toList();
+        return trendingItems;
     }
 
     private List<VideoResponse> fetchTrendings(int collectSize, String regionCode) {

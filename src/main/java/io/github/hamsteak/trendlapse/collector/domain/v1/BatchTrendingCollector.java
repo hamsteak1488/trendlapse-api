@@ -30,7 +30,7 @@ public class BatchTrendingCollector implements TrendingCollector {
     @Override
     public void collect(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
         for (String regionCode : regionCodes) {
-            List<TrendingItem> fetchedTrendingItems = trendingFetcher.fetch(dateTime, collectSize, regionCode);
+            List<TrendingItem> fetchedTrendingItems = trendingFetcher.fetch(dateTime, collectSize, List.of(regionCode));
             List<String> videoYoutubeIds = fetchedTrendingItems.stream().map(TrendingItem::getVideoYoutubeId).toList();
 
             videoCollector.collect(videoYoutubeIds);

@@ -28,11 +28,9 @@ public class FlexibleBufferedBatchTrendingCollector implements TrendingCollector
     @Override
     public void collect(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
         int pushedCount = 0;
-        for (String regionCode : regionCodes) {
-            List<TrendingItem> fetchedTrendingItems = trendingFetcher.fetch(dateTime, collectSize, regionCode);
-            flexibleTrendingBuffer.pushTrendingItems(fetchedTrendingItems);
-            pushedCount += fetchedTrendingItems.size();
-        }
+        List<TrendingItem> fetchedTrendingItems = trendingFetcher.fetch(dateTime, collectSize, regionCodes);
+        flexibleTrendingBuffer.pushTrendingItems(fetchedTrendingItems);
+        pushedCount += fetchedTrendingItems.size();
         log.info("Pushed {} trending items.", pushedCount);
 
         int availableTokenCountForVideoAndChannel = 5000;

@@ -55,7 +55,7 @@ class OneByOneTrendingCollectorTest {
         LocalDateTime dateTime = LocalDateTime.of(1, 1, 1, 1, 1);
 
         TrendingItem trendingItem = new TrendingItem(dateTime, "RG1", 1, "video-youtube-id");
-        when(trendingFetcher.fetch(dateTime, 1, "RG1"))
+        when(trendingFetcher.fetch(dateTime, 1, List.of("RG1")))
                 .thenReturn(List.of(trendingItem));
 
         ArgumentCaptor<LocalDateTime> dateTimeArgumentCaptor = ArgumentCaptor.forClass(LocalDateTime.class);

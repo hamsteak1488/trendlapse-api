@@ -27,9 +27,7 @@ public class BufferedBatchTrendingCollector implements TrendingCollector {
     public void collect(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
         List<TrendingItem> fetchedTrendingItems = new ArrayList<>();
 
-        for (String regionCode : regionCodes) {
-            fetchedTrendingItems.addAll(trendingFetcher.fetch(dateTime, collectSize, regionCode));
-        }
+        fetchedTrendingItems.addAll(trendingFetcher.fetch(dateTime, collectSize, regionCodes));
 
         List<String> videoYoutubeIds = fetchedTrendingItems.stream().map(TrendingItem::getVideoYoutubeId).toList();
         videoCollector.collect(videoYoutubeIds);

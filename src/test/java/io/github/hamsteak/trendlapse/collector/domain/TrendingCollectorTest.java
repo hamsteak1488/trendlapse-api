@@ -21,6 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -235,8 +236,11 @@ class TrendingCollectorTest {
         }
 
         @Override
-        public List<TrendingItem> fetch(LocalDateTime dateTime, int collectSize, String regionCode) {
-            return trendingItemsMap.get(regionCode);
+        public List<TrendingItem> fetch(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
+            return regionCodes.stream()
+                    .map(trendingItemsMap::get)
+                    .flatMap(Collection::stream)
+                    .toList();
         }
     }
 }
