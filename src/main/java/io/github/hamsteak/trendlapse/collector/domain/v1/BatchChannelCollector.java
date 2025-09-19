@@ -5,6 +5,7 @@ import io.github.hamsteak.trendlapse.collector.domain.ChannelCollector;
 import io.github.hamsteak.trendlapse.collector.domain.ChannelItem;
 import io.github.hamsteak.trendlapse.collector.fetcher.ChannelFetcher;
 import io.github.hamsteak.trendlapse.collector.storer.ChannelStorer;
+import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,13 +21,14 @@ public class BatchChannelCollector implements ChannelCollector {
     private final ChannelFinder channelFinder;
     private final ChannelFetcher channelFetcher;
     private final ChannelStorer channelStorer;
+    private final YoutubeDataApiProperties youtubeDataApiProperties;
 
     public int collect(List<String> channelYoutubeIds) {
         channelYoutubeIds = channelFinder.findMissingChannelYoutubeIds(channelYoutubeIds.stream().distinct().toList());
 
         log.info("Found {} missing channels.", channelYoutubeIds.size());
 
-        List<ChannelItem> channelItems = channelFetcher.fetch(channelYoutubeIds);
+        List<ChannelItem> channelItems = channelFetcher.fetch(channelYoutubeIds, youtubeDataApiProperties.getMaxResultCount());
 
         int storedCount = channelStorer.store(channelItems);
 

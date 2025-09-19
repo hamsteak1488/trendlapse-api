@@ -4,7 +4,6 @@ package io.github.hamsteak.trendlapse.collector.fetcher;
 import io.github.hamsteak.trendlapse.collector.domain.ChannelItem;
 import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,15 +15,14 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class BatchChannelFetcher implements ChannelFetcher {
-    private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
 
-    public List<ChannelItem> fetch(List<String> channelYoutubeIds) {
+    public List<ChannelItem> fetch(List<String> channelYoutubeIds, int maxResultCount) {
         List<ChannelItem> channelItems = new ArrayList<>();
 
         int startIndex = 0;
         while (startIndex < channelYoutubeIds.size()) {
-            int endIndex = Math.min(startIndex + youtubeDataApiProperties.getMaxResultCount(), channelYoutubeIds.size());
+            int endIndex = Math.min(startIndex + maxResultCount, channelYoutubeIds.size());
             List<String> subFetchChannelYoutubeIds = channelYoutubeIds.subList(startIndex, endIndex);
 
             ChannelListResponse channelListResponse = youtubeDataApiCaller.fetchChannels(subFetchChannelYoutubeIds);
@@ -35,7 +33,7 @@ public class BatchChannelFetcher implements ChannelFetcher {
                             channelResponse.getSnippet().getThumbnails().getHigh().getUrl()
                     )).toList());
 
-            startIndex += youtubeDataApiProperties.getMaxResultCount();
+            startIndex += maxResultCount;
         }
 
         if (channelItems.size() != channelYoutubeIds.size()) {

@@ -1,14 +1,12 @@
 package io.github.hamsteak.trendlapse.collector.domain;
 
-import io.github.hamsteak.trendlapse.channel.domain.ChannelCreator;
 import io.github.hamsteak.trendlapse.channel.domain.ChannelFinder;
 import io.github.hamsteak.trendlapse.collector.domain.v0.OneByOneChannelCollector;
 import io.github.hamsteak.trendlapse.collector.domain.v1.BatchChannelCollector;
-import io.github.hamsteak.trendlapse.external.youtube.dto.*;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
+import io.github.hamsteak.trendlapse.collector.fetcher.ChannelFetcher;
+import io.github.hamsteak.trendlapse.collector.storer.ChannelStorer;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Named;
@@ -20,7 +18,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,41 +25,33 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ChannelCollectorTest {
-    @EqualsAndHashCode
-    @RequiredArgsConstructor
-    private static class Channel {
-        final String youtubeId;
-        final String title;
-        final String thumbnailUrl;
-    }
-
     private interface ChannelCollectorFactory {
         ChannelCollector create(Fixture fix);
     }
 
     @Builder
     private static class Fixture {
-        final YoutubeDataApiProperties youtubeDataApiProperties;
-        final YoutubeDataApiCaller youtubeDataApiCaller;
         final ChannelFinder channelFinder;
-        final ChannelCreator channelCreator;
+        final ChannelFetcher channelFetcher;
+        final ChannelStorer channelStorer;
+        final YoutubeDataApiProperties youtubeDataApiProperties;
     }
 
     private static Stream<Named<ChannelCollectorFactory>> implementations() {
         return Stream.of(
                 Named.of("OneByOneChannelCollector",
                         (fix) -> new OneByOneChannelCollector(
-                                fix.youtubeDataApiCaller,
                                 fix.channelFinder,
-                                fix.channelCreator
+                                fix.channelFetcher,
+                                fix.channelStorer
                         )
                 ),
                 Named.of("BatchChannelCollector",
                         (fix) -> new BatchChannelCollector(
-                                fix.youtubeDataApiProperties,
-                                fix.youtubeDataApiCaller,
                                 fix.channelFinder,
-                                fix.channelCreator
+                                fix.channelFetcher,
+                                fix.channelStorer,
+                                fix.youtubeDataApiProperties
                         )
                 )
         );
@@ -75,7 +64,7 @@ class ChannelCollectorTest {
         final int maxResultCount;
         final List<String> requestChannelYoutubeIds;
         final List<String> existingChannelYoutubeIds;
-        final List<Channel> expectedCreatedChannels;
+        final List<ChannelItem> expectedStoredChannels;
     }
 
     private static Stream<Case> cases() {
@@ -85,49 +74,49 @@ class ChannelCollectorTest {
                         .maxResultCount(50)
                         .requestChannelYoutubeIds(List.of("A"))
                         .existingChannelYoutubeIds(List.of())
-                        .expectedCreatedChannels(List.of(makeChannel("A")))
+                        .expectedStoredChannels(List.of(defaultChannelItem("A")))
                         .build(),
                 Case.builder()
                         .name("여러 개의 데이터")
                         .maxResultCount(50)
                         .requestChannelYoutubeIds(List.of("A", "B", "C"))
                         .existingChannelYoutubeIds(List.of())
-                        .expectedCreatedChannels(List.of(makeChannel("A"), makeChannel("B"), makeChannel("C")))
+                        .expectedStoredChannels(List.of(defaultChannelItem("A"), defaultChannelItem("B"), defaultChannelItem("C")))
                         .build(),
                 Case.builder()
                         .name("DB에 없는 데이터만 DB에 저장하는지 검사")
                         .maxResultCount(50)
                         .requestChannelYoutubeIds(List.of("A", "B", "C"))
                         .existingChannelYoutubeIds(List.of("B"))
-                        .expectedCreatedChannels(List.of(makeChannel("A"), makeChannel("C")))
+                        .expectedStoredChannels(List.of(defaultChannelItem("A"), defaultChannelItem("C")))
                         .build(),
                 Case.builder()
                         .name("DB에 이미 모든 데이터가 존재")
                         .maxResultCount(50)
                         .requestChannelYoutubeIds(List.of("A", "B"))
                         .existingChannelYoutubeIds(List.of("A", "B"))
-                        .expectedCreatedChannels(List.of())
+                        .expectedStoredChannels(List.of())
                         .build(),
                 Case.builder()
                         .name("중복 제거 후 저장하는지 검사")
                         .maxResultCount(50)
                         .requestChannelYoutubeIds(List.of("A", "A", "B", "B"))
                         .existingChannelYoutubeIds(List.of())
-                        .expectedCreatedChannels(List.of(makeChannel("A"), makeChannel("B")))
+                        .expectedStoredChannels(List.of(defaultChannelItem("A"), defaultChannelItem("B")))
                         .build(),
                 Case.builder()
                         .name("MaxResultCount가 요청 데이터 목록 길이보다 작은 경우에도 정상 동작하는지 검사.")
                         .maxResultCount(2)
                         .requestChannelYoutubeIds(List.of("A", "B", "C", "D", "E"))
                         .existingChannelYoutubeIds(List.of())
-                        .expectedCreatedChannels(List.of(makeChannel("A"), makeChannel("B"), makeChannel("C"), makeChannel("D"), makeChannel("E")))
+                        .expectedStoredChannels(List.of(defaultChannelItem("A"), defaultChannelItem("B"), defaultChannelItem("C"), defaultChannelItem("D"), defaultChannelItem("E")))
                         .build(),
                 Case.builder()
                         .name("MaxResultCount가 요청 데이터 목록 길이보다 작은 경우에도 정상 동작하는지 검사.")
                         .maxResultCount(2)
                         .requestChannelYoutubeIds(List.of("A", "B", "C", "D", "E"))
                         .existingChannelYoutubeIds(List.of())
-                        .expectedCreatedChannels(List.of(makeChannel("A"), makeChannel("B"), makeChannel("C"), makeChannel("D"), makeChannel("E")))
+                        .expectedStoredChannels(List.of(defaultChannelItem("A"), defaultChannelItem("B"), defaultChannelItem("C"), defaultChannelItem("D"), defaultChannelItem("E")))
                         .build()
         );
     }
@@ -146,9 +135,9 @@ class ChannelCollectorTest {
     void create_expected_items_from_api_items(String implName, ChannelCollectorFactory channelCollectorFactory, String tcName, Case tc) {
         // given
         ChannelFinder channelFinder = mock(ChannelFinder.class);
-        ChannelCreator channelCreator = mock(ChannelCreator.class);
+        ChannelFetcher channelFetcher = new MockChannelFetcher();
+        ChannelStorer channelStorer = mock(ChannelStorer.class);
         YoutubeDataApiProperties youtubeDataApiProperties = new YoutubeDataApiProperties("baseUrl", "apiKey", tc.maxResultCount, false, 3);
-        YoutubeDataApiCaller youtubeDataApiCaller = new ChannelMockYoutubeApiCaller();
 
         when(channelFinder.findMissingChannelYoutubeIds(anyList()))
                 .then(invocationOnMock -> {
@@ -158,82 +147,39 @@ class ChannelCollectorTest {
                 });
 
         Fixture fix = Fixture.builder()
-                .youtubeDataApiProperties(youtubeDataApiProperties)
-                .youtubeDataApiCaller(youtubeDataApiCaller)
+                .channelFetcher(channelFetcher)
+                .channelStorer(channelStorer)
                 .channelFinder(channelFinder)
-                .channelCreator(channelCreator)
+                .youtubeDataApiProperties(youtubeDataApiProperties)
                 .build();
 
         ChannelCollector channelCollector = channelCollectorFactory.create(fix);
 
         // when
-        int collectedCount = channelCollector.collect(tc.requestChannelYoutubeIds);
+        channelCollector.collect(tc.requestChannelYoutubeIds);
 
         // then
-        ArgumentCaptor<String> youtubeIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> titleArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> thumbnailUrlArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<List> storeChannelItemsArgCaptor = ArgumentCaptor.forClass(List.class);
 
-        // Create 횟수가 기대되는 Create Youtube ID 목록 길이와 일치하는지 검사.
-        verify(channelCreator, times(tc.expectedCreatedChannels.size())).create(
-                youtubeIdArgumentCaptor.capture(), titleArgumentCaptor.capture(), thumbnailUrlArgumentCaptor.capture());
+        verify(channelStorer, atLeast(0)).store(storeChannelItemsArgCaptor.capture());
 
-        // Create할 때 인수로 넘겨진 Youtube Id를 모아놨을 때 기대되는 Create Youtube ID 목록과 구성이 일치하는지 검사.
-        List<Channel> argChannels = IntStream.range(0, tc.expectedCreatedChannels.size())
-                .mapToObj(i -> {
-                    String argYoutubeId = youtubeIdArgumentCaptor.getAllValues().get(i);
-                    String argTitle = titleArgumentCaptor.getAllValues().get(i);
-                    String argThumbnailUrl = thumbnailUrlArgumentCaptor.getAllValues().get(i);
+        List<ChannelItem> argChannelItems = storeChannelItemsArgCaptor.getAllValues().stream()
+                .flatMap(list -> ((List<ChannelItem>) list).stream()).toList();
 
-                    return new Channel(argYoutubeId, argTitle, argThumbnailUrl);
-                }).toList();
-        assertThat(argChannels).containsExactlyInAnyOrderElementsOf(tc.expectedCreatedChannels);
-
-        assertThat(collectedCount).isEqualTo(tc.expectedCreatedChannels.size());
+        assertThat(argChannelItems).containsExactlyInAnyOrderElementsOf(tc.expectedStoredChannels);
     }
 
-    private static class ChannelMockYoutubeApiCaller implements YoutubeDataApiCaller {
+    private static class MockChannelFetcher implements ChannelFetcher {
         @Override
-        public ChannelListResponse fetchChannels(List<String> channelYoutubeIds) {
-            return channelListResponse(channelYoutubeIds.stream()
-                    .map(youtubeId -> channelResponse(makeChannel(youtubeId)))
-                    .toList());
-        }
-
-        @Override
-        public VideoListResponse fetchVideos(List<String> videoYoutubeId) {
-            return null;
-        }
-
-        @Override
-        public TrendingListResponse fetchTrendings(int maxResultCount, String regionCode, String pageToken) {
-            return null;
-        }
-
-        @Override
-        public RegionListResponse fetchRegions() {
-            return null;
+        public List<ChannelItem> fetch(List<String> channelYoutubeIds, int maxResultCount) {
+            return channelYoutubeIds.stream()
+                    .map(ChannelCollectorTest::defaultChannelItem)
+                    .toList();
         }
     }
 
-    private static Channel makeChannel(String youtubeId) {
-        return new Channel(youtubeId, defaultTitle(youtubeId), defaultThumbnailUrl(youtubeId));
-    }
-
-    private static ChannelResponse channelResponse(Channel channel) {
-        ChannelResponse.Snippet.Thumbnails.Thumbnail high = new ChannelResponse.Snippet.Thumbnails.Thumbnail(channel.thumbnailUrl);
-
-        ChannelResponse.Snippet.Thumbnails thumbs = new ChannelResponse.Snippet.Thumbnails(high);
-
-        ChannelResponse.Snippet snippet = new ChannelResponse.Snippet(channel.title, thumbs);
-
-        ChannelResponse resp = new ChannelResponse(channel.youtubeId, snippet);
-
-        return resp;
-    }
-
-    private static ChannelListResponse channelListResponse(List<ChannelResponse> items) {
-        return new ChannelListResponse(items);
+    private static ChannelItem defaultChannelItem(String youtubeId) {
+        return new ChannelItem(youtubeId, defaultTitle(youtubeId), defaultThumbnailUrl(youtubeId));
     }
 
     private static String defaultTitle(String youtubeId) {

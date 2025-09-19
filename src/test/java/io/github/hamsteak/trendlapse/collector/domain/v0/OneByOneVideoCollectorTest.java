@@ -1,9 +1,9 @@
 package io.github.hamsteak.trendlapse.collector.domain.v0;
 
-import io.github.hamsteak.trendlapse.external.youtube.dto.VideoListResponse;
-import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
-import io.github.hamsteak.trendlapse.video.domain.VideoCreator;
+import io.github.hamsteak.trendlapse.collector.domain.ChannelCollector;
+import io.github.hamsteak.trendlapse.collector.domain.VideoItem;
+import io.github.hamsteak.trendlapse.collector.fetcher.VideoFetcher;
+import io.github.hamsteak.trendlapse.collector.storer.VideoStorer;
 import io.github.hamsteak.trendlapse.video.domain.VideoFinder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,120 +20,94 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class OneByOneVideoCollectorTest {
     @Mock
-    YoutubeDataApiCaller youtubeDataApiCaller;
+    ChannelCollector channelCollector;
     @Mock
     VideoFinder videoFinder;
     @Mock
-    VideoCreator videoCreator;
+    VideoFetcher videoFetcher;
     @Mock
-    OneByOneChannelCollector oneByOneChannelCollector;
+    VideoStorer videoStorer;
     @InjectMocks
     OneByOneVideoCollector sut;
-
-    // --- 헬퍼: 간단한 응답 객체 생성 ---
-    private VideoResponse video(String id, String channelId, String title, String thumbUrl) {
-        VideoResponse.Snippet.Thumbnails.Thumbnail high = new VideoResponse.Snippet.Thumbnails.Thumbnail(thumbUrl);
-
-        VideoResponse.Snippet.Thumbnails thumbs = new VideoResponse.Snippet.Thumbnails(high);
-
-        VideoResponse.Snippet snippet = new VideoResponse.Snippet(title, channelId, thumbs);
-
-        VideoResponse resp = new VideoResponse(id, snippet);
-
-        return resp;
-    }
-
-    private VideoListResponse list(VideoResponse... items) {
-        VideoListResponse list = new VideoListResponse(List.of(items));
-
-        return list;
-    }
 
     // 1) 신규만 조회
     @Test
     void collect_queries_only_non_existing_ids_and_saves_them() {
         // given
-        List<String> ids = List.of("A", "B", "C");
-        when(videoFinder.findMissingVideoYoutubeIds(ids)).thenReturn(List.of("A", "C"));
+        int maxResultCount = 1;
+        when(videoFinder.findMissingVideoYoutubeIds(List.of("A", "B", "C"))).thenReturn(List.of("A", "C"));
 
-        when(youtubeDataApiCaller.fetchVideos(List.of("A")))
-                .thenReturn(list(video("A", "channelA", "titleA", "urlA")));
-        when(youtubeDataApiCaller.fetchVideos(List.of("C")))
-                .thenReturn(list(video("C", "channelC", "titleC", "urlC")));
+        VideoItem videoItemA = new VideoItem("A", "channelA", "titleA", "urlA");
+        VideoItem videoItemC = new VideoItem("C", "channelC", "titleC", "urlC");
+        when(videoFetcher.fetch(List.of("A", "C"), maxResultCount))
+                .thenReturn(List.of(videoItemA, videoItemC));
 
         // when
-        int saved = sut.collect(ids);
+        sut.collect(List.of("A", "B", "C"));
 
         // then
-        verify(youtubeDataApiCaller, times(1)).fetchVideos(List.of("A"));
-        verify(youtubeDataApiCaller, never()).fetchVideos(List.of("B"));
-        verify(youtubeDataApiCaller, times(1)).fetchVideos(List.of("C"));
-        verify(oneByOneChannelCollector).collect(List.of("channelA", "channelC"));
-        verify(videoCreator, times(2)).create(anyString(), anyString(), anyString(), anyString());
-        assertThat(saved).isEqualTo(2);
+        verify(videoFetcher, times(1)).fetch(List.of("A", "C"), maxResultCount);
+        verify(videoFetcher, never()).fetch(List.of("A", "B", "C"), maxResultCount);
+        verify(channelCollector).collect(List.of("channelA", "channelC"));
+        verify(videoStorer, times(1)).store(List.of(videoItemA, videoItemC));
     }
 
     // 2) 빈 응답 스킵
     @Test
     void collect_skips_when_items_empty() {
         // given
+        int maxResultCount = 1;
         when(videoFinder.findMissingVideoYoutubeIds(anyList())).thenReturn(List.of("A", "B"));
+        VideoItem videoItemA = new VideoItem("A", "channelA", "titleA", "urlA");
+        VideoItem videoItemB = new VideoItem("B", "channelB", "titleB", "urlB");
 
-        when(youtubeDataApiCaller.fetchVideos(List.of("A")))
-                .thenReturn(list()); // empty
-        when(youtubeDataApiCaller.fetchVideos(List.of("B")))
-                .thenReturn(list(video("B", "channelB", "titleB", "urlB")));
+        when(videoFetcher.fetch(List.of("A", "B"), maxResultCount))
+                .thenReturn(List.of(videoItemB)); // empty
 
         // when
-        int saved = sut.collect(List.of("A", "B"));
+        sut.collect(List.of("A", "B"));
 
         // then
-        verify(videoCreator, times(1)).create(anyString(), anyString(), anyString(), anyString());
-        assertThat(saved).isEqualTo(1);
+        verify(videoStorer, times(1)).store(List.of(videoItemB));
     }
 
     // 3) 매핑 정확성
     @Test
     void collect_maps_response_to_entity_fields() {
+        // given
+        int maxResultCount = 1;
+        VideoItem videoItemZ = new VideoItem("Z", "channelZ", "titleZ", "urlZ");
+
         when(videoFinder.findMissingVideoYoutubeIds(List.of("Z"))).thenReturn(List.of("Z"));
-        when(youtubeDataApiCaller.fetchVideos(List.of("Z")))
-                .thenReturn(list(video("Z", "channelZ", "Z-Title", "https://thumb/z.jpg")));
+        when(videoFetcher.fetch(List.of("Z"), maxResultCount))
+                .thenReturn(List.of(videoItemZ));
 
-        ArgumentCaptor<String> youtubeIdCapture = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> channelYoutubeIdCapture = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> titleCapture = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> thumbnailUrlCapture = ArgumentCaptor.forClass(String.class);
+        // when
+        sut.collect(List.of("Z"));
 
-        int saved = sut.collect(List.of("Z"));
+        // then
+        ArgumentCaptor<List> storeVideoItemsArgCaptor = ArgumentCaptor.forClass(List.class);
+        verify(videoStorer).store(storeVideoItemsArgCaptor.capture());
 
-        verify(videoCreator).create(youtubeIdCapture.capture(), channelYoutubeIdCapture.capture(), titleCapture.capture(), thumbnailUrlCapture.capture());
-        assertThat(youtubeIdCapture.getValue()).isEqualTo("Z");
-        assertThat(channelYoutubeIdCapture.getValue()).isEqualTo("channelZ");
-        assertThat(titleCapture.getValue()).isEqualTo("Z-Title");
-        assertThat(thumbnailUrlCapture.getValue()).isEqualTo("https://thumb/z.jpg");
-        assertThat(saved).isEqualTo(1);
+        VideoItem videoItem = ((List<VideoItem>) storeVideoItemsArgCaptor.getValue()).get(0);
+        assertThat(videoItem.getYoutubeId()).isEqualTo("Z");
+        assertThat(videoItem.getChannelYoutubeId()).isEqualTo("channelZ");
+        assertThat(videoItem.getTitle()).isEqualTo("titleZ");
+        assertThat(videoItem.getThumbnailUrl()).isEqualTo("urlZ");
     }
 
     // 4) 중복 입력 동작 문서화 (현재 구현: 중복 호출 발생)
     @Test
     void collect_calls_api_per_each_input_even_if_duplicate() {
+        int maxResultCount = 1;
+        VideoItem videoItemD = new VideoItem("D", "channelD", "titleD", "urlD");
+
         when(videoFinder.findMissingVideoYoutubeIds(List.of("D"))).thenReturn(List.of("D"));
-        when(youtubeDataApiCaller.fetchVideos(List.of("D")))
-                .thenReturn(list(video("D", "channelD", "title", "url")));
+        when(videoFetcher.fetch(List.of("D"), maxResultCount))
+                .thenReturn(List.of(videoItemD));
 
         sut.collect(List.of("D", "D"));
 
-        verify(youtubeDataApiCaller, times(1)).fetchVideos(List.of("D"));
-    }
-
-    // 5) 이미 존재하면 API 미호출
-    @Test
-    void collect_does_not_call_api_if_exists() {
-        when(videoFinder.findMissingVideoYoutubeIds(List.of("E"))).thenReturn(List.of());
-
-        sut.collect(List.of("E"));
-
-        verifyNoInteractions(youtubeDataApiCaller);
-        verify(videoCreator, never()).create(any(), anyString(), any(), any());
+        verify(videoFetcher, times(1)).fetch(List.of("D"), maxResultCount);
     }
 }

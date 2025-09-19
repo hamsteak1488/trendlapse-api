@@ -5,5 +5,5 @@ import io.github.hamsteak.trendlapse.collector.domain.ChannelItem;
 import java.util.List;
 
 public interface ChannelFetcher {
-    List<ChannelItem> fetch(List<String> channelYoutubeIds);
+    List<ChannelItem> fetch(List<String> channelYoutubeIds, int maxResultCount);
 }
