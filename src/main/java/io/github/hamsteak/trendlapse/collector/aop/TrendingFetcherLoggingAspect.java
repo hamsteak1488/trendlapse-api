@@ -12,10 +12,10 @@ import org.springframework.util.StopWatch;
 @Aspect
 @Component
 @ConditionalOnProperty(prefix = "collector", name = "use-log", havingValue = "true")
-public class TrendingStoreLoggingAspect {
-    @Around("execution(* io.github.hamsteak.trendlapse.collector.storer.TrendingStorer.store(..))")
-    public Object logStoreTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        log.info("Started trendings store task.");
+public class TrendingFetcherLoggingAspect {
+    @Around("execution(* io.github.hamsteak.trendlapse.collector.fetcher.TrendingFetcher.fetch(..))")
+    public Object logFetchTime(ProceedingJoinPoint joinPoint) throws Throwable {
+        log.info("Started trendings fetch task.");
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -24,7 +24,7 @@ public class TrendingStoreLoggingAspect {
 
         stopWatch.stop();
 
-        log.info("Finished trendings store task. (elapsed {}ms)", stopWatch.lastTaskInfo().getTimeMillis());
+        log.info("Finished trendings fetch task. (elapsed {}ms)", stopWatch.lastTaskInfo().getTimeMillis());
 
         return result;
     }
