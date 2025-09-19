@@ -36,10 +36,10 @@ class BatchTrendingFetcherTest {
 
         YoutubeDataApiCaller youtubeDataApiCaller = new TrendingMockYoutubeDataApiCaller(videoResponses);
 
-        BatchTrendingFetcher batchTrendingFetcher = new BatchTrendingFetcher(youtubeDataApiProperties, youtubeDataApiCaller);
+        BatchTrendingFetcher batchTrendingFetcher = new BatchTrendingFetcher(youtubeDataApiCaller);
 
         // when
-        List<TrendingItem> trendingItems = batchTrendingFetcher.fetch(dateTime, 100, List.of("RG1"));
+        List<TrendingItem> trendingItems = batchTrendingFetcher.fetch(dateTime, 100, List.of("RG1"), youtubeDataApiProperties.getMaxResultCount());
 
         // then
         assertThat(trendingItems).containsExactlyInAnyOrderElementsOf(expectedTrendingItems);

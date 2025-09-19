@@ -28,7 +28,7 @@ public class FlexibleBufferedBatchTrendingCollector implements TrendingCollector
     @Override
     public void collect(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
         int pushedCount = 0;
-        List<TrendingItem> fetchedTrendingItems = trendingFetcher.fetch(dateTime, collectSize, regionCodes);
+        List<TrendingItem> fetchedTrendingItems = trendingFetcher.fetch(dateTime, collectSize, regionCodes, youtubeDataApiProperties.getMaxResultCount());
         flexibleTrendingBuffer.pushTrendingItems(fetchedTrendingItems);
         pushedCount += fetchedTrendingItems.size();
         log.info("Pushed {} trending items.", pushedCount);

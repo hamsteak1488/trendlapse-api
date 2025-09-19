@@ -6,5 +6,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TrendingFetcher {
-    List<TrendingItem> fetch(LocalDateTime dateTime, int collectSize, List<String> regionCodes);
+    List<TrendingItem> fetch(LocalDateTime dateTime, int collectSize, List<String> regionCodes, int maxResultCount);
 }

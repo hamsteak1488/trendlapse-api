@@ -58,14 +58,16 @@ class TrendingCollectorTest {
                         fix -> new BatchTrendingCollector(
                                 fix.trendingFetcher,
                                 fix.trendingStorer,
-                                fix.videoCollector
+                                fix.videoCollector,
+                                fix.youtubeDataApiProperties
                         )
                 ),
                 Named.of("BufferedBatchTrendingCollector",
                         fix -> new BufferedBatchTrendingCollector(
                                 fix.trendingFetcher,
                                 fix.trendingStorer,
-                                fix.videoCollector
+                                fix.videoCollector,
+                                fix.youtubeDataApiProperties
                         )
                 ),
                 Named.of("FlexibleBufferedBatchTrendingCollector",
@@ -236,7 +238,7 @@ class TrendingCollectorTest {
         }
 
         @Override
-        public List<TrendingItem> fetch(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
+        public List<TrendingItem> fetch(LocalDateTime dateTime, int collectSize, List<String> regionCodes, int maxResultCount) {
             return regionCodes.stream()
                     .map(trendingItemsMap::get)
                     .flatMap(Collection::stream)

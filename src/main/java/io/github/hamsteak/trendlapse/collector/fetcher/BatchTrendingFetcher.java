@@ -4,7 +4,6 @@ import io.github.hamsteak.trendlapse.collector.domain.TrendingItem;
 import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
 import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,14 +17,13 @@ import java.util.stream.IntStream;
 @Component
 @RequiredArgsConstructor
 public class BatchTrendingFetcher implements TrendingFetcher {
-    private final YoutubeDataApiProperties youtubeDataApiProperties;
     private final YoutubeDataApiCaller youtubeDataApiCaller;
 
     @Override
-    public List<TrendingItem> fetch(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
+    public List<TrendingItem> fetch(LocalDateTime dateTime, int collectSize, List<String> regionCodes, int maxResultCount) {
         List<TrendingItem> trendingItems = new ArrayList<>();
         for (String regionCode : regionCodes) {
-            List<VideoResponse> responses = fetchTrendings(collectSize, regionCode);
+            List<VideoResponse> responses = fetchTrendings(collectSize, regionCode, maxResultCount);
             trendingItems.addAll(IntStream.range(0, responses.size())
                     .mapToObj(i -> {
                         int rank = i + 1;
@@ -38,15 +36,13 @@ public class BatchTrendingFetcher implements TrendingFetcher {
         return trendingItems;
     }
 
-    private List<VideoResponse> fetchTrendings(int collectSize, String regionCode) {
+    private List<VideoResponse> fetchTrendings(int collectSize, String regionCode, int maxResultCount) {
         List<VideoResponse> responses = new ArrayList<>();
 
         String pageToken = null;
         int remainingCount = collectSize;
         while (remainingCount > 0) {
-            int maxResultCount = Math.min(remainingCount, youtubeDataApiProperties.getMaxResultCount());
-
-            TrendingListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(maxResultCount, regionCode, pageToken);
+            TrendingListResponse trendingListResponse = youtubeDataApiCaller.fetchTrendings(Math.min(remainingCount, maxResultCount), regionCode, pageToken);
             responses.addAll(trendingListResponse.getItems());
 
             if (trendingListResponse.getNextPageToken() == null) {
@@ -54,7 +50,7 @@ public class BatchTrendingFetcher implements TrendingFetcher {
             }
             pageToken = trendingListResponse.getNextPageToken();
 
-            remainingCount -= youtubeDataApiProperties.getMaxResultCount();
+            remainingCount -= maxResultCount;
         }
 
         return responses;

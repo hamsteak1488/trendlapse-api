@@ -30,7 +30,7 @@ public class OneByOneTrendingCollector implements TrendingCollector {
     @Override
     public void collect(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
         for (String regionCode : regionCodes) {
-            List<TrendingItem> fetchedTrendingItems = trendingFetcher.fetch(dateTime, 1, List.of(regionCode));
+            List<TrendingItem> fetchedTrendingItems = trendingFetcher.fetch(dateTime, collectSize, List.of(regionCode), 1);
             List<String> videoYoutubeIds = fetchedTrendingItems.stream().map(TrendingItem::getVideoYoutubeId).toList();
 
             videoCollector.collect(videoYoutubeIds);

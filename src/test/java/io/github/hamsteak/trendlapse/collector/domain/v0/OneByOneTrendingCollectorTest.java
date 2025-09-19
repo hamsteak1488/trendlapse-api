@@ -8,7 +8,6 @@ import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -55,13 +54,8 @@ class OneByOneTrendingCollectorTest {
         LocalDateTime dateTime = LocalDateTime.of(1, 1, 1, 1, 1);
 
         TrendingItem trendingItem = new TrendingItem(dateTime, "RG1", 1, "video-youtube-id");
-        when(trendingFetcher.fetch(dateTime, 1, List.of("RG1")))
+        when(trendingFetcher.fetch(dateTime, 1, List.of("RG1"), 1))
                 .thenReturn(List.of(trendingItem));
-
-        ArgumentCaptor<LocalDateTime> dateTimeArgumentCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
-        ArgumentCaptor<String> videoYoutubeIdCapture = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Integer> rankCapture = ArgumentCaptor.forClass(Integer.class);
-        ArgumentCaptor<String> regionCodeCapture = ArgumentCaptor.forClass(String.class);
 
         // when
         sut.collect(dateTime, 1, List.of("RG1"));

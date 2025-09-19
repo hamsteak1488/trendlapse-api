@@ -5,6 +5,7 @@ import io.github.hamsteak.trendlapse.collector.domain.TrendingItem;
 import io.github.hamsteak.trendlapse.collector.domain.VideoCollector;
 import io.github.hamsteak.trendlapse.collector.fetcher.TrendingFetcher;
 import io.github.hamsteak.trendlapse.collector.storer.TrendingStorer;
+import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,11 +27,12 @@ public class BatchTrendingCollector implements TrendingCollector {
     private final TrendingFetcher trendingFetcher;
     private final TrendingStorer trendingStorer;
     private final VideoCollector videoCollector;
+    private final YoutubeDataApiProperties youtubeDataApiProperties;
 
     @Override
     public void collect(LocalDateTime dateTime, int collectSize, List<String> regionCodes) {
         for (String regionCode : regionCodes) {
-            List<TrendingItem> fetchedTrendingItems = trendingFetcher.fetch(dateTime, collectSize, List.of(regionCode));
+            List<TrendingItem> fetchedTrendingItems = trendingFetcher.fetch(dateTime, collectSize, List.of(regionCode), youtubeDataApiProperties.getMaxResultCount());
             List<String> videoYoutubeIds = fetchedTrendingItems.stream().map(TrendingItem::getVideoYoutubeId).toList();
 
             videoCollector.collect(videoYoutubeIds);
