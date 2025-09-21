@@ -38,22 +38,52 @@ management:
 youtube-data-api:
   base-url: https://www.googleapis.com/youtube/v3
   max-result-count: 50
-  use-log: true
+  use-log: false
   max-retry-count: 5
 
 collect-scheduler:
   collect-size: 100
   collect-cron: '0 20 * * * *'
-  use-log: true
+  use-log: false
 
 collector:
-  use-log: true
+  use-log: false
 
 purge-scheduler:
   expiration-period: 30d
   purge-cron: '0 0 0 * * *'
   batch-size: 1000
-  use-log: true
+  use-log: false
+
+elapsed-time-logging:
+  tasks:
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.domain.TrendingCollector.collect(..))"
+      name: "Trending Collect"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.fetcher.TrendingFetcher.fetch(..))"
+      name: "Trending Fetch"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.storer.TrendingStorer.store(..))"
+      name: "Trending Store"
+
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.domain.VideoCollector.collect(..))"
+      name: "Video Collect"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.fetcher.VideoFetcher.fetch(..))"
+      name: "Video Fetch"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.storer.VideoStorer.store(..))"
+      name: "Video Store"
+
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.domain.ChannelCollector.collect(..))"
+      name: "Channel Collect"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.fetcher.ChannelFetcher.fetch(..))"
+      name: "Channel Fetch"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.storer.ChannelStorer.store(..))"
+      name: "Channel Store"
+
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.purger.domain.TrendingPurgeScheduler.purge(..))"
+      name: "Trending Purge"
+
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.service.TrendingService.searchTrending(..))"
+      name: "Trending Search"
+
 
 #logging:
 #  level:
