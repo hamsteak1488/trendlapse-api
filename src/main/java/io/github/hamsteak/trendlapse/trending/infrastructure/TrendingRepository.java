@@ -22,7 +22,16 @@ public interface TrendingRepository extends Repository<Trending, Long> {
     List<LocalDateTime> findDateTimes(String regionCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
     @Query("select t from Trending t where t.region.regionCode = :regionCode and t.dateTime between :startDateTime and :endDateTime")
-    List<Trending> findByRegionAndDateTime(String regionCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
+    List<Trending> findByRegionAndDateTimeBetween(String regionCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
+
+    @Query("""
+                select t
+                from Trending t
+                    join fetch t.video
+                    join fetch t.video.channel
+                where t.region.regionCode = :regionCode and t.dateTime between :startDateTime and :endDateTime
+            """)
+    List<Trending> findWithByRegionAndDateTimeBetweenFetchJoin(String regionCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
     @Query(
             """

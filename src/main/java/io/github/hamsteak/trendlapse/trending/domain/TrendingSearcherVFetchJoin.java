@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class TrendingSearcherV0 implements TrendingSearcher {
+public class TrendingSearcherVFetchJoin implements TrendingSearcher {
     private final TrendingRepository trendingRepository;
     private final TrendingDetailReader trendingDetailReader;
 
     @Transactional(readOnly = true)
     public List<DateTimeTrendingDetailList> search(TrendingSearchFilter filter) {
-        return trendingRepository.findByRegionAndDateTimeBetween(filter.getRegionCode(), filter.getStartDateTime(), filter.getEndDateTime()).stream()
+        return trendingRepository.findWithByRegionAndDateTimeBetweenFetchJoin(filter.getRegionCode(), filter.getStartDateTime(), filter.getEndDateTime()).stream()
                 .map(Trending::getId)
                 .map(trendingDetailReader::read)
                 .collect(Collectors.groupingBy(TrendingDetail::getDateTime, LinkedHashMap::new, Collectors.toList()))

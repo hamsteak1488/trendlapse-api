@@ -30,4 +30,52 @@ public class TrendingController {
                 )
         );
     }
+
+    /**
+     * Batch Size
+     */
+    @GetMapping("/batch-size")
+    public ResponseEntity<?> getTrendingsBatchSize(@Valid GetTrendingRequest request) {
+        return ResponseEntity.ok(
+                trendingService.searchTrendingBatchSize(
+                        TrendingSearchFilter.builder()
+                                .regionCode(request.getRegionCode())
+                                .startDateTime(request.getStartDateTime().withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime())
+                                .endDateTime(request.getEndDateTime().withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime())
+                                .build()
+                )
+        );
+    }
+
+    /**
+     * Fetch Join (Persistence Context)
+     */
+    @GetMapping("/fetch-join")
+    public ResponseEntity<?> getTrendingsFetchJoin(@Valid GetTrendingRequest request) {
+        return ResponseEntity.ok(
+                trendingService.searchTrendingFetchJoin(
+                        TrendingSearchFilter.builder()
+                                .regionCode(request.getRegionCode())
+                                .startDateTime(request.getStartDateTime().withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime())
+                                .endDateTime(request.getEndDateTime().withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime())
+                                .build()
+                )
+        );
+    }
+
+    /**
+     * Join + DTO
+     */
+    @GetMapping("/join-dto")
+    public ResponseEntity<?> getTrendingJoinDTO(@Valid GetTrendingRequest request) {
+        return ResponseEntity.ok(
+                trendingService.searchTrendingJoinDTO(
+                        TrendingSearchFilter.builder()
+                                .regionCode(request.getRegionCode())
+                                .startDateTime(request.getStartDateTime().withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime())
+                                .endDateTime(request.getEndDateTime().withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime())
+                                .build()
+                )
+        );
+    }
 }

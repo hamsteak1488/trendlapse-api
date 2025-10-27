@@ -44,16 +44,19 @@ public class CacheByDateTimeDateTimeTrendingDetailListFinder {
             }
         }
 
-        List<DateTimeTrendingDetailList> loadedDateTimeTrendingDetailLists = trendingRepository.findDetailByRegionAndDateTimeIn(regionCode, missingDateTimes).stream()
-                .collect(Collectors.groupingBy(TrendingDetail::getDateTime)).entrySet().stream()
-                .map(entry -> new DateTimeTrendingDetailList(entry.getKey(), entry.getValue()))
-                .toList();
+        if (!missingDateTimes.isEmpty()) {
+            List<DateTimeTrendingDetailList> loadedDateTimeTrendingDetailLists = trendingRepository.findDetailByRegionAndDateTimeIn(regionCode, missingDateTimes).stream()
+                    .collect(Collectors.groupingBy(TrendingDetail::getDateTime)).entrySet().stream()
+                    .map(entry -> new DateTimeTrendingDetailList(entry.getKey(), entry.getValue()))
+                    .toList();
 
-        for (DateTimeTrendingDetailList loadedDateTimeTrendingDetailList : loadedDateTimeTrendingDetailLists) {
-            cache.put(getCacheKey(regionCode, loadedDateTimeTrendingDetailList.getDateTime()), loadedDateTimeTrendingDetailList);
+            for (DateTimeTrendingDetailList loadedDateTimeTrendingDetailList : loadedDateTimeTrendingDetailLists) {
+                cache.put(getCacheKey(regionCode, loadedDateTimeTrendingDetailList.getDateTime()), loadedDateTimeTrendingDetailList);
+            }
+
+            dateTimeTrendingDetailLists.addAll(loadedDateTimeTrendingDetailLists);
         }
 
-        dateTimeTrendingDetailLists.addAll(loadedDateTimeTrendingDetailLists);
         dateTimeTrendingDetailLists.sort(Comparator.comparing(DateTimeTrendingDetailList::getDateTime));
 
         return dateTimeTrendingDetailLists;
