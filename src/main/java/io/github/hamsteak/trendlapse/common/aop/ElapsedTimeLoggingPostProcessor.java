@@ -38,7 +38,7 @@ public class ElapsedTimeLoggingPostProcessor implements BeanPostProcessor {
 
             log.info("Created proxy for bean: {} of type: {}", beanName, beanClass.getName());
 
-            return proxy;
+            bean = proxy;
         }
 
         return bean;
