@@ -17,7 +17,7 @@ spring:
       hibernate:
         highlight_sql: true
         format_sql: true
-        default_batch_fetch_size: 200
+        default_batch_fetch_size: 100
     defer-datasource-initialization: true
 
   servlet:
@@ -82,7 +82,13 @@ elapsed-time-logging:
       name: "Trending Purge"
 
     - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.service.TrendingService.searchTrending(..))"
-      name: "Trending Search"
+      name: "Trending Search (Caching)"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.service.TrendingService.searchTrendingBatchSize(..))"
+      name: "Trending Search (Batch Size)"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.service.TrendingService.searchTrendingFetchJoin(..))"
+      name: "Trending Search (Fetch Join)"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.service.TrendingService.searchTrendingJoinDTO(..))"
+      name: "Trending Search (Join + DTO)"
 
 
 #logging:
