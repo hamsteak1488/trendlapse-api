@@ -21,14 +21,17 @@ public class TrendingService {
         return trendingSearcher.search(filter);
     }
 
+    @Timed("trending.search")
     public List<DateTimeTrendingDetailList> searchTrendingBatchSize(TrendingSearchFilter filter) {
         return trendingSearcherV0.search(filter);
     }
 
+    @Timed("trending.search")
     public List<DateTimeTrendingDetailList> searchTrendingFetchJoin(TrendingSearchFilter filter) {
         return trendingSearcherVFetchJoin.search(filter);
     }
 
+    @Timed("trending.search")
     public List<DateTimeTrendingDetailList> searchTrendingJoinDTO(TrendingSearchFilter filter) {
         return trendingSearcherV1.search(filter);
     }
