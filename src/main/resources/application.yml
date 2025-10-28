@@ -95,3 +95,9 @@ elapsed-time-logging:
 #  level:
 #    org.hibernate.SQL: debug
 #    org.hibernate.orm.jdbc.bind: trace
+
+server:
+  compression:
+    enabled: true
+    mime-types: application/json
+    min-response-size: 1024
