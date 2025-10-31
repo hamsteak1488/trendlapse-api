@@ -26,14 +26,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(YoutubeDataNotFoundException.class)
     public ResponseEntity<Object> handleYoutubeDataNotFoundException(YoutubeDataNotFoundException e) {
         log.warn("RestApiException occurred: {}", e.getMessage(), e);
-        return handleExceptionInternal(CommonErrorCode.RESOURCE_NOT_FOUND);
+        return handleExceptionInternal(CommonErrorCode.RESOURCE_NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler(RestApiException.class)
     public ResponseEntity<Object> handleRestApiException(RestApiException e) {
         log.warn("RestApiException occurred: {}", e.getMessage(), e);
-        ErrorCode errorCode = e.getErrorCode();
-        return handleExceptionInternal(errorCode);
+        return handleExceptionInternal(e.getErrorCode(), e.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -56,8 +55,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<Object> handleAllException(Exception ex) {
-        log.warn("Exception occurred", ex);
+    public ResponseEntity<Object> handleAllException(Exception e) {
+        log.warn("Exception occurred", e);
         ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
         return handleExceptionInternal(errorCode);
     }

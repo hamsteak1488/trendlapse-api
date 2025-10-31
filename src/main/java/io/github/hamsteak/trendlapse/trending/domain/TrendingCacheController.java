@@ -1,11 +1,14 @@
 package io.github.hamsteak.trendlapse.trending.domain;
 
+import io.github.hamsteak.trendlapse.common.errors.errorcode.CommonErrorCode;
+import io.github.hamsteak.trendlapse.common.errors.exception.RestApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -16,11 +19,11 @@ public class TrendingCacheController {
     private final CacheInvalidationConfig cacheInvalidationConfig;
 
     @PostMapping("/clear")
-    public ResponseEntity<?> clearCache() {
-        Cache cache = cacheManager.getCache("trendingsByDay");
+    public ResponseEntity<?> clearCache(@RequestParam String cacheName) {
+        Cache cache = cacheManager.getCache(cacheName);
 
         if (cache == null) {
-            return ResponseEntity.badRequest().build();
+            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER, "Cannot find cache. [cacheName: " + cacheName + "]");
         }
 
         cache.clear();
@@ -29,11 +32,11 @@ public class TrendingCacheController {
     }
 
     @PostMapping("/toggle-always-invalidate")
-    public ResponseEntity<?> setCacheSize() {
-        Cache cache = cacheManager.getCache("trendingsByDay");
+    public ResponseEntity<?> toggleAlwaysInvalidateCache(@RequestParam String cacheName) {
+        Cache cache = cacheManager.getCache(cacheName);
 
         if (cache == null) {
-            return ResponseEntity.badRequest().build();
+            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER, "Cannot find cache. [cacheName: " + cacheName + "]");
         }
 
         cacheInvalidationConfig.setAlwaysInvalidateCache(!cacheInvalidationConfig.isAlwaysInvalidateCache());

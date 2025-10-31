@@ -20,11 +20,12 @@ public class CacheByDateTimeDateTimeTrendingDetailListFinder {
     private final CacheManager cacheManager;
     private final TrendingRepository trendingRepository;
 
+    private final String CACHE_NAME = "trendingsByDateTime";
+
     public List<DateTimeTrendingDetailList> find(String regionCode, List<LocalDateTime> dateTimes) {
         List<DateTimeTrendingDetailList> dateTimeTrendingDetailLists = new ArrayList<>();
 
-        String cacheName = "trendingsByDateTime";
-        Cache cache = cacheManager.getCache(cacheName);
+        Cache cache = cacheManager.getCache(CACHE_NAME);
         if (cache == null) {
             throw new IllegalStateException("Cache not found.");
         }
@@ -36,10 +37,8 @@ public class CacheByDateTimeDateTimeTrendingDetailListFinder {
             DateTimeTrendingDetailList dateTimeTrendingDetailList = cache.get(cacheKey, DateTimeTrendingDetailList.class);
 
             if (dateTimeTrendingDetailList == null) {
-                log.debug("[Cache Miss] name={}, key={}", cacheName, cacheKey);
                 missingDateTimes.add(dateTime);
             } else {
-                log.debug("[Cache Hit] name={}, key={}", cacheName, cacheKey);
                 dateTimeTrendingDetailLists.add(dateTimeTrendingDetailList);
             }
         }
