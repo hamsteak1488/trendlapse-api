@@ -31,7 +31,7 @@ public class Trending {
     @NotNull
     private Integer rankValue;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "region_id")
     @NotNull
     private Region region;
