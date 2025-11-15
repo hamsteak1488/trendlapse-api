@@ -18,105 +18,102 @@ public interface TrendingRepository extends Repository<Trending, Long> {
 
     List<Trending> findByDateTime(LocalDateTime dateTime);
 
-    @Query("select distinct t.dateTime from Trending t where t.region.regionCode = :regionCode and t.dateTime between :startDateTime and :endDateTime")
+    @Query("""
+            select distinct t.dateTime
+            from Trending t
+            where t.region.regionCode = :regionCode and t.dateTime between :startDateTime and :endDateTime
+            """)
     List<LocalDateTime> findDateTimes(String regionCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
-    @Query("select t from Trending t where t.region.regionCode = :regionCode and t.dateTime between :startDateTime and :endDateTime")
+    @Query("""
+            select t
+            from Trending t
+            where t.region.regionCode = :regionCode and t.dateTime between :startDateTime and :endDateTime
+            """)
     List<Trending> findByRegionAndDateTimeBetween(String regionCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
     @Query("""
-                select t
-                from Trending t
-                    join fetch t.video
-                    join fetch t.video.channel
-                where t.region.regionCode = :regionCode and t.dateTime between :startDateTime and :endDateTime
+            select t
+            from Trending t
+                join fetch t.video
+                join fetch t.video.channel
+            where t.region.regionCode = :regionCode and t.dateTime between :startDateTime and :endDateTime
             """)
     List<Trending> findWithByRegionAndDateTimeBetweenFetchJoin(String regionCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
-    @Query(
-            """
-                    select
-                        new io.github.hamsteak.trendlapse.trending.application.dto.TrendingDetail(
-                            t.dateTime,
-                            t.rankValue,
-                            new io.github.hamsteak.trendlapse.video.application.dto.VideoDetail(
-                                v.id,
-                                c.id,
-                                v.youtubeId,
-                                v.title,
-                                v.thumbnailUrl
-                            ),
-                            new io.github.hamsteak.trendlapse.channel.application.dto.ChannelDetail(
-                                c.id,
-                                c.youtubeId,
-                                c.title,
-                                c.thumbnailUrl
-                            )
-                        )
-                    from Trending t
-                        join Video v on t.video.id = v.id
-                        join Channel c on v.channel.id = c.id
-                    where t.region.regionCode = :regionCode and t.dateTime between :startDateTime and :endDateTime
-                    """
-    )
+    @Query("""
+            select new io.github.hamsteak.trendlapse.trending.application.dto.TrendingDetail(
+                t.dateTime,
+                t.rankValue,
+                new io.github.hamsteak.trendlapse.video.application.dto.VideoDetail(
+                    v.id,
+                    c.id,
+                    v.youtubeId,
+                    v.title,
+                    v.thumbnailUrl
+                ),
+                new io.github.hamsteak.trendlapse.channel.application.dto.ChannelDetail(
+                    c.id,
+                    c.youtubeId,
+                    c.title,
+                    c.thumbnailUrl
+                )
+            )
+            from Trending t
+                join Video v on t.video.id = v.id
+                join Channel c on v.channel.id = c.id
+            where t.region.regionCode = :regionCode and t.dateTime between :startDateTime and :endDateTime
+            """)
     List<TrendingDetail> findDetailByRegionAndDateTimeBetween(String regionCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
-
-    @Query(
-            """
-                    select
-                        new io.github.hamsteak.trendlapse.trending.application.dto.TrendingDetail(
-                            t.dateTime,
-                            t.rankValue,
-                            new io.github.hamsteak.trendlapse.video.application.dto.VideoDetail(
-                                v.id,
-                                c.id,
-                                v.youtubeId,
-                                v.title,
-                                v.thumbnailUrl
-                            ),
-                            new io.github.hamsteak.trendlapse.channel.application.dto.ChannelDetail(
-                                c.id,
-                                c.youtubeId,
-                                c.title,
-                                c.thumbnailUrl
-                            )
-                        )
-                    from Trending t
-                        join Video v on t.video.id = v.id
-                        join Channel c on v.channel.id = c.id
-                    where t.region.regionCode = :regionCode and t.dateTime in :dateTimes
-                    """
-    )
+    @Query("""
+            select new io.github.hamsteak.trendlapse.trending.application.dto.TrendingDetail(
+                t.dateTime,
+                t.rankValue,
+                new io.github.hamsteak.trendlapse.video.application.dto.VideoDetail(
+                    v.id,
+                    c.id,
+                    v.youtubeId,
+                    v.title,
+                    v.thumbnailUrl
+                ),
+                new io.github.hamsteak.trendlapse.channel.application.dto.ChannelDetail(
+                    c.id,
+                    c.youtubeId,
+                    c.title,
+                    c.thumbnailUrl
+                )
+            )
+            from Trending t
+                join Video v on t.video.id = v.id
+                join Channel c on v.channel.id = c.id
+            where t.region.regionCode = :regionCode and t.dateTime in :dateTimes
+            """)
     List<TrendingDetail> findDetailByRegionAndDateTimeIn(String regionCode, List<LocalDateTime> dateTimes);
 
-
-    @Query(
-            """
-                    select
-                        new io.github.hamsteak.trendlapse.trending.application.dto.TrendingDetail(
-                            t.dateTime,
-                            t.rankValue,
-                            new io.github.hamsteak.trendlapse.video.application.dto.VideoDetail(
-                                v.id,
-                                c.id,
-                                v.youtubeId,
-                                v.title,
-                                v.thumbnailUrl
-                            ),
-                            new io.github.hamsteak.trendlapse.channel.application.dto.ChannelDetail(
-                                c.id,
-                                c.youtubeId,
-                                c.title,
-                                c.thumbnailUrl
-                            )
-                        )
-                    from Trending t
-                        join Video v on t.video.id = v.id
-                        join Channel c on v.channel.id = c.id
-                    where t.region.regionCode = :regionCode and t.dateTime = :dateTime
-                    """
-    )
+    @Query("""
+            select new io.github.hamsteak.trendlapse.trending.application.dto.TrendingDetail(
+                t.dateTime,
+                t.rankValue,
+                new io.github.hamsteak.trendlapse.video.application.dto.VideoDetail(
+                    v.id,
+                    c.id,
+                    v.youtubeId,
+                    v.title,
+                    v.thumbnailUrl
+                ),
+                new io.github.hamsteak.trendlapse.channel.application.dto.ChannelDetail(
+                    c.id,
+                    c.youtubeId,
+                    c.title,
+                    c.thumbnailUrl
+                )
+            )
+            from Trending t
+                join Video v on t.video.id = v.id
+                join Channel c on v.channel.id = c.id
+            where t.region.regionCode = :regionCode and t.dateTime = :dateTime
+            """)
     List<TrendingDetail> findDetailByRegionAndDateTime(String regionCode, LocalDateTime dateTime);
 
     /*
