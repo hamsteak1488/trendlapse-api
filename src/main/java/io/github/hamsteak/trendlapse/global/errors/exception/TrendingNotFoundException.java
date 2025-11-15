@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.common.errors.exception;
+package io.github.hamsteak.trendlapse.global.errors.exception;
 
 public class TrendingNotFoundException extends YoutubeDataNotFoundException {
     public TrendingNotFoundException(String message) {

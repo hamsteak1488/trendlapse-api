@@ -1,6 +1,6 @@
 package io.github.hamsteak.trendlapse.region.domain;
 
-import io.github.hamsteak.trendlapse.common.errors.exception.RegionNotFoundException;
+import io.github.hamsteak.trendlapse.global.errors.exception.RegionNotFoundException;
 import io.github.hamsteak.trendlapse.region.infrastructure.RegionRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

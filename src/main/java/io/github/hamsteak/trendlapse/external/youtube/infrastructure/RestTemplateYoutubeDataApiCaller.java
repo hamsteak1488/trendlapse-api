@@ -1,10 +1,10 @@
 package io.github.hamsteak.trendlapse.external.youtube.infrastructure;
 
-import io.github.hamsteak.trendlapse.common.errors.exception.YoutubeNullResponseException;
 import io.github.hamsteak.trendlapse.external.youtube.dto.ChannelListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.RegionListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.external.youtube.dto.VideoListResponse;
+import io.github.hamsteak.trendlapse.global.errors.exception.YoutubeNullResponseException;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;

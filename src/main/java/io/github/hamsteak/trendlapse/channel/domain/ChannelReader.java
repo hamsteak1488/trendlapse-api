@@ -1,7 +1,7 @@
 package io.github.hamsteak.trendlapse.channel.domain;
 
 import io.github.hamsteak.trendlapse.channel.infrastructure.ChannelRepository;
-import io.github.hamsteak.trendlapse.common.errors.exception.ChannelNotFoundException;
+import io.github.hamsteak.trendlapse.global.errors.exception.ChannelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

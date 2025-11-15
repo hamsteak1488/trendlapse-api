@@ -1,7 +1,7 @@
 package io.github.hamsteak.trendlapse.trending.domain;
 
-import io.github.hamsteak.trendlapse.common.errors.errorcode.CommonErrorCode;
-import io.github.hamsteak.trendlapse.common.errors.exception.RestApiException;
+import io.github.hamsteak.trendlapse.global.errors.errorcode.CommonErrorCode;
+import io.github.hamsteak.trendlapse.global.errors.exception.RestApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;

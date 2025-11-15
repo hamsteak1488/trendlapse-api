@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.common.errors.errorcode;
+package io.github.hamsteak.trendlapse.global.errors.errorcode;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

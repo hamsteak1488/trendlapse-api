@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.common.errors.exception;
+package io.github.hamsteak.trendlapse.global.errors.exception;
 
 public class ChannelNotFoundException extends YoutubeDataNotFoundException {
     public ChannelNotFoundException(String message) {

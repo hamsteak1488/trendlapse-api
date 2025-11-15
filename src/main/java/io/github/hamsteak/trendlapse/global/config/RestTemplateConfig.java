@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.common.config;
+package io.github.hamsteak.trendlapse.global.config;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

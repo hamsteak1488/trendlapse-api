@@ -1,6 +1,6 @@
 package io.github.hamsteak.trendlapse.video.domain;
 
-import io.github.hamsteak.trendlapse.common.errors.exception.VideoNotFoundException;
+import io.github.hamsteak.trendlapse.global.errors.exception.VideoNotFoundException;
 import io.github.hamsteak.trendlapse.video.infrastructure.VideoRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;

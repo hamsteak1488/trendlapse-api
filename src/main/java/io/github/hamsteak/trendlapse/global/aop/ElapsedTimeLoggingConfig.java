@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.common.aop;
+package io.github.hamsteak.trendlapse.global.aop;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.config.BeanPostProcessor;

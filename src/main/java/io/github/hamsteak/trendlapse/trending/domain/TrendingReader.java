@@ -1,6 +1,6 @@
 package io.github.hamsteak.trendlapse.trending.domain;
 
-import io.github.hamsteak.trendlapse.common.errors.exception.TrendingNotFoundException;
+import io.github.hamsteak.trendlapse.global.errors.exception.TrendingNotFoundException;
 import io.github.hamsteak.trendlapse.trending.infrastructure.TrendingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

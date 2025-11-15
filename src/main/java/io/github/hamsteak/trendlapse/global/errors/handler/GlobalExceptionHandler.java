@@ -1,10 +1,10 @@
-package io.github.hamsteak.trendlapse.common.errors.handler;
+package io.github.hamsteak.trendlapse.global.errors.handler;
 
-import io.github.hamsteak.trendlapse.common.errors.errorcode.CommonErrorCode;
-import io.github.hamsteak.trendlapse.common.errors.errorcode.ErrorCode;
-import io.github.hamsteak.trendlapse.common.errors.exception.RestApiException;
-import io.github.hamsteak.trendlapse.common.errors.exception.YoutubeDataNotFoundException;
-import io.github.hamsteak.trendlapse.common.errors.response.ErrorResponse;
+import io.github.hamsteak.trendlapse.global.errors.errorcode.CommonErrorCode;
+import io.github.hamsteak.trendlapse.global.errors.errorcode.ErrorCode;
+import io.github.hamsteak.trendlapse.global.errors.exception.RestApiException;
+import io.github.hamsteak.trendlapse.global.errors.exception.YoutubeDataNotFoundException;
+import io.github.hamsteak.trendlapse.global.errors.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;

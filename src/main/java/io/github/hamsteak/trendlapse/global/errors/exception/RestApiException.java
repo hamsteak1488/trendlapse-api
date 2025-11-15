@@ -1,6 +1,6 @@
-package io.github.hamsteak.trendlapse.common.errors.exception;
+package io.github.hamsteak.trendlapse.global.errors.exception;
 
-import io.github.hamsteak.trendlapse.common.errors.errorcode.ErrorCode;
+import io.github.hamsteak.trendlapse.global.errors.errorcode.ErrorCode;
 import lombok.Getter;
 
 @Getter

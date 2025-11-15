@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.common.config;
+package io.github.hamsteak.trendlapse.global.config;
 
 import io.micrometer.core.aop.CountedAspect;
 import io.micrometer.core.aop.TimedAspect;

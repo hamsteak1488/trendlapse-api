@@ -1,7 +1,7 @@
 package io.github.hamsteak.trendlapse.collector.storer;
 
 import io.github.hamsteak.trendlapse.collector.domain.TrendingItem;
-import io.github.hamsteak.trendlapse.common.errors.exception.VideoNotFoundException;
+import io.github.hamsteak.trendlapse.global.errors.exception.VideoNotFoundException;
 import io.github.hamsteak.trendlapse.trending.domain.TrendingCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

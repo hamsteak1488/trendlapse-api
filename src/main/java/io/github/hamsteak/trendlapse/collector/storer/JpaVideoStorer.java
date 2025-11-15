@@ -1,7 +1,7 @@
 package io.github.hamsteak.trendlapse.collector.storer;
 
 import io.github.hamsteak.trendlapse.collector.domain.VideoItem;
-import io.github.hamsteak.trendlapse.common.errors.exception.ChannelNotFoundException;
+import io.github.hamsteak.trendlapse.global.errors.exception.ChannelNotFoundException;
 import io.github.hamsteak.trendlapse.video.domain.VideoCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

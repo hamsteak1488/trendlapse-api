@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.common.errors.response;
+package io.github.hamsteak.trendlapse.global.errors.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
