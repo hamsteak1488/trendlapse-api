@@ -1,9 +1,10 @@
 package io.github.hamsteak.trendlapse.collector.fetcher;
 
-import io.github.hamsteak.trendlapse.collector.domain.TrendingItem;
-import io.github.hamsteak.trendlapse.external.youtube.dto.*;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
+import io.github.hamsteak.trendlapse.collector.application.component.fetcher.BatchTrendingFetcher;
+import io.github.hamsteak.trendlapse.collector.application.dto.TrendingItem;
+import io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiCaller;
+import io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiProperties;
+import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,7 +1,7 @@
 package io.github.hamsteak.trendlapse.trending.infrastructure;
 
+import io.github.hamsteak.trendlapse.trending.application.dto.TrendingDetail;
 import io.github.hamsteak.trendlapse.trending.domain.Trending;
-import io.github.hamsteak.trendlapse.trending.domain.TrendingDetail;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
@@ -36,17 +36,17 @@ public interface TrendingRepository extends Repository<Trending, Long> {
     @Query(
             """
                     select
-                        new io.github.hamsteak.trendlapse.trending.domain.TrendingDetail(
+                        new io.github.hamsteak.trendlapse.trending.application.dto.TrendingDetail(
                             t.dateTime,
                             t.rankValue,
-                            new io.github.hamsteak.trendlapse.video.domain.VideoDetail(
+                            new io.github.hamsteak.trendlapse.video.application.dto.VideoDetail(
                                 v.id,
                                 c.id,
                                 v.youtubeId,
                                 v.title,
                                 v.thumbnailUrl
                             ),
-                            new io.github.hamsteak.trendlapse.channel.domain.ChannelDetail(
+                            new io.github.hamsteak.trendlapse.channel.application.dto.ChannelDetail(
                                 c.id,
                                 c.youtubeId,
                                 c.title,
@@ -65,17 +65,17 @@ public interface TrendingRepository extends Repository<Trending, Long> {
     @Query(
             """
                     select
-                        new io.github.hamsteak.trendlapse.trending.domain.TrendingDetail(
+                        new io.github.hamsteak.trendlapse.trending.application.dto.TrendingDetail(
                             t.dateTime,
                             t.rankValue,
-                            new io.github.hamsteak.trendlapse.video.domain.VideoDetail(
+                            new io.github.hamsteak.trendlapse.video.application.dto.VideoDetail(
                                 v.id,
                                 c.id,
                                 v.youtubeId,
                                 v.title,
                                 v.thumbnailUrl
                             ),
-                            new io.github.hamsteak.trendlapse.channel.domain.ChannelDetail(
+                            new io.github.hamsteak.trendlapse.channel.application.dto.ChannelDetail(
                                 c.id,
                                 c.youtubeId,
                                 c.title,
@@ -94,17 +94,17 @@ public interface TrendingRepository extends Repository<Trending, Long> {
     @Query(
             """
                     select
-                        new io.github.hamsteak.trendlapse.trending.domain.TrendingDetail(
+                        new io.github.hamsteak.trendlapse.trending.application.dto.TrendingDetail(
                             t.dateTime,
                             t.rankValue,
-                            new io.github.hamsteak.trendlapse.video.domain.VideoDetail(
+                            new io.github.hamsteak.trendlapse.video.application.dto.VideoDetail(
                                 v.id,
                                 c.id,
                                 v.youtubeId,
                                 v.title,
                                 v.thumbnailUrl
                             ),
-                            new io.github.hamsteak.trendlapse.channel.domain.ChannelDetail(
+                            new io.github.hamsteak.trendlapse.channel.application.dto.ChannelDetail(
                                 c.id,
                                 c.youtubeId,
                                 c.title,

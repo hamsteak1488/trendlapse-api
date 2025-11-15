@@ -1,11 +1,14 @@
 package io.github.hamsteak.trendlapse.collector.domain;
 
-import io.github.hamsteak.trendlapse.collector.domain.v0.OneByOneVideoCollector;
-import io.github.hamsteak.trendlapse.collector.domain.v1.BatchVideoCollector;
-import io.github.hamsteak.trendlapse.collector.fetcher.VideoFetcher;
-import io.github.hamsteak.trendlapse.collector.storer.VideoStorer;
-import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
-import io.github.hamsteak.trendlapse.video.domain.VideoFinder;
+import io.github.hamsteak.trendlapse.collector.application.component.collector.ChannelCollector;
+import io.github.hamsteak.trendlapse.collector.application.component.collector.VideoCollector;
+import io.github.hamsteak.trendlapse.collector.application.dto.VideoItem;
+import io.github.hamsteak.trendlapse.collector.application.component.collector.v0.OneByOneVideoCollector;
+import io.github.hamsteak.trendlapse.collector.application.component.collector.v1.BatchVideoCollector;
+import io.github.hamsteak.trendlapse.collector.application.component.fetcher.VideoFetcher;
+import io.github.hamsteak.trendlapse.collector.application.component.storer.VideoStorer;
+import io.github.hamsteak.trendlapse.video.application.component.VideoFinder;
+import io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiProperties;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;

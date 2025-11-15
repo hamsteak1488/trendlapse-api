@@ -1,0 +1,42 @@
+package io.github.hamsteak.trendlapse.collector.application.scheduler;
+
+import io.github.hamsteak.trendlapse.collector.application.CollectSchedulerProperties;
+import io.github.hamsteak.trendlapse.collector.application.component.collector.TrendingCollector;
+import io.github.hamsteak.trendlapse.region.application.component.RegionReader;
+import io.github.hamsteak.trendlapse.region.domain.Region;
+import io.micrometer.core.annotation.Timed;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class TrendingCollectScheduler {
+    private final RegionReader regionReader;
+    private final TrendingCollector trendingCollector;
+    private final CollectSchedulerProperties collectSchedulerProperties;
+
+    @Timed("collect.whole")
+    @Scheduled(cron = "${collect-scheduler.collect-cron}", zone = "UTC")
+    public void collect() {
+        if (!regionReader.isReady()) {
+            log.info("RegionReader is not ready yet. Skipping scheduled task.");
+            return;
+        }
+
+        LocalDateTime dateTime = LocalDateTime.now(Clock.systemUTC());
+        List<String> regionCodes = regionReader.readAll().stream().map(Region::getRegionCode).toList();
+
+        if (regionCodes.size() < 110) {
+            log.warn("Region list contains fewer than 110 items. This may cause incomplete processing.");
+        }
+
+        trendingCollector.collect(dateTime, collectSchedulerProperties.getCollectSize(), regionCodes);
+    }
+}

@@ -2,7 +2,7 @@
 //
 //import io.github.hamsteak.trendlapse.collector.domain.v1.BatchVideoCollector;
 //import io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiProperties;
-//import io.github.hamsteak.trendlapse.video.domain.VideoFinder;
+//import io.github.hamsteak.trendlapse.video.application.component.VideoFinder;
 //import org.junit.jupiter.api.Test;
 //import org.junit.jupiter.api.extension.ExtendWith;
 //import org.junit.jupiter.params.ParameterizedTest;

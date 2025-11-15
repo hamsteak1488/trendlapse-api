@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 @ConditionalOnProperty(name = "only-korea-region", havingValue = "true")
 public class CollectOnlyKoreaAspect {
-    @Around("execution(* io.github.hamsteak.trendlapse.collector.domain.TrendingCollector.collect(..))")
+    @Around("execution(* io.github.hamsteak.trendlapse.collector.application.component.collector.TrendingCollector.collect(..))")
     public Object logApiCallTime(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
         args[2] = List.of("KR");
