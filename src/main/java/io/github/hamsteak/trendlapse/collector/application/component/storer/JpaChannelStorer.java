@@ -14,6 +14,7 @@ import java.util.List;
 public class JpaChannelStorer implements ChannelStorer {
     private final ChannelCreator channelCreator;
 
+    @Override
     public int store(List<ChannelItem> channelItems) {
         int storedCount = 0;
 

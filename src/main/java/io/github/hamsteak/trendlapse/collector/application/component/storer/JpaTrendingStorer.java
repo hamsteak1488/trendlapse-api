@@ -1,8 +1,8 @@
 package io.github.hamsteak.trendlapse.collector.application.component.storer;
 
 import io.github.hamsteak.trendlapse.collector.application.dto.TrendingItem;
-import io.github.hamsteak.trendlapse.global.errors.exception.VideoNotFoundException;
 import io.github.hamsteak.trendlapse.trending.application.component.TrendingCreator;
+import io.github.hamsteak.trendlapse.video.application.component.VideoFinder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JpaTrendingStorer implements TrendingStorer {
     private final TrendingCreator trendingCreator;
+    private final VideoFinder videoFinder;
 
     @Override
     public int store(List<TrendingItem> trendingItems) {
@@ -25,6 +26,8 @@ public class JpaTrendingStorer implements TrendingStorer {
     }
 
     private int storeFromTrendingItems(List<TrendingItem> trendingItems) {
+        trendingItems = getVideoMissingExcludedTrendingItems(trendingItems);
+
         int storedCount = 0;
 
         for (TrendingItem trendingItem : trendingItems) {
@@ -33,15 +36,27 @@ public class JpaTrendingStorer implements TrendingStorer {
             int rank = trendingItem.getRank();
             String regionCode = trendingItem.getRegionCode();
 
-            try {
-                trendingCreator.create(dateTime, videoYoutubeId, rank, regionCode);
-                storedCount++;
-            } catch (VideoNotFoundException ex) {
-                log.info("Skipping trending record creation: No matching video found (region={}, rank={}, videoYoutubeId={}).",
-                        regionCode, rank, videoYoutubeId);
-            }
+            trendingCreator.create(dateTime, videoYoutubeId, rank, regionCode);
+            storedCount++;
         }
 
         return storedCount;
+    }
+
+    private List<TrendingItem> getVideoMissingExcludedTrendingItems(List<TrendingItem> trendingItems) {
+        List<String> videoYoutubeIds = trendingItems.stream().map(TrendingItem::getVideoYoutubeId).distinct().toList();
+        List<String> missingVideoYoutubeIds = videoFinder.findMissingVideoYoutubeIds(videoYoutubeIds);
+
+        List<TrendingItem> videoMissingTrendingItems = trendingItems.stream()
+                .filter(trendingItem -> missingVideoYoutubeIds.contains(trendingItem.getVideoYoutubeId()))
+                .toList();
+        videoMissingTrendingItems.forEach(trendingItem ->
+                log.info("Skipping trending record creation: No matching video found (region={}, rank={}, videoYoutubeId={}).",
+                        trendingItem.getRegionCode(), trendingItem.getRank(), trendingItem.getVideoYoutubeId())
+        );
+
+        return trendingItems.stream()
+                .filter(trendingItem -> !missingVideoYoutubeIds.contains(trendingItem.getVideoYoutubeId()))
+                .toList();
     }
 }

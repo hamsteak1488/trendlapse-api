@@ -4,14 +4,15 @@ import io.github.hamsteak.trendlapse.channel.domain.Channel;
 import io.github.hamsteak.trendlapse.channel.infrastructure.ChannelRepository;
 import io.github.hamsteak.trendlapse.collector.application.component.storer.JpaTrendingStorer;
 import io.github.hamsteak.trendlapse.collector.application.dto.TrendingItem;
-import io.github.hamsteak.trendlapse.region.domain.Region;
 import io.github.hamsteak.trendlapse.region.application.component.RegionReader;
+import io.github.hamsteak.trendlapse.region.domain.Region;
 import io.github.hamsteak.trendlapse.region.infrastructure.RegionRepository;
-import io.github.hamsteak.trendlapse.trending.domain.Trending;
 import io.github.hamsteak.trendlapse.trending.application.component.TrendingCreator;
+import io.github.hamsteak.trendlapse.trending.domain.Trending;
 import io.github.hamsteak.trendlapse.trending.infrastructure.TrendingRepository;
-import io.github.hamsteak.trendlapse.video.domain.Video;
+import io.github.hamsteak.trendlapse.video.application.component.VideoFinder;
 import io.github.hamsteak.trendlapse.video.application.component.VideoReader;
+import io.github.hamsteak.trendlapse.video.domain.Video;
 import io.github.hamsteak.trendlapse.video.infrastructure.VideoRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +48,8 @@ class JpaTrendingStorerTest {
         RegionReader regionReader = new RegionReader(regionRepository);
         VideoReader videoReader = new VideoReader(videoRepository);
         TrendingCreator trendingCreator = new TrendingCreator(trendingRepository, videoReader, regionReader);
-        JpaTrendingStorer jpaTrendingStorer = new JpaTrendingStorer(trendingCreator);
+        VideoFinder videoFinder = new VideoFinder(videoRepository);
+        JpaTrendingStorer jpaTrendingStorer = new JpaTrendingStorer(trendingCreator, videoFinder);
 
         Region region = regionRepository.save(Region.builder().regionCode("RG1").name("Region").isoCode("RG1").build());
         Channel channel = channelRepository.save(Channel.builder().youtubeId("channel-youtube-id").title("channel-title").thumbnailUrl("channel-thumbnail-url").build());
