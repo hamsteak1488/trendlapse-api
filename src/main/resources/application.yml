@@ -9,14 +9,14 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
-    #    show-sql: true
+    show-sql: false
     open-in-view: false
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
         highlight_sql: true
-        format_sql: true
+        format_sql: false
         default_batch_fetch_size: 100
     defer-datasource-initialization: true
 
@@ -90,11 +90,10 @@ elapsed-time-logging:
     - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.application.service.TrendingService.searchTrendingJoinDTO(..))"
       name: "Trending Search (Join + DTO)"
 
-
-#logging:
-#  level:
-#    org.hibernate.SQL: debug
-#    org.hibernate.orm.jdbc.bind: trace
+logging:
+  level:
+    org.hibernate.SQL: INFO
+    org.springframework.jdbc.core.JdbcTemplate: INFO
 
 server:
   compression:
