@@ -6,7 +6,6 @@ import io.github.hamsteak.trendlapse.trending.application.dto.TrendingSearchFilt
 import io.github.hamsteak.trendlapse.trending.infrastructure.TrendingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
 public class TrendingSearcherV1 implements TrendingSearcher {
     private final TrendingRepository trendingRepository;
 
-    @Transactional(readOnly = true)
     public List<DateTimeTrendingDetailList> search(TrendingSearchFilter filter) {
         return trendingRepository.findDetailByRegionAndDateTimeBetween(filter.getRegionCode(), filter.getStartDateTime(), filter.getEndDateTime()).stream()
                 .collect(Collectors.groupingBy(TrendingDetail::getDateTime, LinkedHashMap::new, Collectors.toList()))

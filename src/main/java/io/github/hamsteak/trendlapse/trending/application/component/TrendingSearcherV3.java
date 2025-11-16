@@ -6,7 +6,6 @@ import io.github.hamsteak.trendlapse.trending.infrastructure.TrendingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -19,7 +18,6 @@ public class TrendingSearcherV3 implements TrendingSearcher {
     private final TrendingRepository trendingRepository;
     private final CacheByDateTimeDateTimeTrendingDetailListFinder cacheByDateTimeDateTimeTrendingDetailListFinder;
 
-    @Transactional(readOnly = true)
     public List<DateTimeTrendingDetailList> search(TrendingSearchFilter filter) {
         List<LocalDateTime> dateTimes = trendingRepository.findDateTimes(filter.getRegionCode(), filter.getStartDateTime(), filter.getEndDateTime());
 
