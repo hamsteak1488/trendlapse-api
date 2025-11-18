@@ -2,9 +2,9 @@ package io.github.hamsteak.trendlapse.collector.domain.v1;
 
 import io.github.hamsteak.trendlapse.channel.application.component.ChannelFinder;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.v1.BatchChannelCollector;
-import io.github.hamsteak.trendlapse.collector.application.dto.ChannelItem;
 import io.github.hamsteak.trendlapse.collector.application.component.fetcher.ChannelFetcher;
 import io.github.hamsteak.trendlapse.collector.application.component.storer.ChannelStorer;
+import io.github.hamsteak.trendlapse.collector.application.dto.ChannelItem;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

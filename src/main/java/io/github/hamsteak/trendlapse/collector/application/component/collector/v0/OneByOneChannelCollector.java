@@ -2,9 +2,9 @@ package io.github.hamsteak.trendlapse.collector.application.component.collector.
 
 import io.github.hamsteak.trendlapse.channel.application.component.ChannelFinder;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.ChannelCollector;
-import io.github.hamsteak.trendlapse.collector.application.dto.ChannelItem;
 import io.github.hamsteak.trendlapse.collector.application.component.fetcher.ChannelFetcher;
 import io.github.hamsteak.trendlapse.collector.application.component.storer.ChannelStorer;
+import io.github.hamsteak.trendlapse.collector.application.dto.ChannelItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;

@@ -1,30 +1,9 @@
 package io.github.hamsteak.trendlapse.channel.application.component;
 
-import io.github.hamsteak.trendlapse.channel.domain.Channel;
-import io.github.hamsteak.trendlapse.channel.infrastructure.ChannelRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import io.github.hamsteak.trendlapse.channel.application.dto.ChannelCreateDto;
 
-@Slf4j
-@Component
-@RequiredArgsConstructor
-public class ChannelCreator {
-    private final ChannelRepository channelRepository;
+import java.util.List;
 
-    @Transactional
-    public Channel create(String youtubeId, String title, String thumbnailUrl) {
-        if (thumbnailUrl == null) {
-            log.warn("Channel thumbnail url is null. (youtubeId={})", youtubeId);
-        }
-
-        return channelRepository.save(
-                Channel.builder()
-                        .youtubeId(youtubeId)
-                        .title(title)
-                        .thumbnailUrl(thumbnailUrl)
-                        .build()
-        );
-    }
+public interface ChannelCreator {
+    int create(List<ChannelCreateDto> channelCreateDtos);
 }

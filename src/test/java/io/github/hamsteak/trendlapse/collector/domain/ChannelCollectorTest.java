@@ -2,11 +2,11 @@ package io.github.hamsteak.trendlapse.collector.domain;
 
 import io.github.hamsteak.trendlapse.channel.application.component.ChannelFinder;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.ChannelCollector;
-import io.github.hamsteak.trendlapse.collector.application.dto.ChannelItem;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.v0.OneByOneChannelCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.v1.BatchChannelCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.fetcher.ChannelFetcher;
 import io.github.hamsteak.trendlapse.collector.application.component.storer.ChannelStorer;
+import io.github.hamsteak.trendlapse.collector.application.dto.ChannelItem;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiProperties;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
