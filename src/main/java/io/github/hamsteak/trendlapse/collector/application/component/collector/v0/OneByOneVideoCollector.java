@@ -2,9 +2,9 @@ package io.github.hamsteak.trendlapse.collector.application.component.collector.
 
 import io.github.hamsteak.trendlapse.collector.application.component.collector.ChannelCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.VideoCollector;
-import io.github.hamsteak.trendlapse.collector.application.dto.VideoItem;
 import io.github.hamsteak.trendlapse.collector.application.component.fetcher.VideoFetcher;
 import io.github.hamsteak.trendlapse.collector.application.component.storer.VideoStorer;
+import io.github.hamsteak.trendlapse.collector.application.dto.VideoItem;
 import io.github.hamsteak.trendlapse.video.application.component.VideoFinder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

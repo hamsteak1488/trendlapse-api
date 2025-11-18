@@ -2,9 +2,9 @@ package io.github.hamsteak.trendlapse.collector.domain.v0;
 
 import io.github.hamsteak.trendlapse.collector.application.component.collector.ChannelCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.v0.OneByOneVideoCollector;
-import io.github.hamsteak.trendlapse.collector.application.dto.VideoItem;
 import io.github.hamsteak.trendlapse.collector.application.component.fetcher.VideoFetcher;
 import io.github.hamsteak.trendlapse.collector.application.component.storer.VideoStorer;
+import io.github.hamsteak.trendlapse.collector.application.dto.VideoItem;
 import io.github.hamsteak.trendlapse.video.application.component.VideoFinder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -2,9 +2,9 @@ package io.github.hamsteak.trendlapse.collector.domain.v1;
 
 import io.github.hamsteak.trendlapse.collector.application.component.collector.ChannelCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.v1.BatchVideoCollector;
-import io.github.hamsteak.trendlapse.collector.application.dto.VideoItem;
 import io.github.hamsteak.trendlapse.collector.application.component.fetcher.VideoFetcher;
 import io.github.hamsteak.trendlapse.collector.application.component.storer.VideoStorer;
+import io.github.hamsteak.trendlapse.collector.application.dto.VideoItem;
 import io.github.hamsteak.trendlapse.video.application.component.VideoFinder;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiProperties;
 import org.junit.jupiter.api.Test;

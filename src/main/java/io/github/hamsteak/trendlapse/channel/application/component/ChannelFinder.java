@@ -16,14 +16,14 @@ public class ChannelFinder {
     private final ChannelRepository channelRepository;
 
     @Transactional(readOnly = true)
-    public List<Channel> findExistingChannels(List<String> channelYoutubeIds) {
+    public List<Channel> findByYoutubeIds(List<String> channelYoutubeIds) {
         return channelRepository.findByYoutubeIdIn(channelYoutubeIds);
     }
 
     @Transactional(readOnly = true)
     public List<String> findMissingChannelYoutubeIds(List<String> channelYoutubeIds) {
         Map<String, Channel> existingChannelMap = new HashMap<>();
-        findExistingChannels(channelYoutubeIds).forEach(
+        findByYoutubeIds(channelYoutubeIds).forEach(
                 channel -> existingChannelMap.put(channel.getYoutubeId(), channel));
 
         return channelYoutubeIds.stream()
