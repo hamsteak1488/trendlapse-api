@@ -1,10 +1,10 @@
 package io.github.hamsteak.trendlapse.collector.domain.v0;
 
-import io.github.hamsteak.trendlapse.collector.application.component.collector.v0.OneByOneTrendingCollector;
-import io.github.hamsteak.trendlapse.collector.application.dto.TrendingItem;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.VideoCollector;
+import io.github.hamsteak.trendlapse.collector.application.component.collector.v0.OneByOneTrendingCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.fetcher.TrendingFetcher;
 import io.github.hamsteak.trendlapse.collector.application.component.storer.TrendingStorer;
+import io.github.hamsteak.trendlapse.collector.application.dto.TrendingItem;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.VideoResponse;
 import org.junit.jupiter.api.Test;

@@ -20,6 +20,7 @@ public class JdbcBulkChannelCreator implements ChannelCreator {
     private static final String INSERT_SQL = "INSERT INTO channel(youtube_id, title, thumbnail_url) VALUES (?, ?, ?)";
 
     @Transactional
+    @Override
     public int create(List<ChannelCreateDto> channelCreateDtos) {
         jdbcTemplate.batchUpdate(
                 INSERT_SQL,

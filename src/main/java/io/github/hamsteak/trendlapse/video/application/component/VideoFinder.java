@@ -21,14 +21,14 @@ public class VideoFinder {
     }
 
     @Transactional(readOnly = true)
-    public List<Video> findExistingVideos(List<String> videoYoutubeIds) {
+    public List<Video> findByYoutubeIds(List<String> videoYoutubeIds) {
         return videoRepository.findByYoutubeIdIn(videoYoutubeIds);
     }
 
     @Transactional(readOnly = true)
     public List<String> findMissingVideoYoutubeIds(List<String> videoYoutubeIds) {
         Map<String, Video> existingVideoMap = new HashMap<>();
-        findExistingVideos(videoYoutubeIds).forEach(
+        findByYoutubeIds(videoYoutubeIds).forEach(
                 video -> existingVideoMap.put(video.getYoutubeId(), video));
 
         return videoYoutubeIds.stream()

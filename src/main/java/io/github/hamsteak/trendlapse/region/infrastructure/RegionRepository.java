@@ -16,6 +16,8 @@ public interface RegionRepository extends Repository<Region, Long> {
 
     Optional<Region> findByRegionCode(String regionCode);
 
+    List<Region> findByRegionCodeIn(List<String> regionCodes);
+
     @Query("select r.regionCode from Region r where r.regionCode in :regionCodes")
     List<String> findRegionCodeByRegionCodeIn(List<String> regionCodes);
 

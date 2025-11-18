@@ -1,10 +1,10 @@
 package io.github.hamsteak.trendlapse.collector.application.component.collector.v1;
 
 import io.github.hamsteak.trendlapse.collector.application.component.collector.TrendingCollector;
-import io.github.hamsteak.trendlapse.collector.application.dto.TrendingItem;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.VideoCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.fetcher.TrendingFetcher;
 import io.github.hamsteak.trendlapse.collector.application.component.storer.TrendingStorer;
+import io.github.hamsteak.trendlapse.collector.application.dto.TrendingItem;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

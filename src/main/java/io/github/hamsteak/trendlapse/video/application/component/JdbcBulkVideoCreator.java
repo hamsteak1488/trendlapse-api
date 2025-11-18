@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ public class JdbcBulkVideoCreator implements VideoCreator {
     private final JdbcTemplate jdbcTemplate;
     private static final int INSERT_BATCH_SIZE = 1000;
 
+    @Transactional
     @Override
     public int create(List<VideoCreateDto> videoCreateDtos) {
         Map<String, Channel> channelMap = getChannelMap(videoCreateDtos);
