@@ -1,7 +1,7 @@
 package io.github.hamsteak.trendlapse.region.application.service;
 
+import io.github.hamsteak.trendlapse.collector.application.component.fetcher.RegionFetcher;
 import io.github.hamsteak.trendlapse.region.application.dto.RegionDetail;
-import io.github.hamsteak.trendlapse.region.application.component.RegionFetcher;
 import io.github.hamsteak.trendlapse.region.infrastructure.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,10 +16,11 @@ public class RegionService {
 
     public List<RegionDetail> getRegionDetails() {
         return regionRepository.findAll().stream()
-                .map(region -> RegionDetail.builder()
-                        .regionCode(region.getRegionCode())
-                        .name(region.getName())
-                        .build())
+                .map(region ->
+                        RegionDetail.builder()
+                                .regionCode(region.getRegionCode())
+                                .name(region.getName())
+                                .build())
                 .toList();
     }
 

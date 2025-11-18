@@ -2,8 +2,11 @@ package io.github.hamsteak.trendlapse.collector.application.scheduler;
 
 import io.github.hamsteak.trendlapse.collector.application.CollectSchedulerProperties;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.TrendingCollector;
-import io.github.hamsteak.trendlapse.region.application.component.RegionReader;
+import io.github.hamsteak.trendlapse.collector.application.component.fetcher.RegionFetcher;
+import io.github.hamsteak.trendlapse.collector.application.component.storer.RegionStorer;
+import io.github.hamsteak.trendlapse.collector.application.dto.RegionItem;
 import io.github.hamsteak.trendlapse.region.domain.Region;
+import io.github.hamsteak.trendlapse.region.infrastructure.RegionRepository;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,25 +21,27 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class TrendingCollectScheduler {
-    private final RegionReader regionReader;
+    private final RegionRepository regionRepository;
+    private final RegionFetcher regionFetcher;
+    private final RegionStorer regionStorer;
     private final TrendingCollector trendingCollector;
     private final CollectSchedulerProperties collectSchedulerProperties;
 
     @Timed("collect.whole")
     @Scheduled(cron = "${collect-scheduler.collect-cron}", zone = "UTC")
     public void collect() {
-        if (!regionReader.isReady()) {
-            log.info("RegionReader is not ready yet. Skipping scheduled task.");
-            return;
+        List<String> regionCodes = regionRepository.findAll().stream()
+                .map(Region::getRegionCode)
+                .toList();
+
+        if (regionCodes.size() < regionFetcher.getExternalRegionCount()) {
+            log.info("Starting to fetch regions because the number of regions is fewer than {} items.", regionFetcher.getExternalRegionCount());
+            List<RegionItem> regionItems = regionFetcher.fetch();
+            regionStorer.store(regionItems);
         }
 
-        LocalDateTime dateTime = LocalDateTime.now(Clock.systemUTC());
-        List<String> regionCodes = regionReader.readAll().stream().map(Region::getRegionCode).toList();
+        LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
 
-        if (regionCodes.size() < 110) {
-            log.warn("Region list contains fewer than 110 items. This may cause incomplete processing.");
-        }
-
-        trendingCollector.collect(dateTime, collectSchedulerProperties.getCollectSize(), regionCodes);
+        trendingCollector.collect(now, collectSchedulerProperties.getCollectSize(), regionCodes);
     }
 }
