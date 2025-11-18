@@ -38,6 +38,9 @@ public class TrendingCollectScheduler {
             log.info("Starting to fetch regions because the number of regions is fewer than {} items.", regionFetcher.getExternalRegionCount());
             List<RegionItem> regionItems = regionFetcher.fetch();
             regionStorer.store(regionItems);
+            regionCodes = regionRepository.findAll().stream()
+                    .map(Region::getRegionCode)
+                    .toList();
         }
 
         LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
