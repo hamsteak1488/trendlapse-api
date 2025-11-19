@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@ConditionalOnProperty(prefix = "collector", name = "trending-strategy", havingValue = "buffered-batch")
+@ConditionalOnProperty(prefix = "collector", name = "trending-strategy", havingValue = "buffered-batch", matchIfMissing = true)
 @Slf4j
 @Component
 @RequiredArgsConstructor

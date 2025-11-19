@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@ConditionalOnProperty(prefix = "collector", name = "trending-strategy", havingValue = "flexible-buffered-batch", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "collector", name = "trending-strategy", havingValue = "flexible-buffered-batch")
 @Slf4j
 @Component
 @RequiredArgsConstructor
