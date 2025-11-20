@@ -4,6 +4,7 @@ import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.ChannelListRespo
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.RegionListResponse;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.TrendingListResponse;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.VideoListResponse;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.util.List;
 
+@Timed("youtube.api.call")
 @Component
 @RequiredArgsConstructor
 public class WebClientYoutubeDataApiCaller implements NonblockingYoutubeDataApiCaller {
