@@ -30,6 +30,8 @@ public class TrendingCollectScheduler {
     @Timed("collect.whole")
     @Scheduled(cron = "${collect-scheduler.collect-cron}", zone = "UTC")
     public void collect() {
+        log.info("Starting scheduled trending collection job.");
+
         List<String> regionCodes = regionRepository.findAll().stream()
                 .map(Region::getRegionCode)
                 .toList();
@@ -46,5 +48,7 @@ public class TrendingCollectScheduler {
         LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
 
         trendingCollector.collect(now, collectSchedulerProperties.getCollectSize(), regionCodes);
+
+        log.info("Completed scheduled trending collection job.");
     }
 }
