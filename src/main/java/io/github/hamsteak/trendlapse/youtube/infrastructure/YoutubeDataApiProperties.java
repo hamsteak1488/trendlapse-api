@@ -19,11 +19,14 @@ public class YoutubeDataApiProperties {
     @NotEmpty
     private final String apiKey;
 
-    @Range(min = 1, max = 150)
+    @Range(min = 1, max = 50)
     private final int maxResultCount;
 
     private final boolean useLog;
 
     @Range(min = 0, max = 5)
-    private final int maxRetryCount;
+    private final int retryCount;
+
+    @Range(min = 5, max = 60)
+    private final int timeout;
 }

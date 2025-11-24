@@ -23,7 +23,7 @@ class NonblockingBatchTrendingFetcherTest {
     void test() {
         // given
         YoutubeDataApiProperties youtubeDataApiProperties =
-                new YoutubeDataApiProperties("baseUrl", "apiKey", 3, false, 3);
+                new YoutubeDataApiProperties("baseUrl", "apiKey", 3, false, 3, 10);
 
         LocalDateTime dateTime = defaultLocalDateTime();
         List<TrendingItem> expectedTrendingItems = List.of(

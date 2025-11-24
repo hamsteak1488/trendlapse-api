@@ -29,6 +29,11 @@ spring:
     ansi:
       enabled: always
 
+  task:
+    scheduling:
+      pool:
+        size: 3
+
 management:
   endpoints:
     web:
@@ -39,7 +44,8 @@ youtube-data-api:
   base-url: https://www.googleapis.com/youtube/v3
   max-result-count: 50
   use-log: false
-  max-retry-count: 5
+  retry-count: 5
+  timeout: 60
 
 collect-scheduler:
   collect-size: 100

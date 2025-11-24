@@ -183,7 +183,7 @@ class TrendingCollectorTest {
     void create_expected_items_from_api_items(String implName, TrendingCollectorFactory trendingCollectorFactory, String tcName, Case tc) {
         // given
         YoutubeDataApiProperties youtubeDataApiProperties =
-                new YoutubeDataApiProperties("baseUrl", "apiKey", tc.maxResultCount, false, 3);
+                new YoutubeDataApiProperties("baseUrl", "apiKey", tc.maxResultCount, false, 3, 10);
 
         TrendingFetcher trendingFetcher = new MockTrendingFetcher(tc.trendingItemsToBeFetched);
         TrendingStorer trendingStorer = mock(TrendingStorer.class);

@@ -6,15 +6,19 @@ import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.TrendingListResp
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.VideoListResponse;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.List;
 
 @Timed("youtube.api.call")
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class WebClientYoutubeDataApiCaller implements NonblockingYoutubeDataApiCaller {
@@ -49,7 +53,14 @@ public class WebClientYoutubeDataApiCaller implements NonblockingYoutubeDataApiC
         return webClient.get()
                 .uri(requestUri)
                 .retrieve()
-                .bodyToMono(TrendingListResponse.class);
+                .bodyToMono(TrendingListResponse.class)
+                .timeout(Duration.ofSeconds(youtubeDataApiProperties.getTimeout()))
+                .retryWhen(Retry.backoff(youtubeDataApiProperties.getRetryCount(), Duration.ofSeconds(1))
+                        .doBeforeRetry(retrySignal -> {
+                            Throwable failure = retrySignal.failure();
+                            long attempt = retrySignal.totalRetries() + 1;
+                            log.warn("[WebClient] Retry #{} for fetching trendings (region={}, cause={})", attempt, regionCode, failure.toString());
+                        }));
     }
 
     @Override

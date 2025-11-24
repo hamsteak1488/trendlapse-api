@@ -139,7 +139,7 @@ class ChannelCollectorTest {
         ChannelFinder channelFinder = mock(ChannelFinder.class);
         ChannelFetcher channelFetcher = new MockChannelFetcher();
         ChannelStorer channelStorer = mock(ChannelStorer.class);
-        YoutubeDataApiProperties youtubeDataApiProperties = new YoutubeDataApiProperties("baseUrl", "apiKey", tc.maxResultCount, false, 3);
+        YoutubeDataApiProperties youtubeDataApiProperties = new YoutubeDataApiProperties("baseUrl", "apiKey", tc.maxResultCount, false, 3, 10);
 
         when(channelFinder.findMissingChannelYoutubeIds(anyList()))
                 .then(invocationOnMock -> {

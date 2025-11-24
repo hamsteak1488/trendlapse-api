@@ -9,9 +9,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,16 +26,14 @@ public class NonblockingBatchTrendingFetcher implements TrendingFetcher {
                 .flatMap(regionCode ->
                         fetchRegionTrendings(collectSize, regionCode, maxResultCount, null, new ArrayList<>())
                                 .map(videoResponses -> mapFromResponsesToItems(dateTime, regionCode, videoResponses))
-                                .flatMapMany(Flux::fromIterable)
-                )
+                                .flatMapMany(Flux::fromIterable))
                 .collectList()
                 .block();
     }
 
     private Mono<List<VideoResponse>> fetchRegionTrendings(int remainingCount, String regionCode, int maxResultCount, String pageToken, List<VideoResponse> trendingsAcc) {
         int resultCount = Math.min(remainingCount, maxResultCount);
-        Mono<TrendingListResponse> responseMono = nonblockingYoutubeDataApiCaller.fetchTrendings(resultCount, regionCode, pageToken)
-                .retryWhen(Retry.backoff(5, Duration.ofSeconds(1)));
+        Mono<TrendingListResponse> responseMono = nonblockingYoutubeDataApiCaller.fetchTrendings(resultCount, regionCode, pageToken);
 
         return responseMono.flatMap(trendingListResponse -> {
             trendingsAcc.addAll(trendingListResponse.getItems());

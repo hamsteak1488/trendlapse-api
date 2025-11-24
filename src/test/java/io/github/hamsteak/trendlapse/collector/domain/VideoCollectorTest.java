@@ -145,7 +145,7 @@ class VideoCollectorTest {
         VideoFinder videoFinder = mock(VideoFinder.class);
         VideoFetcher videoFetcher = new MockVideoFetcher();
         VideoStorer videoStorer = mock(VideoStorer.class);
-        YoutubeDataApiProperties youtubeDataApiProperties = new YoutubeDataApiProperties("baseUrl", "apiKey", tc.maxResultCount, false, 3);
+        YoutubeDataApiProperties youtubeDataApiProperties = new YoutubeDataApiProperties("baseUrl", "apiKey", tc.maxResultCount, false, 3, 10);
 
         when(videoFinder.findMissingVideoYoutubeIds(anyList()))
                 .then(invocationOnMock -> {

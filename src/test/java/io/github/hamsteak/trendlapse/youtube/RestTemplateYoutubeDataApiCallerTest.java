@@ -35,7 +35,8 @@ class RestTemplateYoutubeDataApiCallerTest {
                         "fake-api-key",
                         50,
                         false,
-                        0
+                        0,
+                        10
                 ),
                 restTemplate
         );
