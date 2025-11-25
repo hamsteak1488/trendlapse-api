@@ -1,8 +1,7 @@
-package io.github.hamsteak.trendlapse.purger.domain;
+package io.github.hamsteak.trendlapse.purger.application.component;
 
 import io.github.hamsteak.trendlapse.channel.domain.Channel;
 import io.github.hamsteak.trendlapse.channel.infrastructure.ChannelRepository;
-import io.github.hamsteak.trendlapse.purger.application.component.TrendingPurger;
 import io.github.hamsteak.trendlapse.region.domain.Region;
 import io.github.hamsteak.trendlapse.region.infrastructure.RegionRepository;
 import io.github.hamsteak.trendlapse.trending.domain.Trending;

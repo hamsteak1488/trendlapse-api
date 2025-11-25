@@ -1,6 +1,5 @@
-package io.github.hamsteak.trendlapse.collector.fetcher;
+package io.github.hamsteak.trendlapse.collector.application.component.fetcher;
 
-import io.github.hamsteak.trendlapse.collector.application.component.fetcher.BatchTrendingFetcher;
 import io.github.hamsteak.trendlapse.collector.application.dto.TrendingItem;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiCaller;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiProperties;

@@ -1,7 +1,6 @@
-package io.github.hamsteak.trendlapse.collector.domain;
+package io.github.hamsteak.trendlapse.collector.application.component.collector;
 
 import io.github.hamsteak.trendlapse.channel.application.component.ChannelFinder;
-import io.github.hamsteak.trendlapse.collector.application.component.collector.ChannelCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.v0.OneByOneChannelCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.v1.BatchChannelCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.fetcher.ChannelFetcher;

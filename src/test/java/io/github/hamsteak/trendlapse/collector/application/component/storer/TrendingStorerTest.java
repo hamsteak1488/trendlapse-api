@@ -1,8 +1,7 @@
-package io.github.hamsteak.trendlapse.collector.storer;
+package io.github.hamsteak.trendlapse.collector.application.component.storer;
 
 import io.github.hamsteak.trendlapse.channel.domain.Channel;
 import io.github.hamsteak.trendlapse.channel.infrastructure.ChannelRepository;
-import io.github.hamsteak.trendlapse.collector.application.component.storer.TrendingStorer;
 import io.github.hamsteak.trendlapse.collector.application.dto.TrendingItem;
 import io.github.hamsteak.trendlapse.region.application.component.RegionReader;
 import io.github.hamsteak.trendlapse.region.domain.Region;

@@ -1,7 +1,5 @@
-package io.github.hamsteak.trendlapse.collector.domain;
+package io.github.hamsteak.trendlapse.collector.application.component.collector;
 
-import io.github.hamsteak.trendlapse.collector.application.component.collector.TrendingCollector;
-import io.github.hamsteak.trendlapse.collector.application.component.collector.VideoCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.v0.OneByOneTrendingCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.v1.BatchTrendingCollector;
 import io.github.hamsteak.trendlapse.collector.application.component.collector.v2.BufferedBatchTrendingCollector;

@@ -1,7 +1,5 @@
-package io.github.hamsteak.trendlapse.youtube;
+package io.github.hamsteak.trendlapse.youtube.infrastructure;
 
-import io.github.hamsteak.trendlapse.youtube.infrastructure.RestTemplateYoutubeDataApiCaller;
-import io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiProperties;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.ChannelListResponse;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.ChannelResponse;
 import org.junit.jupiter.api.BeforeEach;
