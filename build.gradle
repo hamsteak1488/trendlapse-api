@@ -18,14 +18,11 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    asciidoctorExt
 }
 
 repositories {
     mavenCentral()
-}
-
-ext {
-    set('snippetsDir', file("build/generated-snippets"))
 }
 
 dependencies {
@@ -55,13 +52,40 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
-tasks.named('test') {
-    outputs.dir snippetsDir
-    useJUnitPlatform()
-    systemProperty "spring.profiles.active", "test"
+ext {
+    snippetsDir = file('build/generated-snippets')
 }
 
-tasks.named('asciidoctor') {
+test {
+    outputs.dir snippetsDir
+    systemProperty "spring.profiles.active", "test"
+    useJUnitPlatform()
+}
+
+asciidoctor {
     inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
     dependsOn test
+
+    baseDirFollowsSourceFile()
+    
+    delete file('src/main/resources/static/docs')
+}
+
+tasks.register('copyDocument', Copy) {
+    dependsOn asciidoctor
+
+    from file("build/docs/asciidoc/")
+    into file("src/main/resources/static/docs")
+}
+
+bootJar {
+    dependsOn copyDocument
+    from('src/main/resources/static/docs') {
+        into('static/docs')
+    }
+}
+
+clean {
+    delete file('src/main/generated')
 }

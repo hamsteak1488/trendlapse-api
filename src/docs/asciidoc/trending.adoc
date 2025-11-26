@@ -1,0 +1,13 @@
+=== 트렌딩 API
+
+`GET /trendings`
+
+트렌딩 목록을 조회합니다.
+
+==== Request Parameters
+
+include::{snippets}/get-trendings/query-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/get-trendings/response-fields.adoc[]

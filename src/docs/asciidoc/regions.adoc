@@ -1,0 +1,9 @@
+=== 지역 목록 조회
+
+`GET /regions`
+
+지역 목록 전체를 조회합니다.
+
+==== Response
+
+include::{snippets}/get-regions/response-fields.adoc[]

@@ -3,8 +3,10 @@ package io.github.hamsteak.trendlapse.youtube.infrastructure;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.ChannelListResponse;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.ChannelResponse;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
@@ -16,6 +18,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,24 +26,27 @@ class RestTemplateYoutubeDataApiCallerTest {
     @Mock
     private RestTemplate restTemplate;
 
+    private YoutubeDataApiProperties properties;
     private RestTemplateYoutubeDataApiCaller apiCaller;
 
     @BeforeEach
     void setup() {
+        properties = new YoutubeDataApiProperties(
+                "https://www.googleapis.com/youtube/v3",
+                "fake-api-key",
+                50,
+                false,
+                0,
+                10
+        );
         apiCaller = new RestTemplateYoutubeDataApiCaller(
-                new YoutubeDataApiProperties(
-                        "https://www.googleapis.com/youtube/v3",
-                        "fake-api-key",
-                        50,
-                        false,
-                        0,
-                        10
-                ),
+                properties,
                 restTemplate
         );
     }
 
     @Test
+    @DisplayName("URL 생성 로직 확인 (참고용)")
     void urlTest() {
         String requestUrl = UriComponentsBuilder.fromUriString("https://www.googleapis.com/youtube/v3")
                 .path("/channels")
@@ -52,14 +58,14 @@ class RestTemplateYoutubeDataApiCallerTest {
     }
 
     @Test
+    @DisplayName("채널 정보를 요청할 때, 올바른 URI로 요청하고 결과를 반환한다")
     void givenValidId_whenFetchChannel_thenReturnChannel() {
-        // Given
+        // given
         String channelId = "test-channel-id";
-        String channelTitle = "test-channel-title";
         ChannelResponse mockResponse = new ChannelResponse(
                 channelId,
                 new ChannelResponse.Snippet(
-                        channelTitle,
+                        "test-channel-title",
                         new ChannelResponse.Snippet.Thumbnails(
                                 new ChannelResponse.Snippet.Thumbnails.Thumbnail("test-thumbnail-url")
                         )
@@ -67,16 +73,26 @@ class RestTemplateYoutubeDataApiCallerTest {
         );
         ChannelListResponse mockListResponse = new ChannelListResponse(List.of(mockResponse));
 
-//        when(restTemplate.getForObject(any(), any())).thenReturn(mockListResponse);
         when(restTemplate.getForObject(any(URI.class), eq(ChannelListResponse.class)))
                 .thenReturn(mockListResponse);
 
-        // When
-        ChannelResponse result = apiCaller.fetchChannels(List.of(channelId)).getItems().get(0);
+        // when
+        ChannelListResponse result = apiCaller.fetchChannels(List.of(channelId));
 
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result).isEqualTo(mockResponse);
+        // then
+        // 1. 결과값 검증
+        assertThat(result.getItems()).isNotNull();
+        assertThat(result.getItems().get(0)).isEqualTo(mockResponse);
+
+        // 2. 행위 검증 (ArgumentCaptor 사용)
+        ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
+        verify(restTemplate).getForObject(uriCaptor.capture(), eq(ChannelListResponse.class));
+
+        URI actualUri = uriCaptor.getValue();
+        assertThat(actualUri.toString()).contains(properties.getBaseUrl());
+        assertThat(actualUri.toString()).contains("key=" + properties.getApiKey());
+        assertThat(actualUri.toString()).contains("part=id,snippet");
+        assertThat(actualUri.toString()).contains("id=" + channelId);
     }
 
     @Test

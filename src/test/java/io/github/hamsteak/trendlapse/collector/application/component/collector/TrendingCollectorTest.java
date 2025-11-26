@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static io.github.hamsteak.trendlapse.support.fixture.DomainFixture.createTrendingItem;
+import static io.github.hamsteak.trendlapse.support.fixture.DomainFixture.getDefaultDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -99,16 +101,16 @@ class TrendingCollectorTest {
                         .name("한 개의 데이터")
                         .collectSize(1)
                         .maxResultCount(1)
-                        .trendingItemsToBeFetched(List.of(defaultTrendingItem(1, "RG1")))
+                        .trendingItemsToBeFetched(List.of(createTrendingItem("RG1", 1)))
                         .build(),
                 Case.builder()
                         .name("여러 데이터")
                         .collectSize(3)
                         .maxResultCount(3)
                         .trendingItemsToBeFetched(List.of(
-                                defaultTrendingItem(1, "RG1"),
-                                defaultTrendingItem(2, "RG1"),
-                                defaultTrendingItem(3, "RG1")
+                                createTrendingItem("RG1", 1),
+                                createTrendingItem("RG1", 2),
+                                createTrendingItem("RG1", 3)
                         ))
                         .build(),
                 Case.builder()
@@ -116,12 +118,12 @@ class TrendingCollectorTest {
                         .collectSize(3)
                         .maxResultCount(3)
                         .trendingItemsToBeFetched(List.of(
-                                defaultTrendingItem(1, "RG1"),
-                                defaultTrendingItem(2, "RG1"),
-                                defaultTrendingItem(3, "RG1"),
-                                defaultTrendingItem(1, "RG2"),
-                                defaultTrendingItem(2, "RG2"),
-                                defaultTrendingItem(3, "RG2")
+                                createTrendingItem("RG1", 1),
+                                createTrendingItem("RG1", 2),
+                                createTrendingItem("RG1", 3),
+                                createTrendingItem("RG2", 1),
+                                createTrendingItem("RG2", 2),
+                                createTrendingItem("RG2", 3)
                         ))
                         .build(),
                 Case.builder()
@@ -129,12 +131,12 @@ class TrendingCollectorTest {
                         .collectSize(3)
                         .maxResultCount(1)
                         .trendingItemsToBeFetched(List.of(
-                                defaultTrendingItem(1, "RG1"),
-                                defaultTrendingItem(2, "RG1"),
-                                defaultTrendingItem(3, "RG1"),
-                                defaultTrendingItem(1, "RG2"),
-                                defaultTrendingItem(2, "RG2"),
-                                defaultTrendingItem(3, "RG2")
+                                createTrendingItem("RG1", 1),
+                                createTrendingItem("RG1", 2),
+                                createTrendingItem("RG1", 3),
+                                createTrendingItem("RG2", 1),
+                                createTrendingItem("RG2", 2),
+                                createTrendingItem("RG2", 3)
                         ))
                         .build(),
                 Case.builder()
@@ -142,16 +144,16 @@ class TrendingCollectorTest {
                         .collectSize(5)
                         .maxResultCount(2)
                         .trendingItemsToBeFetched(List.of(
-                                defaultTrendingItem(1, "RG1"),
-                                defaultTrendingItem(2, "RG1"),
-                                defaultTrendingItem(3, "RG1"),
-                                defaultTrendingItem(4, "RG1"),
-                                defaultTrendingItem(5, "RG1"),
-                                defaultTrendingItem(1, "RG2"),
-                                defaultTrendingItem(2, "RG2"),
-                                defaultTrendingItem(3, "RG2"),
-                                defaultTrendingItem(4, "RG2"),
-                                defaultTrendingItem(5, "RG2")
+                                createTrendingItem("RG1", 1),
+                                createTrendingItem("RG1", 2),
+                                createTrendingItem("RG1", 3),
+                                createTrendingItem("RG1", 4),
+                                createTrendingItem("RG1", 5),
+                                createTrendingItem("RG2", 1),
+                                createTrendingItem("RG2", 2),
+                                createTrendingItem("RG2", 3),
+                                createTrendingItem("RG2", 4),
+                                createTrendingItem("RG2", 5)
                         ))
                         .build(),
                 Case.builder()
@@ -159,9 +161,9 @@ class TrendingCollectorTest {
                         .collectSize(3)
                         .maxResultCount(10)
                         .trendingItemsToBeFetched(List.of(
-                                defaultTrendingItem(1, "RG1"),
-                                defaultTrendingItem(2, "RG1"),
-                                defaultTrendingItem(3, "RG1")
+                                createTrendingItem("RG1", 1),
+                                createTrendingItem("RG1", 2),
+                                createTrendingItem("RG1", 3)
                         ))
                         .build()
         );
@@ -177,8 +179,8 @@ class TrendingCollectorTest {
 
     @ParameterizedTest(name = "({0}) x ({2})")
     @MethodSource("params")
-    @DisplayName("모든 TrendingCollector 구현체에 대해 검증")
-    void create_expected_items_from_api_items(String implName, TrendingCollectorFactory trendingCollectorFactory, String tcName, Case tc) {
+    @DisplayName("TrendingCollector 구현체 검증")
+    void test_TrendingCollector_implementation(String implName, TrendingCollectorFactory trendingCollectorFactory, String tcName, Case tc) {
         // given
         YoutubeDataApiProperties youtubeDataApiProperties =
                 new YoutubeDataApiProperties("baseUrl", "apiKey", tc.maxResultCount, false, 3, 10);
@@ -205,7 +207,7 @@ class TrendingCollectorTest {
         TrendingCollector trendingCollector = trendingCollectorFactory.create(fix);
 
         // when
-        trendingCollector.collect(defaultLocalDateTime(), tc.collectSize, regionCodes);
+        trendingCollector.collect(getDefaultDateTime(), tc.collectSize, regionCodes);
 
         // then
         ArgumentCaptor<List> storeTrendingItemsArgCaptor = ArgumentCaptor.forClass(List.class);
@@ -216,18 +218,6 @@ class TrendingCollectorTest {
                 .flatMap(list -> ((List<TrendingItem>) list).stream()).toList();
 
         assertThat(argTrendingItems).containsExactlyInAnyOrderElementsOf(tc.trendingItemsToBeFetched);
-    }
-
-    private static TrendingItem defaultTrendingItem(int rank, String regionCode) {
-        return new TrendingItem(defaultLocalDateTime(), regionCode, rank, defaultVideoYoutubeId(regionCode, rank));
-    }
-
-    private static String defaultVideoYoutubeId(String regionCode, int rank) {
-        return String.format("%s-videoYoutubeId-%d", regionCode, rank);
-    }
-
-    private static LocalDateTime defaultLocalDateTime() {
-        return LocalDateTime.of(2025, 1, 1, 0, 0);
     }
 
     private static class MockTrendingFetcher implements TrendingFetcher {

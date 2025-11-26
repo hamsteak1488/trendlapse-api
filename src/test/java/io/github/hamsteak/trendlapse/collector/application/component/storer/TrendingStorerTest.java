@@ -20,9 +20,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+import static io.github.hamsteak.trendlapse.support.fixture.DomainFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -48,13 +48,15 @@ class TrendingStorerTest {
         JpaTrendingCreator jpaTrendingCreator = new JpaTrendingCreator(trendingRepository, videoFinder, regionReader);
         TrendingStorer trendingStorer = new TrendingStorer(jpaTrendingCreator, videoFinder);
 
-        Region region = regionRepository.save(Region.builder().regionCode("RG1").name("Region").isoCode("RG1").build());
-        Channel channel = channelRepository.save(Channel.builder().youtubeId("channel-youtube-id").title("channel-title").thumbnailUrl("channel-thumbnail-url").build());
+        Region region = regionRepository.save(createRegion("RG1"));
+        Channel channel = channelRepository.save(createChannel("channel-youtube-id"));
         List<Video> videos = List.of(
-                videoRepository.save(Video.builder().youtubeId("video-1-youtube-id").channel(channel).title("video-1-title").thumbnailUrl("video-1-thumbnail-url").build()),
-                videoRepository.save(Video.builder().youtubeId("video-2-youtube-id").channel(channel).title("video-2-title").thumbnailUrl("video-2-thumbnail-url").build())
+                videoRepository.save(createVideo(channel, "video-1-youtube-id")),
+                videoRepository.save(createVideo(channel, "video-2-youtube-id"))
         );
-        List<TrendingItem> trendingItems = videos.stream().map(video -> new TrendingItem(defaultLocalDateTime(), region.getRegionCode(), 1, video.getYoutubeId())).toList();
+        List<TrendingItem> trendingItems = videos.stream()
+                .map(video -> createTrendingItem(video.getYoutubeId(), region.getRegionCode(), 1))
+                .toList();
 
         // when
         int storedCount = trendingStorer.store(trendingItems);
@@ -63,16 +65,12 @@ class TrendingStorerTest {
 
         // then
         assertThat(storedCount).isEqualTo(trendingItems.size());
-        List<Trending> trendings = trendingRepository.findByDateTime(defaultLocalDateTime());
+        List<Trending> trendings = trendingRepository.findByDateTime(getDefaultDateTime());
+        List<Long> expectedVideoIds = videos.stream().map(Video::getId).toList();
 
-        assertThat(trendings.size()).isEqualTo(trendingItems.size());
-        for (int i = 0; i < trendings.size(); i++) {
-            // EntityManager를 clear했기 때문에 인스턴스 대신 id 비교.
-            assertThat(trendings.get(i).getVideo().getId()).isEqualTo(videos.get(i).getId());
-        }
-    }
-
-    private static LocalDateTime defaultLocalDateTime() {
-        return LocalDateTime.of(2025, 1, 1, 0, 0);
+        assertThat(trendings)
+                .hasSize(trendingItems.size())
+                .extracting(trending -> trending.getVideo().getId())
+                .containsExactlyInAnyOrderElementsOf(expectedVideoIds);
     }
 }

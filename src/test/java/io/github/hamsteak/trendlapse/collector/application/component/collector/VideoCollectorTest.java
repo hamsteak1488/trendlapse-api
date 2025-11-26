@@ -5,6 +5,7 @@ import io.github.hamsteak.trendlapse.collector.application.component.collector.v
 import io.github.hamsteak.trendlapse.collector.application.component.fetcher.VideoFetcher;
 import io.github.hamsteak.trendlapse.collector.application.component.storer.VideoStorer;
 import io.github.hamsteak.trendlapse.collector.application.dto.VideoItem;
+import io.github.hamsteak.trendlapse.support.fixture.DomainFixture;
 import io.github.hamsteak.trendlapse.video.application.component.VideoFinder;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiProperties;
 import lombok.Builder;
@@ -21,7 +22,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static io.github.hamsteak.trendlapse.support.fixture.DomainFixture.createVideoItem;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
@@ -79,21 +82,21 @@ class VideoCollectorTest {
                         .maxResultCount(50)
                         .requestVideoYoutubeIds(List.of("A"))
                         .existingVideoYoutubeIds(List.of())
-                        .expectedCreatedVideos(List.of(defaultVideoItem("A")))
+                        .expectedCreatedVideos(List.of(createVideoItem("A")))
                         .build(),
                 Case.builder()
                         .name("여러 개의 데이터")
                         .maxResultCount(50)
                         .requestVideoYoutubeIds(List.of("A", "B", "C"))
                         .existingVideoYoutubeIds(List.of())
-                        .expectedCreatedVideos(List.of(defaultVideoItem("A"), defaultVideoItem("B"), defaultVideoItem("C")))
+                        .expectedCreatedVideos(List.of(createVideoItem("A"), createVideoItem("B"), createVideoItem("C")))
                         .build(),
                 Case.builder()
                         .name("DB에 없는 데이터만 DB에 저장하는지 검사")
                         .maxResultCount(50)
                         .requestVideoYoutubeIds(List.of("A", "B", "C"))
                         .existingVideoYoutubeIds(List.of("B"))
-                        .expectedCreatedVideos(List.of(defaultVideoItem("A"), defaultVideoItem("C")))
+                        .expectedCreatedVideos(List.of(createVideoItem("A"), createVideoItem("C")))
                         .build(),
                 Case.builder()
                         .name("DB에 이미 모든 데이터가 존재")
@@ -107,21 +110,21 @@ class VideoCollectorTest {
                         .maxResultCount(50)
                         .requestVideoYoutubeIds(List.of("A", "A", "B", "B"))
                         .existingVideoYoutubeIds(List.of())
-                        .expectedCreatedVideos(List.of(defaultVideoItem("A"), defaultVideoItem("B")))
+                        .expectedCreatedVideos(List.of(createVideoItem("A"), createVideoItem("B")))
                         .build(),
                 Case.builder()
                         .name("MaxResultCount가 요청 데이터 목록 길이보다 작은 경우에도 정상 동작하는지 검사.")
                         .maxResultCount(2)
                         .requestVideoYoutubeIds(List.of("A", "B", "C", "D", "E"))
                         .existingVideoYoutubeIds(List.of())
-                        .expectedCreatedVideos(List.of(defaultVideoItem("A"), defaultVideoItem("B"), defaultVideoItem("C"), defaultVideoItem("D"), defaultVideoItem("E")))
+                        .expectedCreatedVideos(List.of(createVideoItem("A"), createVideoItem("B"), createVideoItem("C"), createVideoItem("D"), createVideoItem("E")))
                         .build(),
                 Case.builder()
                         .name("MaxResultCount가 요청 데이터 목록 길이보다 작은 경우에도 정상 동작하는지 검사.")
                         .maxResultCount(2)
                         .requestVideoYoutubeIds(List.of("A", "B", "C", "D", "E"))
                         .existingVideoYoutubeIds(List.of())
-                        .expectedCreatedVideos(List.of(defaultVideoItem("A"), defaultVideoItem("B"), defaultVideoItem("C"), defaultVideoItem("D"), defaultVideoItem("E")))
+                        .expectedCreatedVideos(List.of(createVideoItem("A"), createVideoItem("B"), createVideoItem("C"), createVideoItem("D"), createVideoItem("E")))
                         .build()
         );
     }
@@ -136,12 +139,12 @@ class VideoCollectorTest {
 
     @ParameterizedTest(name = "({0}) x ({2})")
     @MethodSource("params")
-    @DisplayName("모든 VideoCollector 구현체에 대해 검증")
-    void create_expected_items_from_api_items(String implName, VideoCollectorFactory videoCollectorFactory, String tcName, Case tc) {
+    @DisplayName("VideoCollector 구현체 검증")
+    void test_VideoCollector_implementation(String implName, VideoCollectorFactory videoCollectorFactory, String tcName, Case tc) {
         // given
         ChannelCollector channelCollector = mock(ChannelCollector.class);
         VideoFinder videoFinder = mock(VideoFinder.class);
-        VideoFetcher videoFetcher = new MockVideoFetcher();
+        VideoFetcher videoFetcher = mock(VideoFetcher.class);
         VideoStorer videoStorer = mock(VideoStorer.class);
         YoutubeDataApiProperties youtubeDataApiProperties = new YoutubeDataApiProperties("baseUrl", "apiKey", tc.maxResultCount, false, 3, 10);
 
@@ -151,6 +154,11 @@ class VideoCollectorTest {
                     return videoYoutubeIds.stream()
                             .filter(videoYoutubeId -> !tc.existingVideoYoutubeIds.contains(videoYoutubeId)).toList();
                 });
+
+        when(videoFetcher.fetch(anyList(), anyInt())).thenAnswer(invocation -> {
+            List<String> youtubeIds = invocation.getArgument(0);
+            return youtubeIds.stream().map(DomainFixture::createVideoItem).toList();
+        });
 
         Fixture fix = Fixture.builder()
                 .channelCollector(channelCollector)
@@ -175,30 +183,5 @@ class VideoCollectorTest {
                 .flatMap(list -> ((List<VideoItem>) list).stream()).toList();
 
         assertThat(argVideoItems).containsExactlyInAnyOrderElementsOf(tc.expectedCreatedVideos);
-    }
-
-    private static class MockVideoFetcher implements VideoFetcher {
-        @Override
-        public List<VideoItem> fetch(List<String> videoYoutubeIds, int maxResultCount) {
-            return videoYoutubeIds.stream()
-                    .map(VideoCollectorTest::defaultVideoItem)
-                    .toList();
-        }
-    }
-
-    private static VideoItem defaultVideoItem(String youtubeId) {
-        return new VideoItem(youtubeId, defaultChannelYoutubeId(youtubeId), defaultTitle(youtubeId), defaultThumbnailUrl(youtubeId));
-    }
-
-    private static String defaultChannelYoutubeId(String youtubeId) {
-        return String.format("channelYoutubeId-%s", youtubeId);
-    }
-
-    private static String defaultTitle(String youtubeId) {
-        return String.format("title-%s", youtubeId);
-    }
-
-    private static String defaultThumbnailUrl(String youtubeId) {
-        return String.format("thumbnailUrl-%s", youtubeId);
     }
 }

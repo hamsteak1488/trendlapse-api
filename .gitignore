@@ -41,3 +41,6 @@ application-secret.yml
 
 ### PlantUML ###
 *.puml
+
+### Spring REST Docs ###
+src/main/resources/static/docs/
