@@ -9,6 +9,7 @@ import io.github.hamsteak.trendlapse.video.application.component.VideoFinder;
 import io.github.hamsteak.trendlapse.video.domain.Video;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Primary
 @Slf4j
 @Component
 @RequiredArgsConstructor
