@@ -33,9 +33,12 @@ public class JpaTrendingCreator implements TrendingCreator {
     public int create(List<TrendingCreateDto> trendingCreateDtos) {
         int createdCount = 0;
 
+        Map<String, Region> regionMap = getRegionMap(trendingCreateDtos);
+        Map<String, Video> videoMap = getVideoMap(trendingCreateDtos);
+
         for (TrendingCreateDto dto : trendingCreateDtos) {
-            Region region = regionReader.readByRegionCode(dto.getRegionCode());
-            Video video = videoReader.readByYoutubeId(dto.getVideoYoutubeId());
+            Region region = regionMap.get(dto.getRegionCode());
+            Video video = videoMap.get(dto.getVideoYoutubeId());
 
             trendingRepository.save(Trending.builder()
                     .dateTime(dto.getDateTime())
