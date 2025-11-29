@@ -15,7 +15,7 @@ import org.springframework.util.StopWatch;
 @Component
 @ConditionalOnProperty(prefix = "youtube-data-api", name = "use-log", havingValue = "true")
 public class YoutubeDataApiCallLoggingAspect {
-    @Around("execution(* io.github.hamsteak.trendlapse.external.youtube.infrastructure.YoutubeDataApiCaller.*(..))")
+    @Around("execution(* io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiCaller.*(..))")
     public Object logApiCallTime(ProceedingJoinPoint joinPoint) throws Throwable {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
