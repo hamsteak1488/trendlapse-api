@@ -96,6 +96,8 @@ elapsed-time-logging:
     - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.application.service.TrendingService.searchTrendingJoinDTO(..))"
       name: "Trending Search (Join + DTO)"
 
+query-counter: true
+
 logging:
   level:
     org.hibernate.SQL: INFO
