@@ -37,7 +37,7 @@ public class ElapsedTimeLoggingPostProcessor implements BeanPostProcessor {
             proxyFactory.addAdvisor(advisor);
             Object proxy = proxyFactory.getProxy();
 
-            log.info("Created proxy for bean: {} of type: {}", beanName, beanClass.getName());
+            log.info("Created elapsed time logging proxy for bean: {} of type: {}", beanName, beanClass.getName());
 
             bean = proxy;
         }
