@@ -10,6 +10,7 @@ import io.github.hamsteak.trendlapse.trending.application.component.JpaTrendingC
 import io.github.hamsteak.trendlapse.trending.domain.Trending;
 import io.github.hamsteak.trendlapse.trending.infrastructure.TrendingRepository;
 import io.github.hamsteak.trendlapse.video.application.component.VideoFinder;
+import io.github.hamsteak.trendlapse.video.application.component.VideoReader;
 import io.github.hamsteak.trendlapse.video.domain.Video;
 import io.github.hamsteak.trendlapse.video.infrastructure.VideoRepository;
 import jakarta.persistence.EntityManager;
@@ -45,7 +46,8 @@ class TrendingStorerTest {
         // given
         RegionReader regionReader = new RegionReader(regionRepository);
         VideoFinder videoFinder = new VideoFinder(videoRepository);
-        JpaTrendingCreator jpaTrendingCreator = new JpaTrendingCreator(trendingRepository, videoFinder, regionReader);
+        VideoReader videoReader = new VideoReader(videoRepository);
+        JpaTrendingCreator jpaTrendingCreator = new JpaTrendingCreator(trendingRepository, videoFinder, videoReader, regionReader);
         TrendingStorer trendingStorer = new TrendingStorer(jpaTrendingCreator, videoFinder);
 
         Region region = regionRepository.save(createRegion("RG1"));

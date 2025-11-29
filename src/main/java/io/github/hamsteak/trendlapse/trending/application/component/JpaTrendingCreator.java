@@ -6,6 +6,7 @@ import io.github.hamsteak.trendlapse.trending.application.dto.TrendingCreateDto;
 import io.github.hamsteak.trendlapse.trending.domain.Trending;
 import io.github.hamsteak.trendlapse.trending.infrastructure.TrendingRepository;
 import io.github.hamsteak.trendlapse.video.application.component.VideoFinder;
+import io.github.hamsteak.trendlapse.video.application.component.VideoReader;
 import io.github.hamsteak.trendlapse.video.domain.Video;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import java.util.Map;
 public class JpaTrendingCreator implements TrendingCreator {
     private final TrendingRepository trendingRepository;
     private final VideoFinder videoFinder;
+    private final VideoReader videoReader;
     private final RegionReader regionReader;
 
     @Transactional
@@ -31,12 +33,9 @@ public class JpaTrendingCreator implements TrendingCreator {
     public int create(List<TrendingCreateDto> trendingCreateDtos) {
         int createdCount = 0;
 
-        Map<String, Region> regionMap = getRegionMap(trendingCreateDtos);
-        Map<String, Video> videoMap = getVideoMap(trendingCreateDtos);
-
         for (TrendingCreateDto dto : trendingCreateDtos) {
-            Region region = regionMap.get(dto.getRegionCode());
-            Video video = videoMap.get(dto.getVideoYoutubeId());
+            Region region = regionReader.readByRegionCode(dto.getRegionCode());
+            Video video = videoReader.readByYoutubeId(dto.getVideoYoutubeId());
 
             trendingRepository.save(Trending.builder()
                     .dateTime(dto.getDateTime())
