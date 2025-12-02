@@ -5,6 +5,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,15 @@ import org.springframework.util.StopWatch;
 @Component
 @ConditionalOnProperty(prefix = "youtube-data-api", name = "use-log", havingValue = "true")
 public class YoutubeDataApiCallLoggingAspect {
-    @Around("execution(* io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiCaller.*(..))")
+    @Pointcut("execution(* io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiCaller.*(..))")
+    private void blockingYoutubeDataApiCaller() {
+    }
+
+    @Pointcut("execution(* io.github.hamsteak.trendlapse.youtube.infrastructure.NonblockingYoutubeDataApiCaller.*(..))")
+    private void nonblockingYoutubeDataApiCaller() {
+    }
+
+    @Around("blockingYoutubeDataApiCaller() || nonblockingYoutubeDataApiCaller()")
     public Object logApiCallTime(ProceedingJoinPoint joinPoint) throws Throwable {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
