@@ -11,8 +11,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Primary
 @Component
@@ -24,36 +26,38 @@ public class NonblockingBatchTrendingFetcher implements TrendingFetcher {
     public List<TrendingItem> fetch(LocalDateTime dateTime, int collectSize, List<String> regionCodes, int maxResultCount) {
         return Flux.fromIterable(regionCodes)
                 .flatMap(regionCode ->
-                        fetchRegionTrendings(collectSize, regionCode, maxResultCount, null, new ArrayList<>())
+                        fetchTrendings(collectSize, regionCode, maxResultCount, null)
                                 .map(videoResponses -> mapFromResponsesToItems(dateTime, regionCode, videoResponses))
-                                .flatMapMany(Flux::fromIterable))
+                                .flatMapMany(Flux::fromStream))
                 .collectList()
                 .block();
     }
 
-    private Mono<List<VideoResponse>> fetchRegionTrendings(int remainingCount, String regionCode, int maxResultCount, String pageToken, List<VideoResponse> trendingsAcc) {
+    private Mono<Stream<VideoResponse>> fetchTrendings(int remainingCount, String regionCode, int maxResultCount, String pageToken) {
         int resultCount = Math.min(remainingCount, maxResultCount);
         Mono<TrendingListResponse> responseMono = nonblockingYoutubeDataApiCaller.fetchTrendings(resultCount, regionCode, pageToken);
 
         return responseMono.flatMap(trendingListResponse -> {
-            trendingsAcc.addAll(trendingListResponse.getItems());
+            Stream<VideoResponse> trendingResponses = trendingListResponse.getItems().stream();
 
             if (trendingListResponse.getNextPageToken() == null || remainingCount == resultCount) {
-                return Mono.just(trendingsAcc);
+                return Mono.just(trendingResponses);
             }
 
-            return fetchRegionTrendings(remainingCount - resultCount, regionCode, maxResultCount, trendingListResponse.getNextPageToken(), trendingsAcc);
+            Mono<Stream<VideoResponse>> postPageResponseMono = fetchTrendings(remainingCount - resultCount, regionCode, maxResultCount, trendingListResponse.getNextPageToken());
+
+            return Mono.just(trendingResponses).zipWith(postPageResponseMono, Stream::concat);
         });
     }
 
-    private static List<TrendingItem> mapFromResponsesToItems(LocalDateTime dateTime, String regionCode, List<VideoResponse> videoResponses) {
-        List<TrendingItem> trendingItems = new ArrayList<>();
-        for (int i = 0; i < videoResponses.size(); i++) {
-            int rank = i + 1;
-            String videoYoutubeId = videoResponses.get(i).getId();
-            trendingItems.add(new TrendingItem(dateTime, regionCode, rank, videoYoutubeId));
-        }
-        return trendingItems;
+    private static Stream<TrendingItem> mapFromResponsesToItems(LocalDateTime dateTime, String regionCode, Stream<VideoResponse> videoResponses) {
+        Iterator<Integer> indexCounter = IntStream.iterate(0, i -> i + 1).iterator();
+        return videoResponses
+                .map(videoResponse -> {
+                    int rank = indexCounter.next() + 1;
+                    String videoYoutubeId = videoResponse.getId();
+                    return new TrendingItem(dateTime, regionCode, rank, videoYoutubeId);
+                });
     }
 
 
