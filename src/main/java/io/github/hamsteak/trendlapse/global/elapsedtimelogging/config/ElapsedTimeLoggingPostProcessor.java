@@ -11,16 +11,14 @@ import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
-import java.util.List;
-
 @Slf4j
 @RequiredArgsConstructor
 public class ElapsedTimeLoggingPostProcessor implements BeanPostProcessor {
-    private final List<ElapsedTimeLoggingTask> tasks;
+    private final ElapsedTimeLoggingProperties elapsedTimeLoggingProperties;
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        for (ElapsedTimeLoggingTask task : tasks) {
+        for (ElapsedTimeLoggingTask task : elapsedTimeLoggingProperties.getTasks()) {
             if (!task.isEnabled()) {
                 continue;
             }

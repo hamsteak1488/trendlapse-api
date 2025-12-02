@@ -13,14 +13,10 @@ import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
-import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
 import java.util.List;
 
-@ConditionalOnBooleanProperty(name = "query-counter")
-@Configuration
 @Slf4j
 @RequiredArgsConstructor
 public class QueryCounterDataSourceProxyPostProcessor implements BeanPostProcessor {
