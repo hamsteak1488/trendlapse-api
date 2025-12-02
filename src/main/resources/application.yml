@@ -45,7 +45,7 @@ youtube-data-api:
   max-result-count: 50
   use-log: false
   retry-count: 5
-  timeout: 60
+  timeout: 10
 
 collect-scheduler:
   collect-size: 100
