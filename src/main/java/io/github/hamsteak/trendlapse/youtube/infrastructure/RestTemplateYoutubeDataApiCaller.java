@@ -20,7 +20,7 @@ import java.util.List;
 
 @Primary
 @Timed("youtube.api.call")
-@Retryable(maxAttempts = 20, retryFor = {RestClientException.class, YoutubeNullResponseException.class}, listeners = "retryWarnLogger")
+@Retryable(maxAttemptsExpression = "${youtube-data-api.retry-count}", retryFor = {RestClientException.class, YoutubeNullResponseException.class}, listeners = "retryWarnLogger")
 @Component
 @RequiredArgsConstructor
 public class RestTemplateYoutubeDataApiCaller implements YoutubeDataApiCaller {
