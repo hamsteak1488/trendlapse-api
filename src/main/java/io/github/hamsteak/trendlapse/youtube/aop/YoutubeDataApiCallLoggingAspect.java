@@ -10,6 +10,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Aspect
@@ -20,11 +21,11 @@ public class YoutubeDataApiCallLoggingAspect {
     private void blockingYoutubeDataApiCaller() {
     }
 
-    @Pointcut("execution(* io.github.hamsteak.trendlapse.youtube.infrastructure.NonblockingYoutubeDataApiCaller.*(..))")
+    @Pointcut("execution(reactor.core.publisher.Mono io.github.hamsteak.trendlapse.youtube.infrastructure.NonblockingYoutubeDataApiCaller.*(..))")
     private void nonblockingYoutubeDataApiCaller() {
     }
 
-    @Around("blockingYoutubeDataApiCaller() || nonblockingYoutubeDataApiCaller()")
+    @Around("blockingYoutubeDataApiCaller()")
     public Object logApiCallTime(ProceedingJoinPoint joinPoint) throws Throwable {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -36,6 +37,26 @@ public class YoutubeDataApiCallLoggingAspect {
         log.debug("API Call:{}, elapsed {}ms", methodName, stopWatch.lastTaskInfo().getTimeMillis());
 
         return result;
+    }
+
+    @Around("nonblockingYoutubeDataApiCaller()")
+    public Object logNonblockingApiCallTime(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object result = joinPoint.proceed();
+        if (!(result instanceof Mono<?> monoResult)) {
+            return result;
+        }
+
+        String methodName = getMethodName(joinPoint);
+
+        return Mono.defer(() -> {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+
+            return monoResult.doFinally(signalType -> {
+                stopWatch.stop();
+                log.debug("API Call:{}, elapsed {}ms", methodName, stopWatch.lastTaskInfo().getTimeMillis());
+            });
+        });
     }
 
     private static String getMethodName(JoinPoint joinPoint) {

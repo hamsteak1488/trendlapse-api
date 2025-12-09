@@ -17,7 +17,6 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 
-@Timed("youtube.api.call")
 @Slf4j
 @Component
 @RequiredArgsConstructor
