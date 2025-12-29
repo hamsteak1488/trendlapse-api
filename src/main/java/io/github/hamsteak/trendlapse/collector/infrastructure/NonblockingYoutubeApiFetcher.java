@@ -60,7 +60,14 @@ public class NonblockingYoutubeApiFetcher implements YoutubeApiFetcher {
         if (rawChannels.size() != channelYoutubeIds.size()) {
             List<String> channelYoutubeIdsFromItems = rawChannels.stream().map(RawChannel::getYoutubeId).toList();
             List<String> diff = channelYoutubeIds.stream().filter(channelYoutubeId -> !channelYoutubeIdsFromItems.contains(channelYoutubeId)).toList();
-            log.info("Expected {} channels, but only {} returned. Difference: {}", channelYoutubeIds.size(), channelYoutubeIdsFromItems.size(), diff);
+
+            if (diff.size() < 10) {
+                log.info("Expected {} channels, but only {} returned. Difference: {}",
+                        channelYoutubeIds.size(), channelYoutubeIdsFromItems.size(), String.join(", ", diff));
+            } else {
+                log.info("Expected {} channels, but only {} returned. Difference: [{}, ...]",
+                        channelYoutubeIds.size(), channelYoutubeIdsFromItems.size(), String.join(", ", diff.subList(0, 10)));
+            }
         }
 
         return rawChannels.stream()
@@ -89,7 +96,14 @@ public class NonblockingYoutubeApiFetcher implements YoutubeApiFetcher {
         if (rawVideos.size() != videoYoutubeIds.size()) {
             List<String> videoYoutubeIdsFromItems = rawVideos.stream().map(RawVideo::getYoutubeId).toList();
             List<String> diff = videoYoutubeIds.stream().filter(videoYoutubeId -> !videoYoutubeIdsFromItems.contains(videoYoutubeId)).toList();
-            log.info("Expected {} videos, but only {} returned. Difference: {}", videoYoutubeIds.size(), videoYoutubeIdsFromItems.size(), diff);
+
+            if (diff.size() < 10) {
+                log.info("Expected {} videos, but only {} returned. Difference: [{}]",
+                        videoYoutubeIds.size(), videoYoutubeIdsFromItems.size(), String.join(", ", diff));
+            } else {
+                log.info("Expected {} videos, but only {} returned. Difference: [{}, ...]",
+                        videoYoutubeIds.size(), videoYoutubeIdsFromItems.size(), String.join(", ", diff.subList(0, 10)));
+            }
         }
 
         return rawVideos.stream()
