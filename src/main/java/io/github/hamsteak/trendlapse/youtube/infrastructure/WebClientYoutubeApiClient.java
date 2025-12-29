@@ -90,7 +90,7 @@ public class WebClientYoutubeApiClient implements NonblockingYoutubeApiClient {
 
     @Override
     public Mono<RawVideoListResponse> fetchTrendings(String regionCode, String pageToken, int maxResultCount) {
-        String part = "id";
+        String part = String.join(",", List.of("id", "snippet"));
         String chart = "mostPopular";
 
         URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
