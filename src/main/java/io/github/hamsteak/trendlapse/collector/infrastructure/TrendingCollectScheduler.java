@@ -4,6 +4,7 @@ import io.github.hamsteak.trendlapse.collector.application.CollectTrendingSnapsh
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
@@ -16,8 +17,7 @@ public class TrendingCollectScheduler {
     private final CollectTrendingSnapshotService collectTrendingSnapshotService;
 
     @Timed("collect.whole")
-//    @Scheduled(cron = "${collect-scheduler.collect-cron}", zone = "UTC")
-//    @Scheduled(fixedDelay = 30 * 60 * 1000, zone = "UTC")
+    @Scheduled(cron = "${collect-scheduler.collect-cron}", zone = "UTC")
     public void collect() {
         log.info("Starting scheduled trending collection job.");
 
