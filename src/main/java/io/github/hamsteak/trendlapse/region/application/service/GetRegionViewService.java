@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class getRegionViewService {
+public class GetRegionViewService {
     private final RegionRepository regionRepository;
 
     public List<RegionView> getRegionViews() {

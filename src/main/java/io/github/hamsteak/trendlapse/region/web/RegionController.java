@@ -1,7 +1,7 @@
 package io.github.hamsteak.trendlapse.region.web;
 
 import io.github.hamsteak.trendlapse.region.application.dto.RegionView;
-import io.github.hamsteak.trendlapse.region.application.service.getRegionViewService;
+import io.github.hamsteak.trendlapse.region.application.service.GetRegionViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/regions")
 public class RegionController {
-    private final getRegionViewService getRegionViewService;
+    private final GetRegionViewService getRegionViewService;
 
     @GetMapping
     public ResponseEntity<?> getRegions() {
