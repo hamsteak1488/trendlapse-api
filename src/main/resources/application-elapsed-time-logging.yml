@@ -1,0 +1,32 @@
+elapsed-time-logging:
+  enabled: true
+  tasks:
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.CollectTrendingSnapshotService.collect(..))"
+      name: "Collect TrendingSnapshot"
+
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.purger.application.scheduler.TrendingPurgeScheduler.purge(..))"
+      name: "Purge Expired TrendingSnapshot"
+
+    - pointcut: "execution(* org.springframework.data.jpa.repository.JpaRepository.saveAll(..))"
+      name: "Save Jpa Entities"
+
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.YoutubeApiFetcher.fetchRegions(..))"
+      name: "Fetch Youtube Regions"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.YoutubeApiFetcher.fetchChannels(..))"
+      name: "Fetch Youtube Channels"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.YoutubeApiFetcher.fetchVideos(..))"
+      name: "Fetch Youtube Videos"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.YoutubeApiFetcher.fetchTrendingVideos(..))"
+      name: "Fetch Youtube Trending Videos"
+
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.channel.domain.ChannelBulkInsertRepository.bulkInsert(..))"
+      name: "(Bulk) Insert Youtube Channels"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.video.domain.VideoBulkInsertRepository.bulkInsert(..))"
+      name: "(Bulk) Insert Youtube Videos"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.trendingsnapshot.domain.TrendingSnapshotBulkInsertRepository.bulkInsert(..))"
+      name: "(Bulk) Insert Youtube Trending Snapshots"
+
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.trendingsnapshot.application.SearchTrendingService.search(..))"
+      name: "Search Youtube Trending Snapshot"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.trendingsnapshot.application.SearchTrendingService.searchWithCache(..))"
+      name: "Search Youtube Trending Snapshot With Cache"

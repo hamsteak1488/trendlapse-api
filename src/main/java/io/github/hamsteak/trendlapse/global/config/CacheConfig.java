@@ -14,7 +14,7 @@ import java.time.Duration;
 public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("trendingsByDay", "trendingsByDateTime");
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager("trendingVideoView");
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .maximumSize(100_000)
                 .expireAfterAccess(Duration.ofDays(1))

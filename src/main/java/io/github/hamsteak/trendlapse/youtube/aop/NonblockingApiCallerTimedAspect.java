@@ -12,14 +12,14 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-@Slf4j
-@Aspect
 @Component
+@Aspect
+@Slf4j
 @RequiredArgsConstructor
 public class NonblockingApiCallerTimedAspect {
     private final MeterRegistry meterRegistry;
 
-    @Pointcut("execution(reactor.core.publisher.Mono io.github.hamsteak.trendlapse.youtube.infrastructure.NonblockingYoutubeDataApiCaller.*(..))")
+    @Pointcut("execution(reactor.core.publisher.Mono io.github.hamsteak.trendlapse.youtube.domain.NonblockingYoutubeDataApiCaller.*(..))")
     private void nonblockingYoutubeDataApiCaller() {
     }
 

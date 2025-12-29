@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import java.time.Clock;
 import java.time.LocalDateTime;
 
-@Slf4j
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class TrendingPurgeScheduler {
     private final TrendingPurger trendingPurger;

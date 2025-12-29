@@ -1,11 +1,10 @@
 package io.github.hamsteak.trendlapse.region.web;
 
-import io.github.hamsteak.trendlapse.region.application.dto.RegionDetail;
-import io.github.hamsteak.trendlapse.region.application.service.RegionService;
+import io.github.hamsteak.trendlapse.region.application.dto.RegionView;
+import io.github.hamsteak.trendlapse.region.application.service.getRegionViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,19 +14,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/regions")
 public class RegionController {
-    private final RegionService regionService;
+    private final getRegionViewService getRegionViewService;
 
     @GetMapping
     public ResponseEntity<?> getRegions() {
-        List<RegionDetail> regionDetails = regionService.getRegionDetails();
+        List<RegionView> regionViews = getRegionViewService.getRegionViews();
 
-        return ResponseEntity.ok(regionDetails);
-    }
-
-    @PostMapping("/fetch")
-    public ResponseEntity<?> fetch() {
-        regionService.fetchRegions();
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(regionViews);
     }
 }

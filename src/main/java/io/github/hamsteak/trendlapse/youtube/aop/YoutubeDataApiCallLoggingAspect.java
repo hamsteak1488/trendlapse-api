@@ -12,16 +12,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 import reactor.core.publisher.Mono;
 
-@Slf4j
-@Aspect
 @Component
+@Aspect
 @ConditionalOnProperty(prefix = "youtube-data-api", name = "use-log", havingValue = "true")
+@Slf4j
 public class YoutubeDataApiCallLoggingAspect {
-    @Pointcut("execution(* io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiCaller.*(..))")
+    @Pointcut("execution(* io.github.hamsteak.trendlapse.youtube.domain.YoutubeDataApiCaller.*(..))")
     private void blockingYoutubeDataApiCaller() {
     }
 
-    @Pointcut("execution(reactor.core.publisher.Mono io.github.hamsteak.trendlapse.youtube.infrastructure.NonblockingYoutubeDataApiCaller.*(..))")
+    @Pointcut("execution(reactor.core.publisher.Mono io.github.hamsteak.trendlapse.youtube.domain.NonblockingYoutubeDataApiCaller.*(..))")
     private void nonblockingYoutubeDataApiCaller() {
     }
 

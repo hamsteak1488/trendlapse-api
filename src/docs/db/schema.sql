@@ -1,0 +1,55 @@
+﻿DROP DATABASE trendlapse_light;
+CREATE DATABASE trendlapse_light;
+USE trendlapse_light;
+
+-- region
+CREATE TABLE region (
+  id VARCHAR(8) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+-- channel
+CREATE TABLE channel (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  youtube_id VARCHAR(255) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  thumbnail_url VARCHAR(255),
+  last_updated_at DATETIME,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_channel_youtube_id (youtube_id)
+);
+
+-- video
+CREATE TABLE video (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  youtube_id VARCHAR(255) NOT NULL,
+  channel_id BIGINT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  thumbnail_url VARCHAR(255),
+  last_updated_at DATETIME,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_video_youtube_id (youtube_id),
+  CONSTRAINT fk_video_channel_id FOREIGN KEY (channel_id) REFERENCES channel(id)
+);
+
+-- trending_snapshot
+CREATE TABLE trending_snapshot (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  region_id VARCHAR(8) NOT NULL,
+  captured_at DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_region_id_caputred_at FOREIGN KEY (region_id) REFERENCES region(id),
+  KEY idx_region_id_caputred_at (region_id, captured_at)
+);
+
+-- trending_snapshot_video
+CREATE TABLE trending_snapshot_video (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  trending_snapshot_id BIGINT NOT NULL,
+  trending_video_id BIGINT NOT NULL,
+  list_idx INT NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_tsv_snapshot_id FOREIGN KEY (trending_snapshot_id) REFERENCES trending_snapshot (id),
+  CONSTRAINT fk_tsv_video_id FOREIGN KEY (trending_video_id) REFERENCES video (id)
+);

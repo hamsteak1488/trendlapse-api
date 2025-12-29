@@ -19,4 +19,4 @@ include::regions.adoc[]
 [[trendings]]
 == 트렌딩 API
 
-include::trending.adoc[]
+include::trending-snapshot.adoc[]

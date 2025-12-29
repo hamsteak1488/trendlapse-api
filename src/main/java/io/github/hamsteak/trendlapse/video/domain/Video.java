@@ -1,9 +1,11 @@
 package io.github.hamsteak.trendlapse.video.domain;
 
-import io.github.hamsteak.trendlapse.channel.domain.Channel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -19,15 +21,17 @@ public class Video {
     @NotNull
     private String youtubeId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "channel_id")
     @NotNull
-    private Channel channel;
+    private Long channelId;
 
     @Column
     @NotNull
     private String title;
 
-    @Column(nullable = true)
+    @Column
     private String thumbnailUrl;
+
+    @Column
+    @UpdateTimestamp
+    private LocalDateTime lastUpdatedAt;
 }

@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Slf4j
-@Aspect
 @Component
+@Aspect
+@Slf4j
 @ConditionalOnProperty(name = "only-korea-region", havingValue = "true")
 public class CollectOnlyKoreaAspect {
     @Around("execution(* io.github.hamsteak.trendlapse.collector.application.component.collector.TrendingCollector.collect(..))")

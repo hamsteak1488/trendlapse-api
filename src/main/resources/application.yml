@@ -1,6 +1,9 @@
 spring:
   config:
-    import: application-secret.yml
+    import:
+      - application-secret.yml
+      - application-collector.yml
+      - application-elapsed-time-logging.yml
 
   application:
     name: "trendlapse"
@@ -9,7 +12,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
-    show-sql: false
+    show-sql: true
     open-in-view: false
     hibernate:
       ddl-auto: validate
@@ -39,62 +42,6 @@ management:
     web:
       exposure:
         include: prometheus, health
-
-youtube-data-api:
-  base-url: https://www.googleapis.com/youtube/v3
-  max-result-count: 50
-  use-log: false
-  retry-count: 5
-  timeout: 10
-
-collect-scheduler:
-  collect-size: 100
-  collect-cron: '0 20 * * * *'
-  use-log: false
-
-collector:
-  use-log: false
-
-purge-scheduler:
-  expiration-period: 30d
-  purge-cron: '0 0 0 * * *'
-  batch-size: 1000
-  use-log: false
-
-elapsed-time-logging:
-  tasks:
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.component.collector.TrendingCollector.collect(..))"
-      name: "Trending Collect"
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.component.fetcher.TrendingFetcher.fetch(..))"
-      name: "Trending Fetch"
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.component.storer.TrendingStorer.store(..))"
-      name: "Trending Store"
-
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.component.collector.VideoCollector.collect(..))"
-      name: "Video Collect"
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.component.fetcher.VideoFetcher.fetch(..))"
-      name: "Video Fetch"
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.component.storer.VideoStorer.store(..))"
-      name: "Video Store"
-
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.component.collector.ChannelCollector.collect(..))"
-      name: "Channel Collect"
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.component.fetcher.ChannelFetcher.fetch(..))"
-      name: "Channel Fetch"
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.component.storer.ChannelStorer.store(..))"
-      name: "Channel Store"
-
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.purger.application.scheduler.TrendingPurgeScheduler.purge(..))"
-      name: "Trending Purge"
-
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.application.service.TrendingService.searchTrending(..))"
-      name: "Trending Search (Caching)"
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.application.service.TrendingService.searchTrendingBatchSize(..))"
-      name: "Trending Search (Batch Size)"
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.application.service.TrendingService.searchTrendingFetchJoin(..))"
-      name: "Trending Search (Fetch Join)"
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.application.service.TrendingService.searchTrendingJoinDTO(..))"
-      name: "Trending Search (Join + DTO)"
 
 query-counter: true
 
