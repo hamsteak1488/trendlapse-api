@@ -9,6 +9,7 @@ import io.github.hamsteak.trendlapse.region.domain.Region;
 import io.github.hamsteak.trendlapse.trendingsnapshot.domain.TrendingSnapshot;
 import io.github.hamsteak.trendlapse.video.domain.Video;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class FetchedDataAssembler {
     public List<Region> toRegions(List<FetchedRegion> fetchedRegions) {
@@ -38,6 +40,7 @@ public class FetchedDataAssembler {
 
     public List<Video> toVideos(List<FetchedVideo> fetchedVideos, Map<String, Long> channelYoutubeIdEntityIdMap) {
         return fetchedVideos.stream()
+                .filter(fetchedVideo -> isChannelMapped(fetchedVideo, channelYoutubeIdEntityIdMap))
                 .map(fetchedVideo ->
                         Video.builder()
                                 .youtubeId(fetchedVideo.getYoutubeId())
@@ -54,6 +57,7 @@ public class FetchedDataAssembler {
             LocalDateTime captureTime
     ) {
         return regionFetchedTrendingVideosList.stream()
+                .map(regionFetchedTrendingVideos -> filterMappedVideos(regionFetchedTrendingVideos, videoYoutubeIdEntityIdMap))
                 .map(regionFetchedTrendingVideos -> {
                     List<Long> trendingSnapshotVideoIds = regionFetchedTrendingVideos.getFetchedTrendingVideos().stream()
                             .map(fetchedVideo -> videoYoutubeIdEntityIdMap.get(fetchedVideo.getYoutubeId()))
@@ -66,5 +70,31 @@ public class FetchedDataAssembler {
                     );
                 })
                 .toList();
+    }
+
+    private boolean isChannelMapped(FetchedVideo fetchedVideo, Map<String, Long> channelYoutubeIdEntityIdMap) {
+        if (!channelYoutubeIdEntityIdMap.containsKey(fetchedVideo.getChannelYoutubeId())) {
+            log.info("Skipping video record creation: No matching channel found (videoYoutubeId={}, channelYoutubeId={}).",
+                    fetchedVideo.getYoutubeId(), fetchedVideo.getChannelYoutubeId());
+            return false;
+        }
+        return true;
+    }
+
+    private RegionFetchedTrendingVideos filterMappedVideos(
+            RegionFetchedTrendingVideos regionFetchedTrendingVideos,
+            Map<String, Long> videoYoutubeIdEntityIdMap
+    ) {
+        List<FetchedVideo> videoMissingFilteredTrendingVideos = regionFetchedTrendingVideos.getFetchedTrendingVideos().stream()
+                .filter(fetchedTrendingVideo -> {
+                    if (!videoYoutubeIdEntityIdMap.containsKey(fetchedTrendingVideo.getYoutubeId())) {
+                        log.info("Skipping trending record creation: No matching video found (region={}, videoYoutubeId={}).",
+                                regionFetchedTrendingVideos.getRegionId(), fetchedTrendingVideo.getYoutubeId());
+                        return false;
+                    }
+                    return true;
+                })
+                .toList();
+        return new RegionFetchedTrendingVideos(regionFetchedTrendingVideos.getRegionId(), videoMissingFilteredTrendingVideos);
     }
 }
