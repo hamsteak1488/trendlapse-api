@@ -131,11 +131,9 @@ public class NonblockingYoutubeApiFetcher implements YoutubeApiFetcher {
 
             Mono<L> rawDataListResponseMono = rawDataFetcher.apply(dataYotubeIdsToFetch);
 
-            rawDataMono.zipWith(
-                    rawDataListResponseMono
-                            .flatMap(listResponse ->
-                                    Mono.just(rawDataExtractor.apply(listResponse))
-                            ),
+            rawDataMono = rawDataMono.zipWith(
+                    rawDataListResponseMono.flatMap(listResponse ->
+                            Mono.just(rawDataExtractor.apply(listResponse))),
                     (rawData, fetchedRawData) ->
                             Stream.concat(rawData.stream(), fetchedRawData.stream()).toList()
             );
