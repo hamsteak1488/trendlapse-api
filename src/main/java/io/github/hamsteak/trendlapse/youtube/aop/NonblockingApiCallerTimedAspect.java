@@ -19,11 +19,11 @@ import reactor.core.publisher.Mono;
 public class NonblockingApiCallerTimedAspect {
     private final MeterRegistry meterRegistry;
 
-    @Pointcut("execution(reactor.core.publisher.Mono io.github.hamsteak.trendlapse.youtube.domain.NonblockingYoutubeDataApiCaller.*(..))")
-    private void nonblockingYoutubeDataApiCaller() {
+    @Pointcut("execution(reactor.core.publisher.Mono io.github.hamsteak.trendlapse.youtube.application.NonblockingYoutubeApiClient.*(..))")
+    private void nonblockingYoutubeApiClient() {
     }
 
-    @Around("nonblockingYoutubeDataApiCaller()")
+    @Around("nonblockingYoutubeApiClient()")
     public Object measureTimeOfNonblockingApiCaller(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getTarget().getClass().getName();
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
