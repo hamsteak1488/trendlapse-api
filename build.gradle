@@ -56,6 +56,17 @@ dependencies {
 
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+
+    addNettyDnsWhenMacArm(delegate);
+}
+
+def addNettyDnsWhenMacArm(DependencyHandler dependencyHandler) {
+    def os = System.getProperty("os.name").toLowerCase()
+    def arch = System.getProperty("os.arch")
+
+    if (os.contains("mac") && (arch.equals("aarch64"))) {
+        dependencyHandler.add("runtimeOnly", "io.netty:netty-resolver-dns-native-macos:4.2.9.Final:osx-aarch_64")
+    }
 }
 
 ext {
