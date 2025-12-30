@@ -17,15 +17,15 @@ import reactor.core.publisher.Mono;
 @ConditionalOnProperty(prefix = "youtube-data-api", name = "use-log", havingValue = "true")
 @Slf4j
 public class YoutubeDataApiCallLoggingAspect {
-    @Pointcut("execution(* io.github.hamsteak.trendlapse.youtube.domain.YoutubeDataApiCaller.*(..))")
-    private void blockingYoutubeDataApiCaller() {
+    @Pointcut("execution(* io.github.hamsteak.trendlapse.youtube.application.YoutubeApiClient.*(..))")
+    private void blockingYoutubeApiClient() {
     }
 
-    @Pointcut("execution(reactor.core.publisher.Mono io.github.hamsteak.trendlapse.youtube.domain.NonblockingYoutubeDataApiCaller.*(..))")
-    private void nonblockingYoutubeDataApiCaller() {
+    @Pointcut("execution(reactor.core.publisher.Mono io.github.hamsteak.trendlapse.youtube.application.NonblockingYoutubeApiClient.*(..))")
+    private void nonblockingYoutubeApiClient() {
     }
 
-    @Around("blockingYoutubeDataApiCaller()")
+    @Around("blockingYoutubeApiClient()")
     public Object logApiCallTime(ProceedingJoinPoint joinPoint) throws Throwable {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -39,7 +39,7 @@ public class YoutubeDataApiCallLoggingAspect {
         return result;
     }
 
-    @Around("nonblockingYoutubeDataApiCaller()")
+    @Around("nonblockingYoutubeApiClient()")
     public Object logNonblockingApiCallTime(ProceedingJoinPoint joinPoint) throws Throwable {
         Object result = joinPoint.proceed();
         if (!(result instanceof Mono<?> monoResult)) {
