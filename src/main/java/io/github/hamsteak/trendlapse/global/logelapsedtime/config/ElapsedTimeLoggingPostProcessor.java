@@ -14,6 +14,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 @Slf4j
 public class ElapsedTimeLoggingPostProcessor implements BeanPostProcessor {
@@ -21,11 +22,11 @@ public class ElapsedTimeLoggingPostProcessor implements BeanPostProcessor {
 
     public ElapsedTimeLoggingPostProcessor(ElapsedTimeLoggingProperties elapsedTimeLoggingProperties) {
         tasks = elapsedTimeLoggingProperties.getTasks().stream()
-                .filter(ElapsedTimeLoggingTask::isEnabled)
+                .filter(Predicate.not(ElapsedTimeLoggingTask::isDisabled))
                 .map(task -> {
                     AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
                     pointcut.setExpression(task.getPointcut());
-                    return new Task(pointcut, task.getName());
+                    return new Task(pointcut, task.getName(), task.isLoggingBeanNameEnabled());
                 })
                 .toList();
     }
@@ -52,7 +53,7 @@ public class ElapsedTimeLoggingPostProcessor implements BeanPostProcessor {
     }
 
     private static DefaultPointcutAdvisor getAdvisorFromTask(Task task, String beanName) {
-        ElapsedTimeLoggingAdvice advice = new ElapsedTimeLoggingAdvice(task.getName(), beanName);
+        ElapsedTimeLoggingAdvice advice = new ElapsedTimeLoggingAdvice(task.getName(), task.isLoggingBeanNameEnabled(), beanName);
         return new DefaultPointcutAdvisor(task.getPointcut(), advice);
     }
 
@@ -61,5 +62,6 @@ public class ElapsedTimeLoggingPostProcessor implements BeanPostProcessor {
     private static class Task {
         private final Pointcut pointcut;
         private final String name;
+        private final boolean loggingBeanNameEnabled;
     }
 }

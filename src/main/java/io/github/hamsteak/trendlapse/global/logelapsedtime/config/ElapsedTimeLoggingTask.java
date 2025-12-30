@@ -2,12 +2,18 @@ package io.github.hamsteak.trendlapse.global.logelapsedtime.config;
 
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public class ElapsedTimeLoggingTask {
     private final String pointcut;
     private final String name;
-    private final boolean enabled = true;
+    private final boolean disabled;
+    private final boolean loggingBeanNameEnabled;
+
+    public ElapsedTimeLoggingTask(String pointcut, String name, boolean disabled, boolean loggingBeanNameEnabled) {
+        this.pointcut = pointcut;
+        this.name = name;
+        this.disabled = disabled;
+        this.loggingBeanNameEnabled = loggingBeanNameEnabled;
+    }
 }

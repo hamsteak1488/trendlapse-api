@@ -10,6 +10,7 @@ import org.springframework.util.StopWatch;
 @RequiredArgsConstructor
 public class ElapsedTimeLoggingAdvice implements MethodInterceptor {
     private final String taskName;
+    private final boolean loggingBeanNameEnabled;
     private final String beanName;
 
     @Override
@@ -20,7 +21,12 @@ public class ElapsedTimeLoggingAdvice implements MethodInterceptor {
         Object result = invocation.proceed();
 
         stopWatch.stop();
-        log.debug("Elapsed {}ms for task:[{}] completion. (beanName={})", stopWatch.lastTaskInfo().getTimeMillis(), taskName, beanName);
+
+        if (loggingBeanNameEnabled) {
+            log.debug("Elapsed {}ms for task:[{}] completion. (beanName={})", stopWatch.lastTaskInfo().getTimeMillis(), taskName, beanName);
+        } else {
+            log.debug("Elapsed {}ms for task:[{}] completion.", stopWatch.lastTaskInfo().getTimeMillis(), taskName);
+        }
 
         return result;
     }

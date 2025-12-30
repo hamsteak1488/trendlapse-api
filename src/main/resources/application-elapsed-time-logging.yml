@@ -9,6 +9,7 @@ elapsed-time-logging:
 
     - pointcut: "execution(* org.springframework.data.jpa.repository.JpaRepository.saveAll(..))"
       name: "Save Jpa Entities"
+      logging-bean-name-enabled: true
 
     - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.YoutubeApiFetcher.fetchRegions(..))"
       name: "Fetch Youtube Regions"
