@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class TrendingCollectScheduler {
+public class CollectTrendingSnapshotScheduler {
     private final CollectTrendingSnapshotService collectTrendingSnapshotService;
 
     @Timed("collect.whole")

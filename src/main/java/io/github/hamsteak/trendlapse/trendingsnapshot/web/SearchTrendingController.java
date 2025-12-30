@@ -15,7 +15,7 @@ import java.time.ZoneOffset;
 @RestController
 @RequestMapping("/trendings")
 @RequiredArgsConstructor
-public class TrendingController {
+public class SearchTrendingController {
     private final SearchTrendingService searchTrendingService;
 
     @GetMapping
