@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.purger.application.component;
+package io.github.hamsteak.trendlapse.purger.application;
 
 import io.github.hamsteak.trendlapse.trendingsnapshot.domain.TrendingSnapshotRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -10,33 +10,30 @@ import java.time.LocalDateTime;
 
 @Component
 @Slf4j
-public class TrendingPurger {
+public class PurgeExpiredTrendingSnapshotService {
     private final TrendingSnapshotRepository trendingSnapshotRepository;
     private final Duration expirationPeriod;
     private final int batchSize;
 
-    public TrendingPurger(TrendingSnapshotRepository trendingSnapshotRepository,
-                          @Value("${purge-scheduler.expiration-period}") Duration expirationPeriod,
-                          @Value("${purge-scheduler.batch-size}") int batchSize) {
+    public PurgeExpiredTrendingSnapshotService(TrendingSnapshotRepository trendingSnapshotRepository,
+                                               @Value("${purge-scheduler.expiration-period}") Duration expirationPeriod,
+                                               @Value("${purge-scheduler.batch-size}") int batchSize) {
         this.trendingSnapshotRepository = trendingSnapshotRepository;
         this.expirationPeriod = expirationPeriod;
         this.batchSize = batchSize;
     }
 
-    public int purge(LocalDateTime dateTime) {
-        LocalDateTime expirationDateTime = dateTime.minus(expirationPeriod);
+    public void purge(LocalDateTime now) {
+        LocalDateTime expirationTime = now.minus(expirationPeriod);
 
         int totalPurgedCount = 0;
-
         int purgedCount;
         do {
-            purgedCount = trendingSnapshotRepository.deleteByDateTimeBefore(expirationDateTime, batchSize);
+            purgedCount = trendingSnapshotRepository.deleteByDateTimeBefore(expirationTime, batchSize);
             log.debug("Purging... deleted {} records.", purgedCount);
             totalPurgedCount += purgedCount;
         } while (purgedCount > 0);
 
         log.info("Purged {} expired records.", totalPurgedCount);
-
-        return totalPurgedCount;
     }
 }

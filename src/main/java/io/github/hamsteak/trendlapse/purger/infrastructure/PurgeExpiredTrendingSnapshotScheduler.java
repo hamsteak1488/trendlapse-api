@@ -1,6 +1,6 @@
-package io.github.hamsteak.trendlapse.purger.application.scheduler;
+package io.github.hamsteak.trendlapse.purger.infrastructure;
 
-import io.github.hamsteak.trendlapse.purger.application.component.TrendingPurger;
+import io.github.hamsteak.trendlapse.purger.application.PurgeExpiredTrendingSnapshotService;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class TrendingPurgeScheduler {
-    private final TrendingPurger trendingPurger;
+public class PurgeExpiredTrendingSnapshotScheduler {
+    private final PurgeExpiredTrendingSnapshotService purgeExpiredTrendingSnapshotService;
 
     @Timed("purge.whole")
     @Scheduled(cron = "${purge-scheduler.purge-cron}", zone = "UTC")
     public void purge() {
-        LocalDateTime dateTime = LocalDateTime.now(Clock.systemUTC());
-        trendingPurger.purge(dateTime);
+        LocalDateTime now = LocalDateTime.now(Clock.systemUTC());
+        purgeExpiredTrendingSnapshotService.purge(now);
     }
 }
