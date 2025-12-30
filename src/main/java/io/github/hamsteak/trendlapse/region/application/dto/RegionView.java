@@ -7,7 +7,7 @@ import lombok.*;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class RegionView {
     @NonNull
-    private final String regionCode;
+    private final String regionId;
 
     @NonNull
     private final String name;

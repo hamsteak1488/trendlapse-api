@@ -16,7 +16,7 @@ public class GetRegionViewService {
         return regionRepository.findAll().stream()
                 .map(region ->
                         RegionView.builder()
-                                .regionCode(region.getId())
+                                .regionId(region.getId())
                                 .name(region.getName())
                                 .build())
                 .toList();
