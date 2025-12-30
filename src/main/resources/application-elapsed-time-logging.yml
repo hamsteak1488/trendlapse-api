@@ -4,7 +4,7 @@ elapsed-time-logging:
     - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.CollectTrendingSnapshotService.collect(..))"
       name: "Collect TrendingSnapshot"
 
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.purger.infrastructure.TrendingPurgeScheduler.purge(..))"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.purger.infrastructure.PurgeExpiredTrendingSnapshotScheduler.purge(..))"
       name: "Purge Expired TrendingSnapshot"
 
     - pointcut: "execution(* org.springframework.data.jpa.repository.JpaRepository.saveAll(..))"
