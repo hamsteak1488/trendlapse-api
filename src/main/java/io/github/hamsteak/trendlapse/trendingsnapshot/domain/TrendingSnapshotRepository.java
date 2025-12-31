@@ -3,6 +3,7 @@ package io.github.hamsteak.trendlapse.trendingsnapshot.domain;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -23,13 +24,13 @@ public interface TrendingSnapshotRepository extends JpaRepository<TrendingSnapsh
         so the query is designed to work with both MySQL and H2 though it's a bit more complex.
     */
     @Modifying
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Query(value = """
-            delete from trendingSnapshot
+            delete from trending_snapshot
             where id in (
                 select id from (
                     select id
-                    from trendingSnapshot
+                    from trending_snapshot
                     where captured_at < :dateTime
                     order by captured_at
                     limit :count
