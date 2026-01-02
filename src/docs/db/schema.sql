@@ -17,7 +17,7 @@ CREATE TABLE channel (
   thumbnail_url VARCHAR(255),
   last_updated_at DATETIME,
   PRIMARY KEY (id),
-  UNIQUE KEY uk_channel_youtube_id (youtube_id)
+  CONSTRAINT uk_channel_youtube_id UNIQUE (youtube_id)
 );
 
 -- video
@@ -29,7 +29,7 @@ CREATE TABLE video (
   thumbnail_url VARCHAR(255),
   last_updated_at DATETIME,
   PRIMARY KEY (id),
-  UNIQUE KEY uk_video_youtube_id (youtube_id),
+  CONSTRAINT uk_video_youtube_id UNIQUE (youtube_id),
   CONSTRAINT fk_video_channel_id FOREIGN KEY (channel_id) REFERENCES channel(id)
 );
 
@@ -39,9 +39,9 @@ CREATE TABLE trending_snapshot (
   region_id VARCHAR(8) NOT NULL,
   captured_at DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT fk_region_id_caputred_at FOREIGN KEY (region_id) REFERENCES region(id),
-  KEY idx_region_id_caputred_at (region_id, captured_at)
+  CONSTRAINT fk_region_id_caputred_at FOREIGN KEY (region_id) REFERENCES region(id)
 );
+CREATE INDEX idx_region_id_caputred_at ON trending_snapshot (region_id, captured_at);
 
 -- trending_snapshot_video
 CREATE TABLE trending_snapshot_video (
