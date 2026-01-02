@@ -50,6 +50,6 @@ CREATE TABLE trending_snapshot_video (
   trending_video_id BIGINT NOT NULL,
   list_idx INT NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT fk_tsv_snapshot_id FOREIGN KEY (trending_snapshot_id) REFERENCES trending_snapshot (id),
+  CONSTRAINT fk_tsv_snapshot_id FOREIGN KEY (trending_snapshot_id) REFERENCES trending_snapshot (id) ON DELETE CASCADE,
   CONSTRAINT fk_tsv_video_id FOREIGN KEY (trending_video_id) REFERENCES video (id)
 );
