@@ -49,12 +49,9 @@ public class CollectTrendingSnapshotService {
 
         List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList = fetchRegionTrendingVideos(regionIds);
 
-        List<String> distinctChannelYoutubeIds = extractChannelYoutubeIds(regionFetchedTrendingVideosList);
-        List<String> distinctVideoYoutubeIds = extractVideoYoutubeIds(regionFetchedTrendingVideosList);
-
-        fetchAndStoreChannels(distinctChannelYoutubeIds);
-        storeVideos(regionFetchedTrendingVideosList, distinctVideoYoutubeIds, distinctChannelYoutubeIds);
-        storeTrendingSnapshots(regionFetchedTrendingVideosList, distinctVideoYoutubeIds, captureTime);
+        fetchAndStoreChannels(regionFetchedTrendingVideosList);
+        storeVideos(regionFetchedTrendingVideosList);
+        storeTrendingSnapshots(regionFetchedTrendingVideosList, captureTime);
     }
 
     private List<String> fetchAndStoreRegions() {
@@ -69,28 +66,35 @@ public class CollectTrendingSnapshotService {
         return regionIds;
     }
 
-    private void fetchAndStoreChannels(List<String> channelYoutubeIds) {
-        List<String> channelYoutubeIdsNotInDb = findChannelsNotInDbByYoutubeId(channelYoutubeIds);
+    private void fetchAndStoreChannels(List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList) {
+        Set<String> distinctChannelYoutubeIds = extractChannelYoutubeIds(regionFetchedTrendingVideosList);
+        List<String> channelYoutubeIdsNotInDb = findChannelsNotInDbByYoutubeId(distinctChannelYoutubeIds.stream().toList());
         List<FetchedChannel> fetchedChannelsNotInDb = nonblockingYoutubeApiFetcher.fetchChannels(channelYoutubeIdsNotInDb);
 
         List<Channel> channelsNotInDb = fetchedDataAssembler.toChannels(fetchedChannelsNotInDb);
         channelBulkInsertRepository.bulkInsert(channelsNotInDb);
     }
 
-    private void storeVideos(
-            List<RegionFetchedTrendingVideos> regionFetchedTrendingVideos,
-            List<String> videoYoutubeIds,
-            List<String> channelYoutubeIdsForMapping
-    ) {
-        List<String> videoYoutubeIdsNotInDb = findVideosNotInDbByYoutubeId(videoYoutubeIds);
-        List<FetchedVideo> fetchedVideosNotInDb = regionFetchedTrendingVideos.stream()
-                .flatMap(regionFetchedTrendingVideo ->
-                        regionFetchedTrendingVideo.getFetchedTrendingVideos().stream())
-                .filter(fetchedVideo -> videoYoutubeIdsNotInDb.contains(fetchedVideo.getYoutubeId()))
+    private void storeVideos(List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList) {
+        Set<String> distinctChannelYoutubeIds = extractChannelYoutubeIds(regionFetchedTrendingVideosList);
+        Set<String> distinctVideoYoutubeIds = extractVideoYoutubeIds(regionFetchedTrendingVideosList);
+        List<String> videoYoutubeIdsNotInDb = findVideosNotInDbByYoutubeId(distinctVideoYoutubeIds.stream().toList());
+
+        Map<String, FetchedVideo> fetchedVideoMap = regionFetchedTrendingVideosList.stream()
+                .flatMap(regionFetchedTrendingVideos ->
+                        regionFetchedTrendingVideos.getFetchedTrendingVideos().stream())
+                .collect(Collectors.toMap(
+                        fetchedVideo -> fetchedVideo.getYoutubeId(),
+                        fetchedVideo -> fetchedVideo
+                ));
+
+        List<FetchedVideo> fetchedVideosNotInDb = videoYoutubeIdsNotInDb.stream()
+                .map(fetchedVideoMap::get)
                 .toList();
 
-        Map<String, Long> channelYoutubeIdEntityIdMap = channelRepository.findByYoutubeIdIn(channelYoutubeIdsForMapping).stream()
-                .collect(Collectors.toMap(Channel::getYoutubeId, Channel::getId));
+        Map<String, Long> channelYoutubeIdEntityIdMap =
+                channelRepository.findByYoutubeIdIn(distinctChannelYoutubeIds.stream().toList()).stream()
+                        .collect(Collectors.toMap(Channel::getYoutubeId, Channel::getId));
         List<Video> videosNotInDb = fetchedDataAssembler.toVideos(fetchedVideosNotInDb, channelYoutubeIdEntityIdMap);
         videoBulkInsertRepository.bulkInsert(videosNotInDb);
     }
@@ -107,11 +111,12 @@ public class CollectTrendingSnapshotService {
 
     private void storeTrendingSnapshots(
             List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList,
-            List<String> videoYoutubeIds,
             LocalDateTime captureTime
     ) {
+        Set<String> distinctVideoYoutubeIds = extractVideoYoutubeIds(regionFetchedTrendingVideosList);
+
         Map<String, Long> videoYoutubeIdEntityIdMap =
-                videoRepository.findByYoutubeIdIn(videoYoutubeIds).stream()
+                videoRepository.findByYoutubeIdIn(distinctVideoYoutubeIds.stream().toList()).stream()
                         .collect(Collectors.toMap(Video::getYoutubeId, Video::getId));
         List<TrendingSnapshot> trendingSnapshots =
                 fetchedDataAssembler.toTrendingSnapshots(
@@ -154,21 +159,19 @@ public class CollectTrendingSnapshotService {
                 .toList();
     }
 
-    private List<String> extractChannelYoutubeIds(List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList) {
+    private Set<String> extractChannelYoutubeIds(List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList) {
         return regionFetchedTrendingVideosList.stream()
                 .map(RegionFetchedTrendingVideos::getFetchedTrendingVideos)
                 .flatMap(Collection::stream)
                 .map(FetchedVideo::getChannelYoutubeId)
-                .distinct()
-                .toList();
+                .collect(Collectors.toSet());
     }
 
-    private List<String> extractVideoYoutubeIds(List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList) {
+    private Set<String> extractVideoYoutubeIds(List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList) {
         return regionFetchedTrendingVideosList.stream()
                 .map(RegionFetchedTrendingVideos::getFetchedTrendingVideos)
                 .flatMap(Collection::stream)
                 .map(FetchedVideo::getYoutubeId)
-                .distinct()
-                .toList();
+                .collect(Collectors.toSet());
     }
 }
