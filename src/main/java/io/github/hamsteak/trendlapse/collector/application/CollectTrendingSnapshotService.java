@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,9 +45,9 @@ public class CollectTrendingSnapshotService {
 
     @Transactional
     public void collect(LocalDateTime captureTime) {
-        List<Region> regions = fetchAndStoreRegions();
+        List<String> regionIds = fetchAndStoreRegions();
 
-        List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList = fetchRegionTrendingVideos(regions);
+        List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList = fetchRegionTrendingVideos(regionIds);
 
         List<String> distinctChannelYoutubeIds = extractChannelYoutubeIds(regionFetchedTrendingVideosList);
         List<String> distinctVideoYoutubeIds = extractVideoYoutubeIds(regionFetchedTrendingVideosList);
@@ -56,11 +57,16 @@ public class CollectTrendingSnapshotService {
         storeTrendingSnapshots(regionFetchedTrendingVideosList, distinctVideoYoutubeIds, captureTime);
     }
 
-    private List<Region> fetchAndStoreRegions() {
+    private List<String> fetchAndStoreRegions() {
         List<FetchedRegion> fetchedRegions = blockingYoutubeApiFetcher.fetchRegions();
         List<Region> regions = fetchedDataAssembler.toRegions(fetchedRegions);
-        regionRepository.saveAllAndFlush(regions);
-        return regions;
+        List<String> regionIds = regions.stream().map(Region::getId).toList();
+        List<String> regionsIdsNotInDb = findRegionIdsNotInDb(regionIds);
+        List<Region> regionsToInsert = regions.stream()
+                .filter(region -> !regionsIdsNotInDb.contains(region.getId()))
+                .toList();
+        regionRepository.saveAllAndFlush(regionsToInsert);
+        return regionIds;
     }
 
     private void fetchAndStoreChannels(List<String> channelYoutubeIds) {
@@ -81,11 +87,7 @@ public class CollectTrendingSnapshotService {
         videoBulkInsertRepository.bulkInsert(videosNotInDb);
     }
 
-    private List<RegionFetchedTrendingVideos> fetchRegionTrendingVideos(List<Region> regions) {
-        List<String> regionIds = regions.stream()
-                .map(Region::getId)
-                .toList();
-
+    private List<RegionFetchedTrendingVideos> fetchRegionTrendingVideos(List<String> regionIds) {
         return nonblockingYoutubeApiFetcher.fetchTrendingVideos(regionIds).entrySet().stream()
                 .map(entry ->
                         new RegionFetchedTrendingVideos(
@@ -110,6 +112,16 @@ public class CollectTrendingSnapshotService {
                         captureTime
                 );
         trendingSnapshotBulkInsertRepository.bulkInsert(trendingSnapshots);
+    }
+
+    private List<String> findRegionIdsNotInDb(List<String> regionIds) {
+        Set<String> regionIdsInDb = regionRepository.findAllById(regionIds).stream()
+                .map(Region::getId)
+                .collect(Collectors.toSet());
+
+        return regionIds.stream()
+                .filter(channelYoutubeId -> !regionIdsInDb.contains(channelYoutubeId))
+                .toList();
     }
 
     private List<String> findChannelsNotInDbByYoutubeId(List<String> channelYoutubeIds) {
