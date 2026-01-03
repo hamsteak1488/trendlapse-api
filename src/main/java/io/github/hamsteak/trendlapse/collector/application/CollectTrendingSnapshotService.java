@@ -53,7 +53,7 @@ public class CollectTrendingSnapshotService {
         List<String> distinctVideoYoutubeIds = extractVideoYoutubeIds(regionFetchedTrendingVideosList);
 
         fetchAndStoreChannels(distinctChannelYoutubeIds);
-        fetchAndStoreVideos(distinctVideoYoutubeIds, distinctChannelYoutubeIds);
+        storeVideos(regionFetchedTrendingVideosList, distinctVideoYoutubeIds, distinctChannelYoutubeIds);
         storeTrendingSnapshots(regionFetchedTrendingVideosList, distinctVideoYoutubeIds, captureTime);
     }
 
@@ -77,9 +77,17 @@ public class CollectTrendingSnapshotService {
         channelBulkInsertRepository.bulkInsert(channelsNotInDb);
     }
 
-    private void fetchAndStoreVideos(List<String> videoYoutubeIds, List<String> channelYoutubeIdsForMapping) {
+    private void storeVideos(
+            List<RegionFetchedTrendingVideos> regionFetchedTrendingVideos,
+            List<String> videoYoutubeIds,
+            List<String> channelYoutubeIdsForMapping
+    ) {
         List<String> videoYoutubeIdsNotInDb = findVideosNotInDbByYoutubeId(videoYoutubeIds);
-        List<FetchedVideo> fetchedVideosNotInDb = nonblockingYoutubeApiFetcher.fetchVideos(videoYoutubeIdsNotInDb);
+        List<FetchedVideo> fetchedVideosNotInDb = regionFetchedTrendingVideos.stream()
+                .flatMap(regionFetchedTrendingVideo ->
+                        regionFetchedTrendingVideo.getFetchedTrendingVideos().stream())
+                .filter(fetchedVideo -> videoYoutubeIdsNotInDb.contains(fetchedVideo.getYoutubeId()))
+                .toList();
 
         Map<String, Long> channelYoutubeIdEntityIdMap = channelRepository.findByYoutubeIdIn(channelYoutubeIdsForMapping).stream()
                 .collect(Collectors.toMap(Channel::getYoutubeId, Channel::getId));
