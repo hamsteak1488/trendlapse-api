@@ -85,7 +85,8 @@ public class CollectTrendingSnapshotService {
                         regionFetchedTrendingVideos.getFetchedTrendingVideos().stream())
                 .collect(Collectors.toMap(
                         fetchedVideo -> fetchedVideo.getYoutubeId(),
-                        fetchedVideo -> fetchedVideo
+                        fetchedVideo -> fetchedVideo,
+                        (fv1, fv2) -> fv1
                 ));
 
         List<FetchedVideo> fetchedVideosNotInDb = videoYoutubeIdsNotInDb.stream()
