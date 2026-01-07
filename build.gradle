@@ -77,7 +77,7 @@ ext {
 
 processTestResources {
     // Copy schema file for initializing test db.
-    from('src/docs/db') {
+    from('db') {
         include 'schema.sql'
     }
 }
