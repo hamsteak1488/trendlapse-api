@@ -1,7 +1,5 @@
 package io.github.hamsteak.trendlapse.trendingsnapshot.web;
 
-import io.github.hamsteak.trendlapse.global.errors.errorcode.CommonErrorCode;
-import io.github.hamsteak.trendlapse.global.errors.exception.RestApiException;
 import io.github.hamsteak.trendlapse.trendingsnapshot.config.CacheInvalidationConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
@@ -24,7 +22,7 @@ public class TrendingCacheController {
         Cache cache = cacheManager.getCache(cacheName);
 
         if (cache == null) {
-            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER, "Cannot find cache. [cacheName: " + cacheName + "]");
+            throw new RuntimeException("Cannot find cache. [cacheName: " + cacheName + "]");
         }
 
         cache.clear();
@@ -37,7 +35,7 @@ public class TrendingCacheController {
         Cache cache = cacheManager.getCache(cacheName);
 
         if (cache == null) {
-            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER, "Cannot find cache. [cacheName: " + cacheName + "]");
+            throw new RuntimeException("Cannot find cache. [cacheName: " + cacheName + "]");
         }
 
         cacheInvalidationConfig.setAlwaysInvalidateCache(!cacheInvalidationConfig.isAlwaysInvalidateCache());

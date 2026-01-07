@@ -1,7 +1,10 @@
 package io.github.hamsteak.trendlapse.member.domain;
 
-public class InvalidPasswordException extends RuntimeException {
+import io.github.hamsteak.trendlapse.global.error.DomainError;
+import io.github.hamsteak.trendlapse.global.error.DomainException;
+
+public class InvalidPasswordException extends DomainException {
     public InvalidPasswordException(String message) {
-        super(message);
+        super(DomainError.INVALID_PASSWORD, message);
     }
 }

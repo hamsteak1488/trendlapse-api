@@ -1,7 +1,10 @@
 package io.github.hamsteak.trendlapse.member.domain;
 
-public class InvalidUsernameException extends RuntimeException {
+import io.github.hamsteak.trendlapse.global.error.DomainError;
+import io.github.hamsteak.trendlapse.global.error.DomainException;
+
+public class InvalidUsernameException extends DomainException {
     public InvalidUsernameException(String message) {
-        super(message);
+        super(DomainError.INVALID_USERNAME, message);
     }
 }

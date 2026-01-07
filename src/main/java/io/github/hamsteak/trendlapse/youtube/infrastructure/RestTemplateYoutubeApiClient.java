@@ -1,7 +1,7 @@
 package io.github.hamsteak.trendlapse.youtube.infrastructure;
 
-import io.github.hamsteak.trendlapse.global.errors.exception.YoutubeNullResponseException;
 import io.github.hamsteak.trendlapse.youtube.application.YoutubeApiClient;
+import io.github.hamsteak.trendlapse.youtube.domain.YoutubeNullResponseException;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.RawChannelListResponse;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.RawRegionListResponse;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.RawVideoListResponse;

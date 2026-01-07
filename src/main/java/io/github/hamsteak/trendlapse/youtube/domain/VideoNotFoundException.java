@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.global.errors.exception;
+package io.github.hamsteak.trendlapse.youtube.domain;
 
 public class VideoNotFoundException extends YoutubeDataNotFoundException {
     public VideoNotFoundException(String message) {
