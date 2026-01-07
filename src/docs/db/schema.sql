@@ -50,3 +50,13 @@ CREATE TABLE trending_snapshot_video (
     ON DELETE CASCADE,
   CONSTRAINT fk_tsv_video_id FOREIGN KEY (trending_video_id) REFERENCES video (id)
 );
+
+-- member
+CREATE TABLE member (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  username VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  email VARCHAR(255),
+  PRIMARY KEY (id),
+  CONSTRAINT uk_username UNIQUE (username)
+)

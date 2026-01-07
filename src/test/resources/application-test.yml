@@ -7,6 +7,7 @@ spring:
 
   jpa:
     hibernate:
+      # Test DB 초기화는 classpath에 복사된 schema.sql을 사용함.(Gradle processTestResources에서 주입)
       ddl-auto: validate
     defer-datasource-initialization: false
 
