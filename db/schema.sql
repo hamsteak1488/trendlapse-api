@@ -59,4 +59,4 @@ CREATE TABLE member (
   email VARCHAR(255),
   PRIMARY KEY (id),
   CONSTRAINT uk_username UNIQUE (username)
-)
+);
