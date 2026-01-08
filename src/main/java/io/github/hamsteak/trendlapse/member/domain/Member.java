@@ -34,6 +34,21 @@ public class Member {
         this.email = email;
     }
 
+    public void changeUsername(String username) {
+        validateUsername(username);
+        this.username = username;
+    }
+
+    public void changePassword(String password) {
+        validatePassword(password);
+        this.password = password;
+    }
+
+    public void changeEmail(String email) {
+        validateEmail(email);
+        this.email = email;
+    }
+
     private void validateUsername(String username) {
         if (username == null || username.isBlank()) {
             throw new InvalidUsernameException("Username must not be blank.");
