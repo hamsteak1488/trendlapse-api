@@ -1,9 +1,7 @@
 package io.github.hamsteak.trendlapse.member.application;
 
 import io.github.hamsteak.trendlapse.member.application.dto.UpdateMemberCommand;
-import io.github.hamsteak.trendlapse.member.domain.Member;
-import io.github.hamsteak.trendlapse.member.domain.MemberNotFoundException;
-import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
+import io.github.hamsteak.trendlapse.member.domain.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,17 +33,16 @@ public class UpdateMemberServiceTest {
         updateMemberService.update(memberId, command);
 
         // then
-        verify(member, times(1)).changeUsername(command.getUsername());
-        verify(member, times(1)).changePassword(command.getPassword());
-        verify(member, times(1)).changeEmail(command.getEmail());
+        verify(member, times(1)).changeUsername(Username.of(command.getUsername()));
+        verify(member, times(1)).changePassword(Password.of(command.getPassword()));
+        verify(member, times(1)).changeEmail(Email.of(command.getEmail()));
+        verifyNoMoreInteractions(member);
     }
 
     @Test
     public void update_throws_MemberNotFoundException_when_member_not_found() {
         // given
-        when(memberRepository.findById(any()))
-                .thenReturn(Optional.empty());
-
+        when(memberRepository.findById(any())).thenReturn(Optional.empty());
         UpdateMemberService updateMemberService = new UpdateMemberService(memberRepository);
 
         // when

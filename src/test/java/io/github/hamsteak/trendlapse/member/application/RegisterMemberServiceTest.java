@@ -1,9 +1,7 @@
 package io.github.hamsteak.trendlapse.member.application;
 
 import io.github.hamsteak.trendlapse.member.application.dto.RegisterMemberCommand;
-import io.github.hamsteak.trendlapse.member.domain.DuplicateUsernameException;
-import io.github.hamsteak.trendlapse.member.domain.Member;
-import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
+import io.github.hamsteak.trendlapse.member.domain.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -29,7 +27,7 @@ class RegisterMemberServiceTest {
     void register_maps_command_to_member() {
         // given
         when(memberRepository.saveAndFlush(any(Member.class)))
-                .thenReturn(new Member(1L, "Steve", "1234", "abc@gmail.com"));
+                .thenReturn(new Member(1L, new Username("Steve"), new Password("1234"), new Email("abc@gmail.com")));
         RegisterMemberCommand command = new RegisterMemberCommand("Steve", "1234", "abc@gmail.com");
 
         // when
@@ -41,9 +39,9 @@ class RegisterMemberServiceTest {
 
         Member saved = captor.getValue();
         assertThat(saved.getId()).isNull();
-        assertThat(saved.getUsername()).isEqualTo("Steve");
-        assertThat(saved.getPassword()).isEqualTo("1234");
-        assertThat(saved.getEmail()).isEqualTo("abc@gmail.com");
+        assertThat(saved.getUsername()).isEqualTo(Username.of(command.getUsername()));
+        assertThat(saved.getPassword()).isEqualTo(Password.of(command.getPassword()));
+        assertThat(saved.getEmail()).isEqualTo(Email.of(command.getEmail()));
     }
 
     @Test

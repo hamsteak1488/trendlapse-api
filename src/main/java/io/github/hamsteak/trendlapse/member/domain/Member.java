@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.commons.validator.routines.EmailValidator;
+
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -15,18 +16,24 @@ public class Member {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String username;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "username"))
+    private Username username;
 
     @Column(nullable = false)
-    private String password;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "password"))
+    private Password password;
 
     @Column
-    private String email;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "email"))
+    private Email email;
 
-    public Member(Long id, String username, String password, String email) {
-        validateUsername(username);
-        validatePassword(password);
-        validateEmail(email);
+    public Member(Long id, Username username, Password password, Email email) {
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(password);
+        Objects.requireNonNull(email);
 
         this.id = id;
         this.username = username;
@@ -34,44 +41,18 @@ public class Member {
         this.email = email;
     }
 
-    public void changeUsername(String username) {
-        validateUsername(username);
+    public void changeUsername(Username username) {
+        Objects.requireNonNull(username);
         this.username = username;
     }
 
-    public void changePassword(String password) {
-        validatePassword(password);
+    public void changePassword(Password password) {
+        Objects.requireNonNull(password);
         this.password = password;
     }
 
-    public void changeEmail(String email) {
-        validateEmail(email);
+    public void changeEmail(Email email) {
+        Objects.requireNonNull(email);
         this.email = email;
-    }
-
-    private void validateUsername(String username) {
-        if (username == null || username.isBlank()) {
-            throw new InvalidUsernameException("Username must not be blank.");
-        }
-    }
-
-    private void validatePassword(String password) {
-        if (password == null || password.isBlank()) {
-            throw new InvalidPasswordException("Password must not be blank.");
-        }
-    }
-
-    private void validateEmail(String email) {
-        if (email == null) {
-            return;
-        }
-
-        if (email.isBlank()) {
-            throw new InvalidEmailException("Email must not be blank.");
-        }
-
-        if (!EmailValidator.getInstance().isValid(email)) {
-            throw new InvalidEmailException("Email is invalid.");
-        }
     }
 }

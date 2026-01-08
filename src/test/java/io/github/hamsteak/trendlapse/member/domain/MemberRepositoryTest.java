@@ -21,7 +21,7 @@ class MemberRepositoryTest {
     @Test
     void save_persists_member_and_findById_returns_it() {
         // given
-        Member saved = memberRepository.saveAndFlush(new Member(null, "Steve", "1234", "abc@gmail.com"));
+        Member saved = memberRepository.saveAndFlush(new Member(null, new Username("Steve"), new Password("1234"), new Email("abc@gmail.com")));
 
         entityManager.clear();
 
@@ -36,10 +36,10 @@ class MemberRepositoryTest {
     @Test
     void save_throws_DataIntegrityViolationException_when_username_duplicated() {
         // given
-        memberRepository.saveAndFlush(new Member(null, "Steve", "1234", "abc@gmail.com"));
+        memberRepository.saveAndFlush(new Member(null, new Username("Steve"), new Password("1234"), new Email("abc@gmail.com")));
 
         // when
-        Throwable thrown = catchThrowable(() -> memberRepository.save(new Member(null, "Steve", "5678", "def@gmail.com")));
+        Throwable thrown = catchThrowable(() -> memberRepository.save(new Member(null, new Username("Steve"), new Password("1234"), new Email("abc@gmail.com"))));
 
         // then
         assertThat(thrown).isInstanceOf(DataIntegrityViolationException.class);
