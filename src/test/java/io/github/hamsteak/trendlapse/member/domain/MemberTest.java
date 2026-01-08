@@ -18,7 +18,7 @@ class MemberTest {
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" "})
-    void create_throws_InvalidUsernameException_when_username_blank(String username) {
+    void constructor_throws_InvalidUsernameException_when_username_blank(String username) {
         // when
         Throwable thrown = Assertions.catchThrowable(() -> new Member(null, username, DEFAULT_PASSWORD, DEFAULT_EMAIL));
 
@@ -29,7 +29,7 @@ class MemberTest {
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" "})
-    void create_throws_InvalidPasswordException_when_password_blank(String password) {
+    void constructor_throws_InvalidPasswordException_when_password_blank(String password) {
         // when
         Throwable thrown = Assertions.catchThrowable(() -> new Member(null, DEFAULT_USERNAME, password, DEFAULT_EMAIL));
 
@@ -40,7 +40,7 @@ class MemberTest {
     @ParameterizedTest
     @EmptySource
     @ValueSource(strings = {"abcgmailcom", "abcgmail.com", "abc@gmailcom"})
-    void create_throws_InvalidEmailException_when_email_invalid(String email) {
+    void constructor_throws_InvalidEmailException_when_email_invalid(String email) {
         // when
         Throwable thrown = Assertions.catchThrowable(() -> new Member(null, DEFAULT_USERNAME, DEFAULT_PASSWORD, email));
 
