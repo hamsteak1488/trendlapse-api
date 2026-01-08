@@ -5,4 +5,5 @@ public enum DomainError {
     DUPLICATE_USERNAME,
     INVALID_PASSWORD,
     INVALID_EMAIL,
+    MEMBER_NOT_FOUND,
 }
