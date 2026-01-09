@@ -44,4 +44,21 @@ class MemberRepositoryTest {
         // then
         assertThat(thrown).isInstanceOf(DataIntegrityViolationException.class);
     }
+
+    @Test
+    void delete_removes_member_and_findById_returns_empty() {
+        // given
+        Member member = new Member(null, new Username("Steve"), new Password("1234"), new Email("abc@gmail.com"));
+        member = memberRepository.saveAndFlush(member);
+
+        // when
+        memberRepository.delete(member);
+        entityManager.flush();
+        entityManager.clear();
+        
+        Optional<Member> found = memberRepository.findById(member.getId());
+
+        // then
+        assertThat(found).isEmpty();
+    }
 }
