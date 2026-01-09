@@ -1,5 +1,6 @@
 package io.github.hamsteak.trendlapse.global.error;
 
+import io.github.hamsteak.trendlapse.member.web.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -23,6 +24,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDomainException(DomainException e) {
         HttpStatus httpStatus = mapStatus(e.getDomainError());
         return ResponseEntity.status(httpStatus)
+                .body(makeErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(makeErrorResponse(e.getMessage()));
     }
 
