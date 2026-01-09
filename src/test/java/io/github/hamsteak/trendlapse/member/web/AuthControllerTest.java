@@ -1,5 +1,6 @@
 package io.github.hamsteak.trendlapse.member.web;
 
+import io.github.hamsteak.trendlapse.global.session.SessionConst;
 import io.github.hamsteak.trendlapse.member.application.LoginService;
 import io.github.hamsteak.trendlapse.member.application.dto.LoginCommand;
 import io.github.hamsteak.trendlapse.member.application.dto.LoginRequest;
@@ -41,7 +42,7 @@ class AuthControllerTest {
         authController.login(httpSession, new LoginRequest("Steve", "1234"));
 
         // then
-        verify(httpSession, only()).setAttribute("loginMemberId", memberId);
+        verify(httpSession, only()).setAttribute(SessionConst.LOGIN_MEMBER_ID, memberId);
     }
 
     @Test
@@ -50,6 +51,6 @@ class AuthControllerTest {
         authController.logout(httpSession);
 
         // then
-        verify(httpSession, only()).removeAttribute("loginMemberId");
+        verify(httpSession, only()).removeAttribute(SessionConst.LOGIN_MEMBER_ID);
     }
 }

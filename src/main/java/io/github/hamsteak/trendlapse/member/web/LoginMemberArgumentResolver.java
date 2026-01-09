@@ -1,5 +1,6 @@
 package io.github.hamsteak.trendlapse.member.web;
 
+import io.github.hamsteak.trendlapse.global.session.SessionConst;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.core.MethodParameter;
@@ -23,7 +24,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
             throw new UnauthorizedException("Unauthorized.");
         }
 
-        Object loginMemberId = session.getAttribute("loginMemberId");
+        Object loginMemberId = session.getAttribute(SessionConst.LOGIN_MEMBER_ID);
         if (loginMemberId == null) {
             throw new UnauthorizedException("Unauthorized.");
         }

@@ -1,5 +1,6 @@
 package io.github.hamsteak.trendlapse.member.web;
 
+import io.github.hamsteak.trendlapse.global.session.SessionConst;
 import io.github.hamsteak.trendlapse.member.application.LoginService;
 import io.github.hamsteak.trendlapse.member.application.dto.LoginCommand;
 import io.github.hamsteak.trendlapse.member.application.dto.LoginRequest;
@@ -20,14 +21,14 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Void> login(HttpSession httpSession, @RequestBody LoginRequest request) {
         long memberId = loginService.login(new LoginCommand(request.getUsername(), request.getPassword()));
-        httpSession.setAttribute("loginMemberId", memberId);
+        httpSession.setAttribute(SessionConst.LOGIN_MEMBER_ID, memberId);
 
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpSession httpSession) {
-        httpSession.removeAttribute("loginMemberId");
+        httpSession.removeAttribute(SessionConst.LOGIN_MEMBER_ID);
 
         return ResponseEntity.ok().build();
     }

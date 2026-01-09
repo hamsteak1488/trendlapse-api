@@ -1,5 +1,6 @@
 package io.github.hamsteak.trendlapse.member.web;
 
+import io.github.hamsteak.trendlapse.global.session.SessionConst;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.Test;
@@ -61,15 +62,16 @@ class LoginMemberArgumentResolverTest {
                 .thenReturn(httpServletRequest);
         when(httpServletRequest.getSession(false))
                 .thenReturn(httpSession);
-        when(httpSession.getAttribute("loginMemberId"))
+        when(httpSession.getAttribute(SessionConst.LOGIN_MEMBER_ID))
                 .thenReturn(1L);
 
         // when
-        Object loginMemberId = loginMemberArgumentResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
+        Object arg = loginMemberArgumentResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
 
         // then
-        assertThat(loginMemberId).isInstanceOf(Long.class);
-        assertThat(loginMemberId).isEqualTo(1L);
+        assertThat(arg).isNotNull();
+        assertThat(arg).isInstanceOf(LoginMember.class);
+        assertThat(((LoginMember) arg).getMemberId()).isEqualTo(1L);
     }
 
     @Test
@@ -94,7 +96,7 @@ class LoginMemberArgumentResolverTest {
                 .thenReturn(httpServletRequest);
         when(httpServletRequest.getSession(false))
                 .thenReturn(httpSession);
-        when(httpSession.getAttribute("loginMemberId"))
+        when(httpSession.getAttribute(SessionConst.LOGIN_MEMBER_ID))
                 .thenReturn(null);
 
         // when
