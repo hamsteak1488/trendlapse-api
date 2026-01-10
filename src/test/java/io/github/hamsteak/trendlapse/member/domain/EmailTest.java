@@ -30,7 +30,7 @@ class EmailTest {
     @ValueSource(strings = {"abcgmailcom", "abcgmail.com", "abc@gmailcom"})
     void constructor_throws_InvalidEmailException_when_email_invalid(String email) {
         // when
-        Throwable thrown = Assertions.catchThrowable(() -> new Member(null, new Username("Steve"), new Password("1234"), new Email(email)));
+        Throwable thrown = Assertions.catchThrowable(() -> new Member(null, Username.of("Steve"), Password.of("1234"), Email.of(email)));
 
         // then
         assertThat(thrown).isInstanceOf(InvalidEmailException.class);

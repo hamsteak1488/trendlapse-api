@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class Password {
     private String value;
 
-    public Password(String value) {
+    private Password(String value) {
         if (value == null || value.isBlank()) {
             throw new InvalidPasswordException("Password must not be blank.");
         }

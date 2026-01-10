@@ -12,7 +12,7 @@ import org.apache.commons.validator.routines.EmailValidator;
 public class Email {
     private String value;
 
-    public Email(String value) {
+    private Email(String value) {
         if (value == null) {
             return;
         }

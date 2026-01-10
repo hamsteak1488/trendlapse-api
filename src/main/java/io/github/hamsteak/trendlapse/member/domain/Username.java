@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class Username {
     private String value;
 
-    public Username(String value) {
+    private Username(String value) {
         if (value == null || value.isBlank()) {
             throw new InvalidUsernameException("Username must not be blank.");
         }

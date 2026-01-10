@@ -10,7 +10,7 @@ class UsernameTest {
     @NullAndEmptySource
     @ValueSource(strings = {" "})
     void constructor_throws_InvalidUsernameException_when_username_blank(String username) {
-        Assertions.assertThatThrownBy(() -> new Username(username))
+        Assertions.assertThatThrownBy(() -> Username.of(username))
                 .isInstanceOf(InvalidUsernameException.class);
     }
 }

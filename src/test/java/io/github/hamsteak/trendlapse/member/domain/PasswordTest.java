@@ -12,7 +12,7 @@ class PasswordTest {
     @ValueSource(strings = {" "})
     void constructor_throws_InvalidPasswordException_when_password_blank(String password) {
         assertThatThrownBy(() ->
-                new Member(null, new Username("Steve"), new Password(password), new Email("abc@gmail.com"))
+                new Member(null, Username.of("Steve"), Password.of(password), Email.of("abc@gmail.com"))
         ).isInstanceOf(InvalidPasswordException.class);
     }
 }

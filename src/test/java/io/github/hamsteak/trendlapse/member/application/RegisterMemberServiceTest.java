@@ -27,7 +27,7 @@ class RegisterMemberServiceTest {
     void register_maps_command_to_member() {
         // given
         when(memberRepository.saveAndFlush(any(Member.class)))
-                .thenReturn(new Member(1L, new Username("Steve"), new Password("1234"), new Email("abc@gmail.com")));
+                .thenReturn(new Member(memberId, Username.of("Steve"), Password.of("1234"), Email.of("abc@gmail.com")));
         RegisterMemberCommand command = new RegisterMemberCommand("Steve", "1234", "abc@gmail.com");
 
         // when
