@@ -21,7 +21,7 @@ class MemberRepositoryTest {
     @Test
     void save_persists_member_and_findById_returns_it() {
         // given
-        Member saved = memberRepository.saveAndFlush(new Member(null, Username.of("Steve"), Password.of("1234"), Email.of("abc@gmail.com")));
+        Member saved = memberRepository.saveAndFlush(newMember());
 
         entityManager.clear();
 
@@ -36,11 +36,11 @@ class MemberRepositoryTest {
     @Test
     void save_throws_DataIntegrityViolationException_when_username_duplicated() {
         // given
-        memberRepository.saveAndFlush(new Member(null, Username.of("Steve"), Password.of("1234"), Email.of("abc@gmail.com")));
+        memberRepository.saveAndFlush(newMember());
 
         // when
         Throwable thrown = catchThrowable(() ->
-                memberRepository.save(new Member(null, Username.of("Steve"), Password.of("1234"), Email.of("abc@gmail.com")))
+                memberRepository.saveAndFlush(newMember())
         );
 
         // then
@@ -50,7 +50,7 @@ class MemberRepositoryTest {
     @Test
     void delete_removes_member_and_findById_returns_empty() {
         // given
-        Member member = new Member(null, Username.of("Steve"), Password.of("1234"), Email.of("abc@gmail.com"));
+        Member member = newMember();
         member = memberRepository.saveAndFlush(member);
 
         // when
@@ -62,5 +62,9 @@ class MemberRepositoryTest {
 
         // then
         assertThat(found).isEmpty();
+    }
+
+    private static Member newMember() {
+        return new Member(null, Username.of("Steve"), Password.of("1234"), Email.of("abc@gmail.com"));
     }
 }

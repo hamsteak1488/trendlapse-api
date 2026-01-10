@@ -1,38 +1,28 @@
 package io.github.hamsteak.trendlapse.member.domain;
 
-import org.apache.commons.validator.routines.EmailValidator;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 class EmailTest {
     @Test
-    void isValid_validate_email() {
-        // given
-        String validEmail = "abc@gmail.com";
-        String invalidEmail = "abcgmailcom";
-
-        // when
-        boolean valid = EmailValidator.getInstance().isValid(validEmail);
-        boolean invalid = EmailValidator.getInstance().isValid(invalidEmail);
-
-        // then
-        assertThat(valid).isTrue();
-        Assertions.assertThat(invalid).isFalse();
+    void of_creates_email_when_valid() {
+        Email email = Email.of("abc@gmail.com");
+        assertThat(email.getValue()).isEqualTo("abc@gmail.com");
+        assertThatCode(() -> Email.of(null))
+                .doesNotThrowAnyException();
     }
 
     @ParameterizedTest
     @EmptySource
-    @ValueSource(strings = {"abcgmailcom", "abcgmail.com", "abc@gmailcom"})
-    void constructor_throws_InvalidEmailException_when_email_invalid(String email) {
+    @ValueSource(strings = {" ", "  ", "\t", "\n", "abcgmailcom", "abcgmail.com", "abc@gmailcom"})
+    void of_throws_InvalidEmailException_when_invalid(String email) {
+        // Null value is valid.
         // when
-        Throwable thrown = Assertions.catchThrowable(() -> new Member(null, Username.of("Steve"), Password.of("1234"), Email.of(email)));
-
-        // then
-        assertThat(thrown).isInstanceOf(InvalidEmailException.class);
+        assertThatThrownBy(() -> Email.of(email))
+                .isInstanceOf(InvalidEmailException.class);
     }
 }

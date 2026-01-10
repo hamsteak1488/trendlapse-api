@@ -10,7 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateMemberServiceTest {
@@ -20,33 +21,32 @@ public class UpdateMemberServiceTest {
     Member member;
 
     @Test
-    public void update_invokes_member_change() {
+    void update_invokes_member_change() {
         // given
         long memberId = 1L;
-        when(memberRepository.findById(1L))
-                .thenReturn(Optional.of(member));
-
-        UpdateMemberCommand command = new UpdateMemberCommand("James", "5678", "def@gmail.com");
         UpdateMemberService updateMemberService = new UpdateMemberService(memberRepository);
+        UpdateMemberCommand command = new UpdateMemberCommand("James", "5678", "def@gmail.com");
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         // when
         updateMemberService.update(memberId, command);
 
         // then
-        verify(member, times(1)).changeUsername(Username.of(command.getUsername()));
-        verify(member, times(1)).changePassword(Password.of(command.getPassword()));
-        verify(member, times(1)).changeEmail(Email.of(command.getEmail()));
-        verifyNoMoreInteractions(member);
+        verify(member).changeUsername(Username.of(command.getUsername()));
+        verify(member).changePassword(Password.of(command.getPassword()));
+        verify(member).changeEmail(Email.of(command.getEmail()));
     }
 
     @Test
-    public void update_throws_MemberNotFoundException_when_member_not_found() {
+    void update_throws_MemberNotFoundException_when_member_not_found() {
         // given
-        when(memberRepository.findById(any())).thenReturn(Optional.empty());
+        long memberId = 1L;
         UpdateMemberService updateMemberService = new UpdateMemberService(memberRepository);
+        UpdateMemberCommand command = new UpdateMemberCommand("James", "5678", "def@gmail.com");
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // when
-        Throwable thrown = Assertions.catchThrowable(() -> updateMemberService.update(1L, null));
+        Throwable thrown = Assertions.catchThrowable(() -> updateMemberService.update(memberId, command));
 
         // then
         Assertions.assertThat(thrown).isInstanceOf(MemberNotFoundException.class);

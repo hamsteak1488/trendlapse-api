@@ -7,13 +7,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,6 +26,7 @@ class RegisterMemberServiceTest {
     @Test
     void register_maps_command_to_member() {
         // given
+        long memberId = 1L;
         when(memberRepository.saveAndFlush(any(Member.class)))
                 .thenReturn(new Member(memberId, Username.of("Steve"), Password.of("1234"), Email.of("abc@gmail.com")));
         RegisterMemberCommand command = new RegisterMemberCommand("Steve", "1234", "abc@gmail.com");
@@ -35,7 +36,7 @@ class RegisterMemberServiceTest {
 
         // then
         ArgumentCaptor<Member> captor = ArgumentCaptor.forClass(Member.class);
-        Mockito.verify(memberRepository).saveAndFlush(captor.capture());
+        verify(memberRepository).saveAndFlush(captor.capture());
 
         Member saved = captor.getValue();
         assertThat(saved.getId()).isNull();

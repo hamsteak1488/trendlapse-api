@@ -3,17 +3,15 @@ package io.github.hamsteak.trendlapse.member.web;
 import io.github.hamsteak.trendlapse.global.session.SessionConst;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.MethodParameter;
-import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -21,14 +19,11 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LoginMemberArgumentResolverTest {
-    @Mock
-    MethodParameter methodParameter;
-    @Mock
-    ModelAndViewContainer modelAndViewContainer;
+    MethodParameter loginMemberMethodParameter;
+    MethodParameter objectMethodParameter;
+
     @Mock
     NativeWebRequest nativeWebRequest;
-    @Mock
-    WebDataBinderFactory webDataBinderFactory;
     @Mock
     HttpServletRequest httpServletRequest;
     @Mock
@@ -36,27 +31,29 @@ class LoginMemberArgumentResolverTest {
 
     LoginMemberArgumentResolver loginMemberArgumentResolver = new LoginMemberArgumentResolver();
 
-    @Test
-    void supportsParameter_returns_true_when_parameter_is_LoginMember() throws NoSuchMethodException {
-        // given
-        Method loginMemberMethod = this.getClass().getDeclaredMethod("loginMemberMethod", LoginMember.class, Object.class);
-        Parameter loginMemberParameter = loginMemberMethod.getParameters()[0];
-        Parameter objectParameter = loginMemberMethod.getParameters()[1];
+    private void loginMemberMethod(LoginMember loginMember, Object object) {
+    }
 
+    @BeforeEach
+    void setUp() throws NoSuchMethodException {
+        Method loginMemberMethod = this.getClass().getDeclaredMethod("loginMemberMethod", LoginMember.class, Object.class);
+        loginMemberMethodParameter = new MethodParameter(loginMemberMethod, 0);
+        objectMethodParameter = new MethodParameter(loginMemberMethod, 1);
+    }
+
+    @Test
+    void supportsParameter_returns_true_when_parameter_is_LoginMember() {
         // when
-        boolean support = loginMemberArgumentResolver.supportsParameter(MethodParameter.forParameter(loginMemberParameter));
-        boolean notSupport = loginMemberArgumentResolver.supportsParameter(MethodParameter.forParameter(objectParameter));
+        boolean support = loginMemberArgumentResolver.supportsParameter(loginMemberMethodParameter);
+        boolean notSupport = loginMemberArgumentResolver.supportsParameter(objectMethodParameter);
 
         // then
         assertThat(support).isTrue();
         assertThat(notSupport).isFalse();
     }
 
-    private void loginMemberMethod(LoginMember loginMember, Object object) {
-    }
-
     @Test
-    void resolveArgument_returns_session_memberId() {
+    void resolveArgument_returns_session_LoginMember() {
         // given
         when(nativeWebRequest.getNativeRequest())
                 .thenReturn(httpServletRequest);
@@ -66,12 +63,14 @@ class LoginMemberArgumentResolverTest {
                 .thenReturn(1L);
 
         // when
-        Object arg = loginMemberArgumentResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
+        Object arg = loginMemberArgumentResolver.resolveArgument(loginMemberMethodParameter, null, nativeWebRequest, null);
 
         // then
-        assertThat(arg).isNotNull();
-        assertThat(arg).isInstanceOf(LoginMember.class);
-        assertThat(((LoginMember) arg).getMemberId()).isEqualTo(1L);
+        assertThat(arg)
+                .isInstanceOfSatisfying(
+                        LoginMember.class,
+                        loginMember -> assertThat(loginMember.getMemberId()).isEqualTo(1L)
+                );
     }
 
     @Test
@@ -83,7 +82,7 @@ class LoginMemberArgumentResolverTest {
                 .thenReturn(null);
 
         // when
-        Throwable thrown = catchThrowable(() -> loginMemberArgumentResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory));
+        Throwable thrown = catchThrowable(() -> loginMemberArgumentResolver.resolveArgument(loginMemberMethodParameter, null, nativeWebRequest, null));
 
         // then
         assertThat(thrown).isInstanceOf(UnauthorizedException.class);
@@ -100,7 +99,7 @@ class LoginMemberArgumentResolverTest {
                 .thenReturn(null);
 
         // when
-        Throwable thrown = catchThrowable(() -> loginMemberArgumentResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory));
+        Throwable thrown = catchThrowable(() -> loginMemberArgumentResolver.resolveArgument(loginMemberMethodParameter, null, nativeWebRequest, null));
 
         // then
         assertThat(thrown).isInstanceOf(UnauthorizedException.class);
