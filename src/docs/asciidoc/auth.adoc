@@ -6,7 +6,7 @@
 
 `POST /auth/login`
 
-operation::auth/login[snippets='request-fields,http-request,http-response,response-cookies']
+operation::auth/login[snippets='request-fields,http-request,http-response']
 
 == 로그아웃
 
