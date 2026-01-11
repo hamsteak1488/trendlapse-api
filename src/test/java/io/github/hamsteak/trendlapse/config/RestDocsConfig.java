@@ -19,7 +19,8 @@ public class RestDocsConfig {
                 )
                 .withResponseDefaults(
                         prettyPrint(),
-                        modifyHeaders().remove("Vary")
+                        modifyHeaders().remove("Vary"),
+                        modifyHeaders().remove("Content-Length")
                 )
                 ;
     }
