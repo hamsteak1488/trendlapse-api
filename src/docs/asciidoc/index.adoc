@@ -4,19 +4,14 @@
 :icons: font
 :toc: left
 :toclevels: 2
-:snippets: ../../../build/generated-snippets
 
 [[introduction]]
 == 소개
 
 Trendlapse API 문서입니다.
 
-[[regions]]
-== 지역 API
-
+[[region]]
 include::regions.adoc[]
 
-[[trendings]]
-== 트렌딩 API
-
-include::trending-snapshot.adoc[]
+[[auth]]
+include::auth.adoc[]

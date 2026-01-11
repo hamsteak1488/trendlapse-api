@@ -1,0 +1,15 @@
+:source-highlighter: highlightjs
+
+= 인증 API
+
+== 로그인
+
+`POST /auth/login`
+
+operation::auth/login[snippets='request-fields,http-request,http-response,response-cookies']
+
+== 로그아웃
+
+`POST /auth/logout`
+
+operation::auth/logout[snippets='http-request,http-response']
