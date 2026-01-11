@@ -1,14 +1,12 @@
 package io.github.hamsteak.trendlapse.member.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.hamsteak.trendlapse.config.RestDocsConfig;
 import io.github.hamsteak.trendlapse.member.application.LoginService;
 import io.github.hamsteak.trendlapse.member.application.dto.LoginRequest;
 import io.github.hamsteak.trendlapse.test.support.RestDocsTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -22,7 +20,6 @@ import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
-@Import(RestDocsConfig.class)
 class AuthControllerRestDocsTest extends RestDocsTestSupport {
     @MockitoBean
     LoginService loginService;

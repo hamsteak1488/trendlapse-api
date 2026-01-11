@@ -1,9 +1,11 @@
 package io.github.hamsteak.trendlapse.test.support;
 
+import io.github.hamsteak.trendlapse.config.RestDocsConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.RestDocsMockMvcConfigurationCustomizer;
+import org.springframework.context.annotation.Import;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentationConfigurer;
@@ -14,6 +16,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 
 @ExtendWith(RestDocumentationExtension.class)
+@Import(RestDocsConfig.class)
 public abstract class RestDocsTestSupport {
     /*
         setUp 메서드 인수 주입은 JUnit이 담당하지만 RestDocsMockMvcConfigurationCustomizer는

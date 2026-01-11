@@ -1,14 +1,12 @@
 package io.github.hamsteak.trendlapse.region.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.hamsteak.trendlapse.config.RestDocsConfig;
 import io.github.hamsteak.trendlapse.region.application.dto.RegionView;
 import io.github.hamsteak.trendlapse.region.application.service.GetRegionViewService;
 import io.github.hamsteak.trendlapse.test.support.RestDocsTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -25,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(RegionController.class)
-@Import(RestDocsConfig.class)
 class RegionControllerRestDocsTest extends RestDocsTestSupport {
     @Autowired
     private ObjectMapper objectMapper;
