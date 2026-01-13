@@ -1,8 +1,10 @@
 package io.github.hamsteak.trendlapse.member.web;
 
+import io.github.hamsteak.trendlapse.member.application.GetMemberService;
 import io.github.hamsteak.trendlapse.member.application.RegisterMemberService;
 import io.github.hamsteak.trendlapse.member.application.UpdateMemberService;
 import io.github.hamsteak.trendlapse.member.application.WithdrawMemberService;
+import io.github.hamsteak.trendlapse.member.application.dto.MemberView;
 import io.github.hamsteak.trendlapse.member.application.dto.RegisterMemberCommand;
 import io.github.hamsteak.trendlapse.member.application.dto.UpdateMemberCommand;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class MemberController {
     private final RegisterMemberService registerMemberService;
     private final UpdateMemberService updateMemberService;
     private final WithdrawMemberService withdrawMemberService;
+    private final GetMemberService getMemberService;
 
     @PostMapping
     public ResponseEntity<?> registerMember(@Validated @RequestBody RegisterMemberCommand command) {
@@ -39,5 +42,12 @@ public class MemberController {
         withdrawMemberService.withdraw(loginMember.getMemberId());
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(LoginMember loginMember) {
+        MemberView memberView = getMemberService.get(loginMember.getMemberId());
+
+        return ResponseEntity.ok(memberView);
     }
 }
