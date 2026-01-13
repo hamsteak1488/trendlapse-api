@@ -28,7 +28,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpSession httpSession) {
-        httpSession.removeAttribute(SessionConst.LOGIN_MEMBER_ID);
+        httpSession.invalidate();
 
         return ResponseEntity.ok().build();
     }

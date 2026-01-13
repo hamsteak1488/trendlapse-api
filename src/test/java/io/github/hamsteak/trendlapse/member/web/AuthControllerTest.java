@@ -54,6 +54,6 @@ class AuthControllerTest {
         authController.logout(httpSession);
 
         // then
-        verify(httpSession).removeAttribute(SessionConst.LOGIN_MEMBER_ID);
+        verify(httpSession).invalidate();
     }
 }
