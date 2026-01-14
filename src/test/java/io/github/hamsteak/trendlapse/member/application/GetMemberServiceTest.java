@@ -1,8 +1,7 @@
 package io.github.hamsteak.trendlapse.member.application;
 
 import io.github.hamsteak.trendlapse.member.application.dto.MemberView;
-import io.github.hamsteak.trendlapse.member.domain.Member;
-import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
+import io.github.hamsteak.trendlapse.member.domain.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -2,13 +2,15 @@ package io.github.hamsteak.trendlapse.member.application;
 
 import io.github.hamsteak.trendlapse.member.application.dto.RegisterMemberCommand;
 import io.github.hamsteak.trendlapse.member.domain.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -20,8 +22,14 @@ import static org.mockito.Mockito.when;
 class RegisterMemberServiceTest {
     @Mock
     MemberRepository memberRepository;
-    @InjectMocks
+    PasswordPolicy passwordPolicy = new WeakPasswordPolicy();
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     RegisterMemberService registerMemberService;
+
+    @BeforeEach
+    void setUp() {
+        registerMemberService = new RegisterMemberService(memberRepository, passwordPolicy, passwordEncoder);
+    }
 
     @Test
     void register_maps_command_to_member() {
@@ -37,11 +45,10 @@ class RegisterMemberServiceTest {
         // then
         ArgumentCaptor<Member> captor = ArgumentCaptor.forClass(Member.class);
         verify(memberRepository).saveAndFlush(captor.capture());
-
         Member saved = captor.getValue();
         assertThat(saved.getId()).isNull();
         assertThat(saved.getUsername()).isEqualTo(Username.of(command.getUsername()));
-        assertThat(saved.getPassword()).isEqualTo(Password.of(command.getPassword()));
+        assertThat(passwordEncoder.matches(command.getPassword(), saved.getPassword().getHashValue())).isTrue();
         assertThat(saved.getEmail()).isEqualTo(Email.of(command.getEmail()));
     }
 

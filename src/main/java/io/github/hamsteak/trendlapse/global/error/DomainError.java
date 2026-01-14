@@ -6,4 +6,5 @@ public enum DomainError {
     INVALID_PASSWORD,
     INVALID_EMAIL,
     MEMBER_NOT_FOUND,
+    LOGIN_FAILED,
 }

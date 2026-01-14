@@ -13,10 +13,7 @@ public class Email {
     private String value;
 
     private Email(String value) {
-        if (value == null) {
-            return;
-        }
-        if (value.isBlank()) {
+        if (value == null || value.isBlank()) {
             throw new InvalidEmailException("Email must not be blank.");
         }
         if (!EmailValidator.getInstance().isValid(value)) {

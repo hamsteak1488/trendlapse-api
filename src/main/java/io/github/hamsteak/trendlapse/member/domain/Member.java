@@ -20,7 +20,7 @@ public class Member {
 
     @Column(nullable = false)
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "password"))
+    @AttributeOverride(name = "hashValue", column = @Column(name = "password_hash"))
     private Password password;
 
     @Column
@@ -28,19 +28,19 @@ public class Member {
     @AttributeOverride(name = "value", column = @Column(name = "email"))
     private Email email;
 
-    public Member(Long id, String username, String password, String email) {
+    public Member(Long id, String username, String passwordHash, String email) {
         this.id = id;
         this.username = Username.of(username);
-        this.password = Password.of(password);
-        this.email = Email.of(email);
+        this.password = Password.of(passwordHash);
+        this.email = email != null ? Email.of(email) : null;
     }
 
     public void changeUsername(String username) {
         this.username = Username.of(username);
     }
 
-    public void changePassword(String password) {
-        this.password = Password.of(password);
+    public void changePassword(String passwordHash) {
+        this.password = Password.of(passwordHash);
     }
 
     public void changeEmail(String email) {

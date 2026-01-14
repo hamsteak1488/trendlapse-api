@@ -3,6 +3,7 @@ package io.github.hamsteak.trendlapse.member.application;
 import io.github.hamsteak.trendlapse.member.domain.Member;
 import io.github.hamsteak.trendlapse.member.domain.MemberNotFoundException;
 import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
+import io.github.hamsteak.trendlapse.member.domain.Password;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WithdrawMemberServiceTest {
+    @Mock
+    Password password;
     @Mock
     MemberRepository memberRepository;
 

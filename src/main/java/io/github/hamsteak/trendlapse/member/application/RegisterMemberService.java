@@ -4,8 +4,10 @@ import io.github.hamsteak.trendlapse.member.application.dto.RegisterMemberComman
 import io.github.hamsteak.trendlapse.member.domain.DuplicateUsernameException;
 import io.github.hamsteak.trendlapse.member.domain.Member;
 import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
+import io.github.hamsteak.trendlapse.member.domain.PasswordPolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,14 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RegisterMemberService {
     private final MemberRepository memberRepository;
+    private final PasswordPolicy passwordPolicy;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public long register(RegisterMemberCommand command) {
+        passwordPolicy.validate(command.getPassword());
+        String passwordHash = passwordEncoder.encode(command.getPassword());
+
         try {
             Member member = new Member(
                     null,
                     command.getUsername(),
-                    command.getPassword(),
+                    passwordHash,
                     command.getEmail()
             );
             member = memberRepository.saveAndFlush(member);

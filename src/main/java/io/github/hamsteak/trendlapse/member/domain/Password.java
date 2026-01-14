@@ -11,16 +11,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
 public class Password {
-    private String value;
+    private String hashValue;
 
-    private Password(String value) {
-        if (value == null || value.isBlank()) {
+    private Password(String hashValue) {
+        if (hashValue == null || hashValue.isBlank()) {
             throw new InvalidPasswordException("Password must not be blank.");
         }
-        this.value = value;
+        this.hashValue = hashValue;
     }
 
-    public static Password of(String value) {
-        return new Password(value);
+    public static Password of(String passwordHash) {
+        return new Password(passwordHash);
     }
 }

@@ -12,7 +12,7 @@ class PasswordTest {
     @Test
     void of_creates_password_when_valid() {
         Password password = Password.of("1234");
-        assertThat(password.getValue()).isEqualTo("1234");
+        assertThat(password.getHashValue()).isEqualTo("1234");
     }
 
     @ParameterizedTest

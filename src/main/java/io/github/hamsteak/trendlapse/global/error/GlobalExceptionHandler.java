@@ -17,6 +17,7 @@ public class GlobalExceptionHandler {
             case INVALID_USERNAME, INVALID_PASSWORD, INVALID_EMAIL -> HttpStatus.BAD_REQUEST;
             case DUPLICATE_USERNAME -> HttpStatus.CONFLICT;
             case MEMBER_NOT_FOUND -> HttpStatus.NOT_FOUND;
+            case LOGIN_FAILED -> HttpStatus.BAD_REQUEST;
         };
     }
 
