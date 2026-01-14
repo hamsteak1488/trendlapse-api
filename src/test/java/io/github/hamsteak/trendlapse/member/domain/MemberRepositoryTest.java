@@ -2,9 +2,13 @@ package io.github.hamsteak.trendlapse.member.domain;
 
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -12,7 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
 @DataJpaTest
+@ExtendWith(MockitoExtension.class)
 class MemberRepositoryTest {
+    PasswordEncoder encoder = new BCryptPasswordEncoder();
     @Autowired
     MemberRepository memberRepository;
     @Autowired
@@ -64,7 +70,7 @@ class MemberRepositoryTest {
         assertThat(found).isEmpty();
     }
 
-    private static Member newMember() {
-        return new Member(null, "Steve", "1234", "abc@gmail.com");
+    private Member newMember() {
+        return new Member(null, "Steve", "1234", "abc@gmail.com", encoder);
     }
 }

@@ -1,7 +1,9 @@
 package io.github.hamsteak.trendlapse.member.application;
 
 import io.github.hamsteak.trendlapse.member.application.dto.RegisterMemberCommand;
-import io.github.hamsteak.trendlapse.member.domain.*;
+import io.github.hamsteak.trendlapse.member.domain.DuplicateUsernameException;
+import io.github.hamsteak.trendlapse.member.domain.Member;
+import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,13 +24,12 @@ import static org.mockito.Mockito.when;
 class RegisterMemberServiceTest {
     @Mock
     MemberRepository memberRepository;
-    PasswordPolicy passwordPolicy = new WeakPasswordPolicy();
-    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    PasswordEncoder encoder = new BCryptPasswordEncoder();
     RegisterMemberService registerMemberService;
 
     @BeforeEach
     void setUp() {
-        registerMemberService = new RegisterMemberService(memberRepository, passwordPolicy, passwordEncoder);
+        registerMemberService = new RegisterMemberService(memberRepository, encoder);
     }
 
     @Test
@@ -36,7 +37,7 @@ class RegisterMemberServiceTest {
         // given
         long memberId = 1L;
         when(memberRepository.saveAndFlush(any(Member.class)))
-                .thenReturn(new Member(memberId, "Steve", "1234", "abc@gmail.com"));
+                .thenReturn(new Member(memberId, "Steve", "1234", "abc@gmail.com", encoder));
         RegisterMemberCommand command = new RegisterMemberCommand("Steve", "1234", "abc@gmail.com");
 
         // when
@@ -47,9 +48,9 @@ class RegisterMemberServiceTest {
         verify(memberRepository).saveAndFlush(captor.capture());
         Member saved = captor.getValue();
         assertThat(saved.getId()).isNull();
-        assertThat(saved.getUsername()).isEqualTo(Username.of(command.getUsername()));
-        assertThat(passwordEncoder.matches(command.getPassword(), saved.getPassword().getHashValue())).isTrue();
-        assertThat(saved.getEmail()).isEqualTo(Email.of(command.getEmail()));
+        assertThat(saved.getUsername()).isEqualTo(command.getUsername());
+        assertThat(encoder.matches(command.getPassword(), saved.getPasswordHash())).isTrue();
+        assertThat(saved.getEmail()).isEqualTo(command.getEmail());
     }
 
     @Test

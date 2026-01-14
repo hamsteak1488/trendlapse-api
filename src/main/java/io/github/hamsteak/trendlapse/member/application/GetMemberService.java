@@ -16,6 +16,6 @@ public class GetMemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("Cannot find member."));
 
-        return new MemberView(member.getUsername().getValue(), member.getEmail().getValue());
+        return new MemberView(member.getUsername(), member.getEmail());
     }
 }

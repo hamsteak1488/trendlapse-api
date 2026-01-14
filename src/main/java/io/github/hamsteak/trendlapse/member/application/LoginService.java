@@ -4,7 +4,6 @@ import io.github.hamsteak.trendlapse.member.application.dto.LoginCommand;
 import io.github.hamsteak.trendlapse.member.domain.LoginFailedException;
 import io.github.hamsteak.trendlapse.member.domain.Member;
 import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
-import io.github.hamsteak.trendlapse.member.domain.Username;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,10 +17,10 @@ public class LoginService {
 
     @Transactional(readOnly = true)
     public long login(LoginCommand command) {
-        Member member = memberRepository.findByUsername(Username.of(command.getUsername()))
+        Member member = memberRepository.findByUsername(command.getUsername())
                 .orElseThrow(() -> new LoginFailedException("Cannot find member."));
 
-        if (!passwordEncoder.matches(command.getPassword(), member.getPassword().getHashValue())) {
+        if (!passwordEncoder.matches(command.getPassword(), member.getPasswordHash())) {
             throw new LoginFailedException("Login Failed.");
         }
 

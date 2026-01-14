@@ -3,12 +3,13 @@ package io.github.hamsteak.trendlapse.member.application;
 import io.github.hamsteak.trendlapse.member.domain.Member;
 import io.github.hamsteak.trendlapse.member.domain.MemberNotFoundException;
 import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
-import io.github.hamsteak.trendlapse.member.domain.Password;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -19,16 +20,15 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class WithdrawMemberServiceTest {
     @Mock
-    Password password;
-    @Mock
     MemberRepository memberRepository;
+    PasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Test
     void withdraw_deletes_found_member() {
         // given
         long memberId = 1L;
         WithdrawMemberService withdrawMemberService = new WithdrawMemberService(memberRepository);
-        Member member = new Member(memberId, "Steve", "1234", "abc@gmail.com");
+        Member member = new Member(memberId, "Steve", "1234", "abc@gmail.com", encoder);
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         // when

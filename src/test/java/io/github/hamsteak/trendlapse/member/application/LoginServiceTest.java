@@ -4,12 +4,12 @@ import io.github.hamsteak.trendlapse.member.application.dto.LoginCommand;
 import io.github.hamsteak.trendlapse.member.domain.LoginFailedException;
 import io.github.hamsteak.trendlapse.member.domain.Member;
 import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
-import io.github.hamsteak.trendlapse.member.domain.Username;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -22,19 +22,20 @@ import static org.mockito.Mockito.when;
 class LoginServiceTest {
     @Mock
     MemberRepository memberRepository;
-    @InjectMocks
     LoginService loginService;
-    @Mock
-    PasswordEncoder passwordEncoder;
+    PasswordEncoder encoder = new BCryptPasswordEncoder();
+
+    @BeforeEach
+    void setUp() {
+        loginService = new LoginService(memberRepository, encoder);
+    }
 
     @Test
     void login_returns_memberId_when_credentials_match() {
         // given
-        Member member = new Member(1L, "Steve", "hash-1234", "abc@gmail.com");
-        when(memberRepository.findByUsername(Username.of("Steve")))
+        Member member = new Member(1L, "Steve", "1234", "abc@gmail.com", encoder);
+        when(memberRepository.findByUsername("Steve"))
                 .thenReturn(Optional.of(member));
-        when(passwordEncoder.matches("1234", "hash-1234"))
-                .thenReturn(true);
 
         // when
         long memberId = loginService.login(new LoginCommand("Steve", "1234"));
@@ -46,7 +47,7 @@ class LoginServiceTest {
     @Test
     void login_throws_LoginFailedException_when_member_not_found() {
         // given
-        when(memberRepository.findByUsername(Username.of("James")))
+        when(memberRepository.findByUsername("James"))
                 .thenReturn(Optional.empty());
 
         // when
