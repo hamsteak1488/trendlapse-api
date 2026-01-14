@@ -65,6 +65,6 @@ class MemberRepositoryTest {
     }
 
     private static Member newMember() {
-        return new Member(null, Username.of("Steve"), Password.of("1234"), Email.of("abc@gmail.com"));
+        return new Member(null, "Steve", "1234", "abc@gmail.com");
     }
 }

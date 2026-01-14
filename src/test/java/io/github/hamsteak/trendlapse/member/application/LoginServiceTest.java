@@ -24,11 +24,8 @@ class LoginServiceTest {
     @Test
     void login_returns_memberId_when_credentials_match() {
         // given
-        Username username = Username.of("Steve");
-        Password password = Password.of("1234");
-        Email email = Email.of("abc@gmail.com");
-        Member member = new Member(1L, username, password, email);
-        when(memberRepository.findByUsernameAndPassword(username, password))
+        Member member = new Member(1L, "Steve", "1234", "abc@gmail.com");
+        when(memberRepository.findByUsernameAndPassword(Username.of("Steve"), Password.of("1234")))
                 .thenReturn(Optional.of(member));
 
         // when

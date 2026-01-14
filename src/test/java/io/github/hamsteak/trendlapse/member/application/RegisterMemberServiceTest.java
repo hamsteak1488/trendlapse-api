@@ -28,7 +28,7 @@ class RegisterMemberServiceTest {
         // given
         long memberId = 1L;
         when(memberRepository.saveAndFlush(any(Member.class)))
-                .thenReturn(new Member(memberId, Username.of("Steve"), Password.of("1234"), Email.of("abc@gmail.com")));
+                .thenReturn(new Member(memberId, "Steve", "1234", "abc@gmail.com"));
         RegisterMemberCommand command = new RegisterMemberCommand("Steve", "1234", "abc@gmail.com");
 
         // when

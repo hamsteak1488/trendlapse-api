@@ -1,7 +1,9 @@
 package io.github.hamsteak.trendlapse.member.application;
 
 import io.github.hamsteak.trendlapse.member.application.dto.UpdateMemberCommand;
-import io.github.hamsteak.trendlapse.member.domain.*;
+import io.github.hamsteak.trendlapse.member.domain.Member;
+import io.github.hamsteak.trendlapse.member.domain.MemberNotFoundException;
+import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +19,13 @@ public class UpdateMemberService {
                 .orElseThrow(() -> new MemberNotFoundException("Cannot find member."));
 
         if (command.getUsername() != null) {
-            member.changeUsername(Username.of(command.getUsername()));
+            member.changeUsername(command.getUsername());
         }
         if (command.getPassword() != null) {
-            member.changePassword(Password.of(command.getPassword()));
+            member.changePassword(command.getPassword());
         }
         if (command.getEmail() != null) {
-            member.changeEmail(Email.of(command.getEmail()));
+            member.changeEmail(command.getEmail());
         }
     }
 }

@@ -1,7 +1,9 @@
 package io.github.hamsteak.trendlapse.member.application;
 
 import io.github.hamsteak.trendlapse.member.application.dto.RegisterMemberCommand;
-import io.github.hamsteak.trendlapse.member.domain.*;
+import io.github.hamsteak.trendlapse.member.domain.DuplicateUsernameException;
+import io.github.hamsteak.trendlapse.member.domain.Member;
+import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,9 @@ public class RegisterMemberService {
         try {
             Member member = new Member(
                     null,
-                    Username.of(command.getUsername()),
-                    Password.of(command.getPassword()),
-                    Email.of(command.getEmail())
+                    command.getUsername(),
+                    command.getPassword(),
+                    command.getEmail()
             );
             member = memberRepository.saveAndFlush(member);
             return member.getId();

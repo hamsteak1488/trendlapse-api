@@ -1,7 +1,9 @@
 package io.github.hamsteak.trendlapse.member.application;
 
 import io.github.hamsteak.trendlapse.member.application.dto.UpdateMemberCommand;
-import io.github.hamsteak.trendlapse.member.domain.*;
+import io.github.hamsteak.trendlapse.member.domain.Member;
+import io.github.hamsteak.trendlapse.member.domain.MemberNotFoundException;
+import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,9 +34,9 @@ public class UpdateMemberServiceTest {
         updateMemberService.update(memberId, command);
 
         // then
-        verify(member).changeUsername(Username.of(command.getUsername()));
-        verify(member).changePassword(Password.of(command.getPassword()));
-        verify(member).changeEmail(Email.of(command.getEmail()));
+        verify(member).changeUsername(command.getUsername());
+        verify(member).changePassword(command.getPassword());
+        verify(member).changeEmail(command.getEmail());
     }
 
     @Test

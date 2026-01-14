@@ -1,7 +1,8 @@
 package io.github.hamsteak.trendlapse.member.application;
 
 import io.github.hamsteak.trendlapse.member.application.dto.MemberView;
-import io.github.hamsteak.trendlapse.member.domain.*;
+import io.github.hamsteak.trendlapse.member.domain.Member;
+import io.github.hamsteak.trendlapse.member.domain.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,7 +26,7 @@ public class GetMemberServiceTest {
         // given
         long memberId = 1L;
         when(memberRepository.findById(memberId))
-                .thenReturn(Optional.of(new Member(memberId, Username.of("Steve"), Password.of("1234"), Email.of("abc@gmail.com"))));
+                .thenReturn(Optional.of(new Member(memberId, "Steve", "1234", "abc@gmail.com")));
 
         // when
         MemberView memberView = getMemberService.get(memberId);
