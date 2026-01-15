@@ -1,6 +1,7 @@
 package io.github.hamsteak.trendlapse.global.error;
 
 import io.github.hamsteak.trendlapse.member.web.UnauthorizedException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     private static HttpStatus mapStatus(DomainError domainError) {
@@ -42,6 +44,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
+        log.error("Unexpected exception occured.", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(makeErrorResponse(e.getMessage()));
     }
