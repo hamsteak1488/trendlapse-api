@@ -55,8 +55,8 @@ CREATE TABLE trending_snapshot_video (
 CREATE TABLE member (
   id BIGINT NOT NULL AUTO_INCREMENT,
   username VARCHAR(255) NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  email VARCHAR(255),
+  password_hash VARCHAR(255) COLLATE utf8mb4_bin NOT NULL,
+  email VARCHAR(255) COLLATE utf8mb4_bin,
   PRIMARY KEY (id),
   CONSTRAINT uk_username UNIQUE (username)
 );
