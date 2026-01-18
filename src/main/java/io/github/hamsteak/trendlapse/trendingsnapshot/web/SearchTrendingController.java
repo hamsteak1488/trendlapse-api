@@ -1,6 +1,6 @@
 package io.github.hamsteak.trendlapse.trendingsnapshot.web;
 
-import io.github.hamsteak.trendlapse.trendingsnapshot.application.SearchTrendingService;
+import io.github.hamsteak.trendlapse.trendingsnapshot.application.SearchTrendingSnapshotService;
 import io.github.hamsteak.trendlapse.trendingsnapshot.application.dto.TrendingSearchFilter;
 import io.github.hamsteak.trendlapse.trendingsnapshot.web.dto.SearchTrendingRequest;
 import jakarta.validation.Valid;
@@ -16,12 +16,12 @@ import java.time.ZoneOffset;
 @RequestMapping("/trendings")
 @RequiredArgsConstructor
 public class SearchTrendingController {
-    private final SearchTrendingService searchTrendingService;
+    private final SearchTrendingSnapshotService searchTrendingSnapshotService;
 
     @GetMapping
     public ResponseEntity<?> searchTrendings(@Valid SearchTrendingRequest request) {
         return ResponseEntity.ok(
-                searchTrendingService.search(
+                searchTrendingSnapshotService.search(
                         TrendingSearchFilter.builder()
                                 .regionId(request.getRegionId())
                                 .startDateTime(request.getStartDateTime().withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime())
