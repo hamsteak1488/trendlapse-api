@@ -1,5 +1,6 @@
 package io.github.hamsteak.trendlapse.test.support;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.hamsteak.trendlapse.config.RestDocsConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,8 @@ public abstract class RestDocsTestSupport {
     */
     @Autowired
     RestDocsMockMvcConfigurationCustomizer customizer;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     protected MockMvc mockMvc;
 

@@ -15,3 +15,6 @@ include::regions.adoc[]
 
 [[auth]]
 include::auth.adoc[]
+
+[[video]]
+include::video.adoc[]

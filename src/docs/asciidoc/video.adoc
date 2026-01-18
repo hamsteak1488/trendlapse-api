@@ -1,0 +1,9 @@
+:source-highlighter: highlightjs
+
+= 동영상 API
+
+== 검색
+
+`GET /videos`
+
+operation::video/search[snippets='query-parameters,http-request,response-fields,http-response']
