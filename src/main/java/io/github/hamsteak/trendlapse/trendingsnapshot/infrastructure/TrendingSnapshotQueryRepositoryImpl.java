@@ -16,6 +16,7 @@ import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,7 +68,7 @@ public class TrendingSnapshotQueryRepositoryImpl implements TrendingSnapshotQuer
                                 ts.getId(),
                                 ts.getRegionId(),
                                 ts.getCapturedAt(),
-                                trendingVideoViewsMap.get(ts.getId())
+                                trendingVideoViewsMap.getOrDefault(ts.getId(), new ArrayList<>())
                         )
                 ).toList();
     }
