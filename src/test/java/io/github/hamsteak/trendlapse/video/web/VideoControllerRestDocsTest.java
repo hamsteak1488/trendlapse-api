@@ -43,12 +43,17 @@ class VideoControllerRestDocsTest extends RestDocsTestSupport {
         String title = "Video Title";
         String thumbnailUrl = "Video Thumbnail Url";
 
-        int pageSize = 30;
-        int pageNumber = 3;
+        int pageSize = 5;
+        int pageNumber = 1;
+        int totalElmenets = 6;
 
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
         when(searchVideoService.search(any(SearchVideoCommand.class), any(Pageable.class)))
-                .thenReturn(new PagedModel<>(new PageImpl<>(List.of(new VideoView(id, channelId, youtubeId, title, thumbnailUrl)), pageRequest, 1)));
+                .thenReturn(new PagedModel<>(new PageImpl<>(
+                        List.of(new VideoView(id, channelId, youtubeId, title, thumbnailUrl)),
+                        pageRequest,
+                        totalElmenets
+                )));
 
         // when
         ResultActions resultActions = mockMvc.perform(
