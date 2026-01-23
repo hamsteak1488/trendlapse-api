@@ -1,11 +1,11 @@
 elapsed-time-logging:
   enabled: true
   tasks:
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.CollectTrendingSnapshotService.collect(..))"
-      name: "Collect TrendingSnapshot"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.collector.application.CollectTrendingVideoRankingSnapshotService.collect(..))"
+      name: "Collect TrendingVideoRankingSnapshot"
 
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.purger.infrastructure.PurgeExpiredTrendingSnapshotScheduler.purge(..))"
-      name: "Purge Expired TrendingSnapshot"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.purger.infrastructure.PurgeExpiredTrendingVideoRankingSnapshotScheduler.purge(..))"
+      name: "Purge Expired TrendingVideoRankingSnapshot"
 
     - pointcut: "execution(* org.springframework.data.jpa.repository.JpaRepository.saveAll(..))"
       name: "Save Jpa Entities"
@@ -24,10 +24,10 @@ elapsed-time-logging:
       name: "(Bulk) Insert Youtube Channels"
     - pointcut: "execution(* io.github.hamsteak.trendlapse.video.domain.VideoBulkInsertRepository.bulkInsert(..))"
       name: "(Bulk) Insert Youtube Videos"
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.trendingsnapshot.domain.TrendingSnapshotBulkInsertRepository.bulkInsert(..))"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.video.domain.TrendingVideoRankingSnapshotBulkInsertRepository.bulkInsert(..))"
       name: "(Bulk) Insert Youtube Trending Snapshots"
 
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.trendingsnapshot.application.SearchTrendingService.search(..))"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.video.application.SearchTrendingVideoRankingSnapshotService.search(..))"
       name: "Search Youtube Trending Snapshot"
-    - pointcut: "execution(* io.github.hamsteak.trendlapse.trendingsnapshot.application.SearchTrendingService.searchWithCache(..))"
+    - pointcut: "execution(* io.github.hamsteak.trendlapse.trending.video.application.SearchTrendingVideoRankingSnapshotService.searchWithCache(..))"
       name: "Search Youtube Trending Snapshot With Cache"

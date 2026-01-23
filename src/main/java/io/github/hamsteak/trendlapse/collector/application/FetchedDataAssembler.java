@@ -6,7 +6,7 @@ import io.github.hamsteak.trendlapse.collector.application.dto.FetchedRegion;
 import io.github.hamsteak.trendlapse.collector.application.dto.FetchedVideo;
 import io.github.hamsteak.trendlapse.collector.application.dto.RegionFetchedTrendingVideos;
 import io.github.hamsteak.trendlapse.region.domain.Region;
-import io.github.hamsteak.trendlapse.trendingsnapshot.domain.TrendingSnapshot;
+import io.github.hamsteak.trendlapse.trending.video.domain.TrendingVideoRankingSnapshot;
 import io.github.hamsteak.trendlapse.video.domain.Video;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +51,7 @@ public class FetchedDataAssembler {
                 ).toList();
     }
 
-    public List<TrendingSnapshot> toTrendingSnapshots(
+    public List<TrendingVideoRankingSnapshot> toTrendingVideoRankingSnapshots(
             List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList,
             Map<String, Long> videoYoutubeIdEntityIdMap,
             LocalDateTime captureTime
@@ -59,14 +59,14 @@ public class FetchedDataAssembler {
         return regionFetchedTrendingVideosList.stream()
                 .map(regionFetchedTrendingVideos -> filterMappedVideos(regionFetchedTrendingVideos, videoYoutubeIdEntityIdMap))
                 .map(regionFetchedTrendingVideos -> {
-                    List<Long> trendingSnapshotVideoIds = regionFetchedTrendingVideos.getFetchedTrendingVideos().stream()
+                    List<Long> TrendingVideoRankingSnapshotItemIds = regionFetchedTrendingVideos.getFetchedTrendingVideos().stream()
                             .map(fetchedVideo -> videoYoutubeIdEntityIdMap.get(fetchedVideo.getYoutubeId()))
                             .toList();
 
-                    return TrendingSnapshot.createTrendingSnapshot(
+                    return TrendingVideoRankingSnapshot.createTrendingVideoRankingSnapshot(
                             regionFetchedTrendingVideos.getRegionId(),
                             captureTime,
-                            trendingSnapshotVideoIds
+                            TrendingVideoRankingSnapshotItemIds
                     );
                 })
                 .toList();

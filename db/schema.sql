@@ -29,26 +29,26 @@ CREATE TABLE video (
   CONSTRAINT fk_video_channel_id FOREIGN KEY (channel_id) REFERENCES channel(id)
 );
 
--- trending_snapshot
-CREATE TABLE trending_snapshot (
+-- trending_video_ranking_snapshot
+CREATE TABLE trending_video_ranking_snapshot (
   id BIGINT NOT NULL AUTO_INCREMENT,
   region_id VARCHAR(8) NOT NULL,
   captured_at DATETIME NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT fk_region_id_caputred_at FOREIGN KEY (region_id) REFERENCES region(id)
 );
-CREATE INDEX idx_region_id_caputred_at ON trending_snapshot (region_id, captured_at);
+CREATE INDEX idx_region_id_caputred_at ON trending_video_ranking_snapshot (region_id, captured_at);
 
--- trending_snapshot_video
-CREATE TABLE trending_snapshot_video (
+-- trending_video_ranking_snapshot_item
+CREATE TABLE trending_video_ranking_snapshot_item (
   id BIGINT NOT NULL AUTO_INCREMENT,
-  trending_snapshot_id BIGINT NOT NULL,
-  trending_video_id BIGINT NOT NULL,
-  list_idx INT NOT NULL,
+  snapshot_id BIGINT NOT NULL,
+  video_id BIGINT NOT NULL,
+  list_index INT NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT fk_tsv_snapshot_id FOREIGN KEY (trending_snapshot_id) REFERENCES trending_snapshot (id)
+  CONSTRAINT fk_tvrsi_snapshot_id FOREIGN KEY (snapshot_id) REFERENCES trending_video_ranking_snapshot (id)
     ON DELETE CASCADE,
-  CONSTRAINT fk_tsv_video_id FOREIGN KEY (trending_video_id) REFERENCES video (id)
+  CONSTRAINT fk_tvrsi_video_id FOREIGN KEY (video_id) REFERENCES video (id)
 );
 
 -- member
