@@ -5,7 +5,6 @@ import io.github.hamsteak.trendlapse.trending.video.domain.TrendingVideoRankingS
 import io.github.hamsteak.trendlapse.trending.video.domain.TrendingVideoRankingSnapshotItem;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -23,26 +22,28 @@ public class JdbcTrendingVideoRankingSnapshotBulkInsertRepository implements Tre
     private static final int INSERT_BATCH_SIZE = 1000;
 
     /**
-     * @param trendingVideoRankingSnapshots 모든 TrendingVideoRankingSnapshot 엔티티들은 capturedAt 값이 같아야 한다.
+     * @param snapshots 모든 TrendingVideoRankingSnapshot 엔티티들은 capturedAt 값이 같아야 한다.
      */
     @Override
-    public void bulkInsert(List<TrendingVideoRankingSnapshot> trendingVideoRankingSnapshots) {
-        if (trendingVideoRankingSnapshots.isEmpty()) {
+    public void bulkInsert(List<TrendingVideoRankingSnapshot> snapshots) {
+        if (snapshots.isEmpty()) {
             return;
         }
 
-        LocalDateTime captureTime = trendingVideoRankingSnapshots.get(0).getCapturedAt();
-        validateAllCaptureTimeOfSnapshotsAreSame(trendingVideoRankingSnapshots, captureTime);
+        LocalDateTime captureTime = snapshots.get(0).getCapturedAt();
+        validateAllCaptureTimeOfSnapshotsAreSame(snapshots, captureTime);
 
-        insertTrendingVideoRankingSnapshots(trendingVideoRankingSnapshots);
-        List<TrendingVideoRankingSnapshotRow> justInsertedTrendingVideoRankingSnapshotRows =
+        insertTrendingVideoRankingSnapshots(snapshots);
+        List<ItemsLackedTrendingVideoRankingSnapshotRow> justInsertedItemLackedSnapshotRows =
                 findTrendingVideoRankingSnapshotRowsByCaptureTime(captureTime);
 
-        findAndSetRowVideoIdsFromEntities(justInsertedTrendingVideoRankingSnapshotRows, trendingVideoRankingSnapshots);
+        List<TrendingVideoRankingSnapshotRow> itemSetupedSnapshotRows =
+                getItemSetupedSnapshotRows(justInsertedItemLackedSnapshotRows, snapshots);
 
-        List<TrendingVideoRankingSnapshotItemRow> trendingVideoRankingSnapshotItemRowsToInsert =
-                getTrendingVideoRankingSnapshotItemRowsToInsert(justInsertedTrendingVideoRankingSnapshotRows);
-        insertTrendingVideoRankingSnapshotItems(trendingVideoRankingSnapshotItemRowsToInsert);
+        List<TrendingVideoRankingSnapshotItemRow> snapshotItemRowsToInsert =
+                getTrendingVideoRankingSnapshotItemRowsToInsert(itemSetupedSnapshotRows);
+
+        insertTrendingVideoRankingSnapshotItems(snapshotItemRowsToInsert);
     }
 
     private void validateAllCaptureTimeOfSnapshotsAreSame(
@@ -68,7 +69,7 @@ public class JdbcTrendingVideoRankingSnapshotBulkInsertRepository implements Tre
         );
     }
 
-    private List<TrendingVideoRankingSnapshotRow> findTrendingVideoRankingSnapshotRowsByCaptureTime(LocalDateTime capturedAt) {
+    private List<ItemsLackedTrendingVideoRankingSnapshotRow> findTrendingVideoRankingSnapshotRowsByCaptureTime(LocalDateTime capturedAt) {
         String sql = """
                 SELECT id, region_id, captured_at
                 FROM trending_video_ranking_snapshot
@@ -86,36 +87,59 @@ public class JdbcTrendingVideoRankingSnapshotBulkInsertRepository implements Tre
         );
     }
 
-    private void findAndSetRowVideoIdsFromEntities(
-            List<TrendingVideoRankingSnapshotRow> trendingVideoRankingSnapshotRows,
-            List<TrendingVideoRankingSnapshot> trendingVideoRankingSnapshots
+    private List<TrendingVideoRankingSnapshotRow> getItemSetupedSnapshotRows(
+            List<ItemsLackedTrendingVideoRankingSnapshotRow> itemsLackedSnapshotRows,
+            List<TrendingVideoRankingSnapshot> snapshots
     ) {
-        trendingVideoRankingSnapshotRows.forEach(trendingVideoRankingSnapshotRow ->
-                trendingVideoRankingSnapshotRow.setVideoIds(
-                        trendingVideoRankingSnapshots.stream()
-                                .filter(snapshot ->
-                                        snapshot.getRegionId().equals(trendingVideoRankingSnapshotRow.getRegionId())
-                                )
-                                .findAny()
-                                .orElseThrow(() -> new IllegalStateException("Cannot find "))
-                                .getTrendingVideoRankingSnapshotItems()
-                                .stream()
-                                .map(TrendingVideoRankingSnapshotItem::getVideoId)
-                                .toList()
+        return itemsLackedSnapshotRows.stream()
+                .map(snapshotRow -> {
+                            List<TrendingVideoRankingSnapshotItem> items = snapshots.stream()
+                                    .filter(snapshot ->
+                                            snapshot.getRegionId().equals(snapshotRow.getRegionId()))
+                                    .findAny()
+                                    .orElseThrow(() -> new IllegalStateException("Cannot find snapshot having same region id."))
+                                    .getItems();
+
+                            List<Long> videoIds = items.stream()
+                                    .map(TrendingVideoRankingSnapshotItem::getVideoId)
+                                    .toList();
+                            List<Long> viewCounts = items.stream()
+                                    .map(TrendingVideoRankingSnapshotItem::getViewCount)
+                                    .toList();
+                            List<Long> likeCounts = items.stream()
+                                    .map(TrendingVideoRankingSnapshotItem::getLikeCount)
+                                    .toList();
+                            List<Long> commentCounts = items.stream()
+                                    .map(TrendingVideoRankingSnapshotItem::getCommentCount)
+                                    .toList();
+
+                            return new TrendingVideoRankingSnapshotRow(
+                                    snapshotRow.id,
+                                    snapshotRow.regionId,
+                                    snapshotRow.capturedAt,
+                                    videoIds,
+                                    viewCounts,
+                                    likeCounts,
+                                    commentCounts
+                            );
+                        }
                 )
-        );
+                .toList();
     }
 
     private List<TrendingVideoRankingSnapshotItemRow> getTrendingVideoRankingSnapshotItemRowsToInsert(
-            List<TrendingVideoRankingSnapshotRow> justInsertedTrendingVideoRankingSnapshotRows
+            List<TrendingVideoRankingSnapshotRow> justInsertedSnapshotRows
     ) {
-        return justInsertedTrendingVideoRankingSnapshotRows.stream()
+        return justInsertedSnapshotRows.stream()
                 .flatMap(trendingVideoRankingSnapshotRow ->
                         IntStream.range(0, trendingVideoRankingSnapshotRow.getVideoIds().size())
                                 .mapToObj(index -> new TrendingVideoRankingSnapshotItemRow(
                                         trendingVideoRankingSnapshotRow.getId(),
                                         trendingVideoRankingSnapshotRow.getVideoIds().get(index),
-                                        index
+                                        index,
+                                        trendingVideoRankingSnapshotRow.getViewCount().get(index),
+                                        trendingVideoRankingSnapshotRow.getLikeCount().get(index),
+                                        trendingVideoRankingSnapshotRow.getCommentCount().get(index)
                                 ))
                 )
                 .toList();
@@ -124,26 +148,40 @@ public class JdbcTrendingVideoRankingSnapshotBulkInsertRepository implements Tre
     private void insertTrendingVideoRankingSnapshotItems(
             List<TrendingVideoRankingSnapshotItemRow> trendingVideoRankingSnapshotItemRows
     ) {
-        jdbcTemplate.batchUpdate(
-                "INSERT INTO trending_video_ranking_snapshot_item(snapshot_id, video_id, list_index) VALUES (?, ?, ?)",
+        jdbcTemplate.batchUpdate("""
+                        INSERT INTO trending_video_ranking_snapshot_item
+                        (snapshot_id,video_id, list_index, view_count, like_count, comment_count)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                        """,
                 trendingVideoRankingSnapshotItemRows,
                 INSERT_BATCH_SIZE,
                 (ps, trendingVideoRankingSnapshotItemRow) -> {
                     ps.setLong(1, trendingVideoRankingSnapshotItemRow.getSnapshotId());
                     ps.setLong(2, trendingVideoRankingSnapshotItemRow.getVideoId());
                     ps.setInt(3, trendingVideoRankingSnapshotItemRow.getIndex());
+                    ps.setLong(4, trendingVideoRankingSnapshotItemRow.getViewCount());
+                    ps.setLong(5, trendingVideoRankingSnapshotItemRow.getLikeCount());
+                    ps.setLong(6, trendingVideoRankingSnapshotItemRow.getCommentCount());
                 }
         );
     }
 
-    private RowMapper<TrendingVideoRankingSnapshotRow> trendingVideoRankingSnapshotRowMapper() {
+    private RowMapper<ItemsLackedTrendingVideoRankingSnapshotRow> trendingVideoRankingSnapshotRowMapper() {
         return (rs, rowNum) -> {
             long id = rs.getLong("id");
             String regionId = rs.getString("region_id");
             LocalDateTime capturedAt = rs.getTimestamp("captured_at").toLocalDateTime();
 
-            return new TrendingVideoRankingSnapshotRow(id, regionId, capturedAt);
+            return new ItemsLackedTrendingVideoRankingSnapshotRow(id, regionId, capturedAt);
         };
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    private static class ItemsLackedTrendingVideoRankingSnapshotRow {
+        private final long id;
+        private final String regionId;
+        private final LocalDateTime capturedAt;
     }
 
     @Getter
@@ -152,8 +190,10 @@ public class JdbcTrendingVideoRankingSnapshotBulkInsertRepository implements Tre
         private final long id;
         private final String regionId;
         private final LocalDateTime capturedAt;
-        @Setter
-        private List<Long> videoIds;
+        private final List<Long> videoIds;
+        private final List<Long> viewCount;
+        private final List<Long> likeCount;
+        private final List<Long> commentCount;
     }
 
     @Getter
@@ -162,5 +202,8 @@ public class JdbcTrendingVideoRankingSnapshotBulkInsertRepository implements Tre
         private final long snapshotId;
         private final long videoId;
         private final int index;
+        private final long viewCount;
+        private final long likeCount;
+        private final long commentCount;
     }
 }

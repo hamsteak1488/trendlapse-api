@@ -50,6 +50,9 @@ public class TrendingVideoRankingVideoRankingSnapshotQueryRepositoryImpl impleme
                 .select(new QTrendingVideoRankingSnapshotItemView(
                         snapshotItem.snapshot.id,
                         snapshotItem.listIndex,
+                        snapshotItem.viewCount,
+                        snapshotItem.likeCount,
+                        snapshotItem.commentCount,
                         new QVideoView(video.id, video.channelId, video.youtubeId, video.title, video.thumbnailUrl),
                         new QChannelView(channel.id, channel.youtubeId, channel.title, channel.thumbnailUrl)
                 ))

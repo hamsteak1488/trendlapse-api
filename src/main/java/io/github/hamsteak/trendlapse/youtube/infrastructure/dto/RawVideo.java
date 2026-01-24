@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 public class RawVideo {
     private final String id;
     private final Snippet snippet;
+    private final Statistics statistics;
 
     @Getter
     @RequiredArgsConstructor
@@ -28,6 +29,14 @@ public class RawVideo {
         }
     }
 
+    @Getter
+    @RequiredArgsConstructor
+    public static class Statistics {
+        private final long viewCount;
+        private final long likeCount;
+        private final long commentCount;
+    }
+
     public String getYoutubeId() {
         return id;
     }
@@ -42,5 +51,17 @@ public class RawVideo {
 
     public String getChannelYoutubeId() {
         return snippet.getChannelId();
+    }
+
+    public long getViewCount() {
+        return statistics.getViewCount();
+    }
+
+    public long getLikeCount() {
+        return statistics.getLikeCount();
+    }
+
+    public long getCommentCount() {
+        return statistics.getCommentCount();
     }
 }

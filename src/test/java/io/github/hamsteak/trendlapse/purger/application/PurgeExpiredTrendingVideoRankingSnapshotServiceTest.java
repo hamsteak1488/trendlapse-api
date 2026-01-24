@@ -65,10 +65,24 @@ class PurgeExpiredTrendingVideoRankingSnapshotServiceTest {
         int batchSize = 1000;
         LocalDateTime currentDateTime = LocalDateTime.of(2025, 9, 1, 0, 0);
         TrendingVideoRankingSnapshot expired = trendingVideoRankingSnapshotRepository.save(
-                TrendingVideoRankingSnapshot.createTrendingVideoRankingSnapshot(region.getId(), currentDateTime.minus(expirationPeriod).minusMinutes(1), List.of(video.getId()))
+                TrendingVideoRankingSnapshot.createTrendingVideoRankingSnapshot(
+                        region.getId(),
+                        currentDateTime.minus(expirationPeriod).minusMinutes(1),
+                        List.of(video.getId()),
+                        List.of(100_000L),
+                        List.of(1000L),
+                        List.of(10L)
+                )
         );
         TrendingVideoRankingSnapshot notExpired = trendingVideoRankingSnapshotRepository.save(
-                TrendingVideoRankingSnapshot.createTrendingVideoRankingSnapshot(region.getId(), currentDateTime.minus(expirationPeriod).plusMinutes(1), List.of(video.getId()))
+                TrendingVideoRankingSnapshot.createTrendingVideoRankingSnapshot(
+                        region.getId(),
+                        currentDateTime.minus(expirationPeriod).plusMinutes(1),
+                        List.of(video.getId()),
+                        List.of(100_000L),
+                        List.of(1000L),
+                        List.of(10L)
+                )
         );
 
         entityManager.flush();

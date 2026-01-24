@@ -26,7 +26,7 @@ public class WebClientYoutubeApiClient implements NonblockingYoutubeApiClient {
 
     @Override
     public Mono<RawChannelListResponse> fetchChannels(List<String> channelYoutubeIds) {
-        String part = String.join(",", List.of("id", "snippet"));
+        String part = String.join(",", List.of("id", "snippet, statistics"));
 
         URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/channels")
@@ -58,7 +58,7 @@ public class WebClientYoutubeApiClient implements NonblockingYoutubeApiClient {
 
     @Override
     public Mono<RawVideoListResponse> fetchVideos(List<String> videoYoutubeIds) {
-        String part = String.join(",", List.of("id", "snippet"));
+        String part = String.join(",", List.of("id", "snippet, statistics"));
 
         URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/videos")
@@ -90,7 +90,7 @@ public class WebClientYoutubeApiClient implements NonblockingYoutubeApiClient {
 
     @Override
     public Mono<RawVideoListResponse> fetchTrendings(String regionCode, String pageToken, int maxResultCount) {
-        String part = String.join(",", List.of("id", "snippet"));
+        String part = String.join(",", List.of("id", "snippet, statistics"));
         String chart = "mostPopular";
 
         URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())

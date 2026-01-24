@@ -31,7 +31,7 @@ public class RestTemplateYoutubeApiClient implements YoutubeApiClient {
 
     @Override
     public RawChannelListResponse fetchChannels(List<String> channelYoutubeIds) {
-        String part = String.join(",", List.of("id", "snippet"));
+        String part = String.join(",", List.of("id", "snippet, statistics"));
 
         URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/channels")
@@ -56,7 +56,7 @@ public class RestTemplateYoutubeApiClient implements YoutubeApiClient {
 
     @Override
     public RawVideoListResponse fetchVideos(List<String> videoYoutubeIds) {
-        String part = String.join(",", List.of("id", "snippet"));
+        String part = String.join(",", List.of("id", "snippet, statistics"));
 
         URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
                 .path("/videos")
@@ -81,7 +81,7 @@ public class RestTemplateYoutubeApiClient implements YoutubeApiClient {
 
     @Override
     public RawVideoListResponse fetchTrendings(String regionCode, String pageToken, int maxResultCount) {
-        String part = "id";
+        String part = String.join(",", List.of("id", "snippet, statistics"));
         String chart = "mostPopular";
 
         URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())

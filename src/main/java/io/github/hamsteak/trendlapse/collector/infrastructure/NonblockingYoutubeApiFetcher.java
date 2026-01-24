@@ -112,7 +112,10 @@ public class NonblockingYoutubeApiFetcher implements YoutubeApiFetcher {
                                 rawVideo.getYoutubeId(),
                                 rawVideo.getChannelYoutubeId(),
                                 rawVideo.getTitle(),
-                                rawVideo.getThumbnailUrl()
+                                rawVideo.getThumbnailUrl(),
+                                rawVideo.getViewCount(),
+                                rawVideo.getLikeCount(),
+                                rawVideo.getCommentCount()
                         ))
                 .toList();
     }
@@ -154,16 +157,18 @@ public class NonblockingYoutubeApiFetcher implements YoutubeApiFetcher {
                                         regionCode,
                                         null,
                                         collectSchedulerProperties.getCollectSize()
-                                ).map(rawVideos ->
-                                        rawVideos.stream()
-                                                .map(rawVideo ->
-                                                        new FetchedVideo(
-                                                                rawVideo.getYoutubeId(),
-                                                                rawVideo.getChannelYoutubeId(),
-                                                                rawVideo.getTitle(),
-                                                                rawVideo.getThumbnailUrl()
-                                                        )
-                                                ).toList()
+                                ).map(rawVideos -> rawVideos.stream()
+                                        .map(rawVideo ->
+                                                new FetchedVideo(
+                                                        rawVideo.getYoutubeId(),
+                                                        rawVideo.getChannelYoutubeId(),
+                                                        rawVideo.getTitle(),
+                                                        rawVideo.getThumbnailUrl(),
+                                                        rawVideo.getViewCount(),
+                                                        rawVideo.getLikeCount(),
+                                                        rawVideo.getCommentCount()
+                                                )
+                                        ).toList()
                                 )
                         )
                 ).collectMap(

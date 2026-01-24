@@ -101,7 +101,8 @@ public class MockYoutubeApiClient implements YoutubeApiClient {
                                     new RawVideo.Snippet.Thumbnails(
                                             new RawVideo.Snippet.Thumbnails.Thumbnail(regionCode + "-video-thumbnail-" + i)
                                     )
-                            )
+                            ),
+                            new RawVideo.Statistics(100_000, 1000, 10)
                     ));
                 });
     }

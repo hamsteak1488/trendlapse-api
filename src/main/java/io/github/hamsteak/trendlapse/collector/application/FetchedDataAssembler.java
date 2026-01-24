@@ -59,14 +59,26 @@ public class FetchedDataAssembler {
         return regionFetchedTrendingVideosList.stream()
                 .map(regionFetchedTrendingVideos -> filterMappedVideos(regionFetchedTrendingVideos, videoYoutubeIdEntityIdMap))
                 .map(regionFetchedTrendingVideos -> {
-                    List<Long> TrendingVideoRankingSnapshotItemIds = regionFetchedTrendingVideos.getFetchedTrendingVideos().stream()
+                    List<Long> itemIds = regionFetchedTrendingVideos.getFetchedTrendingVideos().stream()
                             .map(fetchedVideo -> videoYoutubeIdEntityIdMap.get(fetchedVideo.getYoutubeId()))
+                            .toList();
+                    List<Long> viewCounts = regionFetchedTrendingVideos.getFetchedTrendingVideos().stream()
+                            .map(FetchedVideo::getViewCount)
+                            .toList();
+                    List<Long> likeCounts = regionFetchedTrendingVideos.getFetchedTrendingVideos().stream()
+                            .map(FetchedVideo::getLikeCount)
+                            .toList();
+                    List<Long> commentCounts = regionFetchedTrendingVideos.getFetchedTrendingVideos().stream()
+                            .map(FetchedVideo::getCommentCount)
                             .toList();
 
                     return TrendingVideoRankingSnapshot.createTrendingVideoRankingSnapshot(
                             regionFetchedTrendingVideos.getRegionId(),
                             captureTime,
-                            TrendingVideoRankingSnapshotItemIds
+                            itemIds,
+                            viewCounts,
+                            likeCounts,
+                            commentCounts
                     );
                 })
                 .toList();

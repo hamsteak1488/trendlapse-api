@@ -45,6 +45,9 @@ CREATE TABLE trending_video_ranking_snapshot_item (
   snapshot_id BIGINT NOT NULL,
   video_id BIGINT NOT NULL,
   list_index INT NOT NULL,
+  view_count BIGINT NOT NULL,
+  like_count BIGINT NOT NULL,
+  comment_count BIGINT NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT fk_tvrsi_snapshot_id FOREIGN KEY (snapshot_id) REFERENCES trending_video_ranking_snapshot (id)
     ON DELETE CASCADE,

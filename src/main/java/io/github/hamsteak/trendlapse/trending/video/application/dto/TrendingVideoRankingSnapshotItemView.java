@@ -18,6 +18,12 @@ public class TrendingVideoRankingSnapshotItemView {
     @NonNull
     private final Integer listIndex;
     @NonNull
+    private final Long viewCount;
+    @NonNull
+    private final Long likeCount;
+    @NonNull
+    private final Long commentCount;
+    @NonNull
     private final VideoView videoView;
     @NonNull
     private final ChannelView channelView;

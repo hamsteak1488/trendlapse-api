@@ -100,7 +100,10 @@ public class BlockingYoutubeApiFetcher implements YoutubeApiFetcher {
                                 rawVideo.getYoutubeId(),
                                 rawVideo.getChannelYoutubeId(),
                                 rawVideo.getTitle(),
-                                rawVideo.getThumbnailUrl()
+                                rawVideo.getThumbnailUrl(),
+                                rawVideo.getViewCount(),
+                                rawVideo.getLikeCount(),
+                                rawVideo.getCommentCount()
                         ))
                 .toList();
     }
@@ -135,7 +138,10 @@ public class BlockingYoutubeApiFetcher implements YoutubeApiFetcher {
                                     rawVideo.getYoutubeId(),
                                     rawVideo.getChannelYoutubeId(),
                                     rawVideo.getTitle(),
-                                    rawVideo.getThumbnailUrl()
+                                    rawVideo.getThumbnailUrl(),
+                                    rawVideo.getViewCount(),
+                                    rawVideo.getLikeCount(),
+                                    rawVideo.getCommentCount()
                             ))
                     .toList();
 

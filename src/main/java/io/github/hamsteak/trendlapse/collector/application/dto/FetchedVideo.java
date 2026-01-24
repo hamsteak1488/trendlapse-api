@@ -14,4 +14,7 @@ public class FetchedVideo {
     private final String channelYoutubeId;
     private final String title;
     private final String thumbnailUrl;
+    private final Long viewCount;
+    private final Long likeCount;
+    private final Long commentCount;
 }
