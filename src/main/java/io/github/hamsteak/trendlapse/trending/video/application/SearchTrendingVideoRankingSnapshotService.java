@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchTrendingVideoRankingSnapshotService {
     private final TrendingVideoRankingSnapshotRepository trendingVideoRankingSnapshotRepository;
-    private final TrendingVideoRankingSnapshotQueryRepository trendingVideoRankingSnapshotQueryRepository;
+    private final TrendingVideoQueryRepository trendingVideoQueryRepository;
 
     private final CacheManager cacheManager;
     private final static String CACHE_NAME = "trendingVideoView";
@@ -57,7 +57,7 @@ public class SearchTrendingVideoRankingSnapshotService {
 
         if (!missingCaptureTimes.isEmpty()) {
             List<TrendingVideoRankingSnapshotView> queriedTrendingVideoRankingSnapshotViews =
-                    trendingVideoRankingSnapshotQueryRepository.findViewByRegionAndCapturedAtIn(regionId, missingCaptureTimes);
+                    trendingVideoQueryRepository.findRankingSnapshotViewByRegionAndCapturedAtIn(regionId, missingCaptureTimes);
 
             queriedTrendingVideoRankingSnapshotViews.forEach(trendingVideoRankingSnapshotView ->
                     cache.put(

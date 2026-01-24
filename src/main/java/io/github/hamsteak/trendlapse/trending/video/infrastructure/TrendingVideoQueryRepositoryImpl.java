@@ -3,10 +3,8 @@ package io.github.hamsteak.trendlapse.trending.video.infrastructure;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.github.hamsteak.trendlapse.channel.application.dto.QChannelView;
 import io.github.hamsteak.trendlapse.channel.domain.QChannel;
-import io.github.hamsteak.trendlapse.trending.video.application.TrendingVideoRankingSnapshotQueryRepository;
-import io.github.hamsteak.trendlapse.trending.video.application.dto.QTrendingVideoRankingSnapshotItemView;
-import io.github.hamsteak.trendlapse.trending.video.application.dto.TrendingVideoRankingSnapshotItemView;
-import io.github.hamsteak.trendlapse.trending.video.application.dto.TrendingVideoRankingSnapshotView;
+import io.github.hamsteak.trendlapse.trending.video.application.TrendingVideoQueryRepository;
+import io.github.hamsteak.trendlapse.trending.video.application.dto.*;
 import io.github.hamsteak.trendlapse.trending.video.domain.QTrendingVideoRankingSnapshot;
 import io.github.hamsteak.trendlapse.trending.video.domain.QTrendingVideoRankingSnapshotItem;
 import io.github.hamsteak.trendlapse.trending.video.domain.TrendingVideoRankingSnapshot;
@@ -22,15 +20,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
-public class TrendingVideoRankingVideoRankingSnapshotQueryRepositoryImpl implements TrendingVideoRankingSnapshotQueryRepository {
+public class TrendingVideoQueryRepositoryImpl implements TrendingVideoQueryRepository {
     private final JPAQueryFactory query;
 
-    public TrendingVideoRankingVideoRankingSnapshotQueryRepositoryImpl(EntityManager em) {
+    public TrendingVideoQueryRepositoryImpl(EntityManager em) {
         this.query = new JPAQueryFactory(em);
     }
 
     @Override
-    public List<TrendingVideoRankingSnapshotView> findViewByRegionAndCapturedAtIn(String regionId, List<LocalDateTime> captureTimes) {
+    public List<TrendingVideoRankingSnapshotView> findRankingSnapshotViewByRegionAndCapturedAtIn(String regionId, List<LocalDateTime> captureTimes) {
         QTrendingVideoRankingSnapshotItem snapshotItem = QTrendingVideoRankingSnapshotItem.trendingVideoRankingSnapshotItem;
         QTrendingVideoRankingSnapshot snapshot = QTrendingVideoRankingSnapshot.trendingVideoRankingSnapshot;
         QVideo video = QVideo.video;
@@ -74,5 +72,21 @@ public class TrendingVideoRankingVideoRankingSnapshotQueryRepositoryImpl impleme
                                 trendingVideoViewsMap.getOrDefault(ts.getId(), new ArrayList<>())
                         )
                 ).toList();
+    }
+
+    @Override
+    public List<TrendingVideoStatisticsView> findStatisticsByVideoId(long videoId) {
+        QTrendingVideoRankingSnapshotItem snapshotItem = QTrendingVideoRankingSnapshotItem.trendingVideoRankingSnapshotItem;
+
+        return query
+                .select(new QTrendingVideoStatisticsView(
+                        snapshotItem.snapshot.id,
+                        snapshotItem.listIndex,
+                        snapshotItem.viewCount,
+                        snapshotItem.likeCount,
+                        snapshotItem.commentCount))
+                .from(snapshotItem)
+                .where(snapshotItem.videoId.eq(videoId))
+                .fetch();
     }
 }

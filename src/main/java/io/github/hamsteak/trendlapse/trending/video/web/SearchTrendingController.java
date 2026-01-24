@@ -1,7 +1,10 @@
 package io.github.hamsteak.trendlapse.trending.video.web;
 
 import io.github.hamsteak.trendlapse.trending.video.application.SearchTrendingVideoRankingSnapshotService;
+import io.github.hamsteak.trendlapse.trending.video.application.SearchTrendingVideoStatisticsService;
 import io.github.hamsteak.trendlapse.trending.video.application.dto.TrendingVideoRankingSnapshotSearchFilter;
+import io.github.hamsteak.trendlapse.trending.video.application.dto.TrendingVideoRankingSnapshotView;
+import io.github.hamsteak.trendlapse.trending.video.application.dto.TrendingVideoStatisticsView;
 import io.github.hamsteak.trendlapse.trending.video.web.dto.SearchTrendingRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,15 +14,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.ZoneOffset;
+import java.util.List;
 
 @RestController
-@RequestMapping("/trendings")
+@RequestMapping("/trendings/videos")
 @RequiredArgsConstructor
 public class SearchTrendingController {
     private final SearchTrendingVideoRankingSnapshotService searchTrendingVideoRankingSnapshotService;
+    private final SearchTrendingVideoStatisticsService searchTrendingVideoStatisticsService;
 
-    @GetMapping
-    public ResponseEntity<?> searchTrendings(@Valid SearchTrendingRequest request) {
+    @GetMapping("/ranking-snapshots")
+    public ResponseEntity<List<TrendingVideoRankingSnapshotView>> searchSnapshots(@Valid SearchTrendingRequest request) {
         return ResponseEntity.ok(
                 searchTrendingVideoRankingSnapshotService.search(
                         TrendingVideoRankingSnapshotSearchFilter.builder()
@@ -29,5 +34,10 @@ public class SearchTrendingController {
                                 .build()
                 )
         );
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<List<TrendingVideoStatisticsView>> search(long videoId) {
+        return ResponseEntity.ok(searchTrendingVideoStatisticsService.search(videoId));
     }
 }
