@@ -28,7 +28,6 @@ public class VideoQueryRepositoryImpl implements VideoQueryRepository {
     @Override
     public PagedModel<VideoView> search(VideoSearchFilter filter, Pageable pageable) {
         BooleanExpression condition = Expressions.FALSE
-                .or(eqId(filter.getId()))
                 .or(eqChannelId(filter.getChannelId()))
                 .or(eqYoutubeId(filter.getYoutubeId()))
                 .or(likeTitle(filter.getTitle()));
@@ -48,13 +47,6 @@ public class VideoQueryRepositoryImpl implements VideoQueryRepository {
                 .fetchFirst();
 
         return new PagedModel<>(new PageImpl<>(content, pageable, total));
-    }
-
-    private BooleanExpression eqId(Long id) {
-        if (id == null) {
-            return null;
-        }
-        return video.id.eq(id);
     }
 
     private BooleanExpression eqChannelId(Long channelId) {

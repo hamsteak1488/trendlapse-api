@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 public class VideoSearchFilter {
-    private final Long id;
     private final Long channelId;
     private final String youtubeId;
     private final String title;

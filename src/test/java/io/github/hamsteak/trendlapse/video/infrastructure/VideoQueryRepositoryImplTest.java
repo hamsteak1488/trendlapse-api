@@ -67,10 +67,10 @@ class VideoQueryRepositoryImplTest {
 
     static Stream<Arguments> conditionResultArgumentProviders() {
         return Stream.of(
-                Arguments.of(new VideoSearchFilter(1L, null, null, null), 1),
-                Arguments.of(new VideoSearchFilter(null, null, "Video Youtube ID 2", null), 1),
-                Arguments.of(new VideoSearchFilter(1L, null, null, "Less"), 2),
-                Arguments.of(new VideoSearchFilter(1L, null, null, "Greater equal"), 3)
+                Arguments.of(new VideoSearchFilter(null, null, null), 0),
+                Arguments.of(new VideoSearchFilter(null, "Video Youtube ID 2", null), 1),
+                Arguments.of(new VideoSearchFilter(null, null, "Less"), 2),
+                Arguments.of(new VideoSearchFilter(null, null, "Greater equal"), 3)
         );
     }
 
@@ -78,7 +78,7 @@ class VideoQueryRepositoryImplTest {
     void search_returns_valid_VideoViewPage() {
         // given
         Pageable pageable = Pageable.ofSize(3);
-        VideoSearchFilter filter = new VideoSearchFilter(null, channel.getId(), null, null);
+        VideoSearchFilter filter = new VideoSearchFilter(channel.getId(), null, null);
 
         // when
         PagedModel<VideoView> videoViewPage = videoQueryRepositoryImpl.search(filter, pageable);

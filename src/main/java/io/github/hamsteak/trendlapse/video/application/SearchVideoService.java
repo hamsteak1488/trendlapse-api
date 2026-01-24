@@ -21,7 +21,6 @@ public class SearchVideoService {
 
     private VideoSearchFilter mapFromCommandToFilter(SearchVideoCommand command) {
         return new VideoSearchFilter(
-                command.getId(),
                 command.getChannelId(),
                 command.getYoutubeId(),
                 command.getTitle()

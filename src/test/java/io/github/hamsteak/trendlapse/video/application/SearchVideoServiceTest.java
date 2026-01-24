@@ -33,8 +33,8 @@ class SearchVideoServiceTest {
         String title = "Video Title";
         String thumbnailUrl = "Video Thumbnail Url";
 
-        SearchVideoCommand command = new SearchVideoCommand(id, channelId, youtubeId, title);
-        VideoSearchFilter filter = new VideoSearchFilter(id, channelId, youtubeId, title);
+        SearchVideoCommand command = new SearchVideoCommand(channelId, youtubeId, title);
+        VideoSearchFilter filter = new VideoSearchFilter(channelId, youtubeId, title);
         Pageable pageable = Pageable.ofSize(10);
 
         when(videoQueryRepository.search(filter, pageable))

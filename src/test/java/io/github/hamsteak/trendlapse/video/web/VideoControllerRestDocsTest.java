@@ -58,7 +58,6 @@ class VideoControllerRestDocsTest extends RestDocsTestSupport {
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/videos")
-                        .queryParam("id", String.valueOf(id))
                         .queryParam("channelId", String.valueOf(channelId))
                         .queryParam("youtubeId", youtubeId)
                         .queryParam("title", title)
@@ -70,7 +69,6 @@ class VideoControllerRestDocsTest extends RestDocsTestSupport {
         ArgumentCaptor<SearchVideoCommand> cmdCaptor = ArgumentCaptor.forClass(SearchVideoCommand.class);
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
         verify(searchVideoService).search(cmdCaptor.capture(), pageableCaptor.capture());
-        assertThat(cmdCaptor.getValue().getId()).isEqualTo(id);
         assertThat(cmdCaptor.getValue().getChannelId()).isEqualTo(channelId);
         assertThat(cmdCaptor.getValue().getYoutubeId()).isEqualTo(youtubeId);
         assertThat(cmdCaptor.getValue().getTitle()).isEqualTo(title);
@@ -82,11 +80,6 @@ class VideoControllerRestDocsTest extends RestDocsTestSupport {
                 .andDo(document(
                         "video/search",
                         queryParameters(
-                                parameterWithName("id").description("ID")
-                                        .attributes(
-                                                key("constraints").value("-"),
-                                                key("optional").value("true")
-                                        ),
                                 parameterWithName("channelId").description("Channel ID")
                                         .attributes(
                                                 key("constraints").value("-"),
