@@ -81,11 +81,14 @@ public class TrendingVideoQueryRepositoryImpl implements TrendingVideoQueryRepos
         return query
                 .select(new QTrendingVideoStatisticsView(
                         snapshotItem.snapshot.id,
+                        snapshotItem.snapshot.regionId,
+                        snapshotItem.snapshot.capturedAt,
                         snapshotItem.listIndex,
                         snapshotItem.viewCount,
                         snapshotItem.likeCount,
                         snapshotItem.commentCount))
                 .from(snapshotItem)
+                .innerJoin(snapshotItem.snapshot)
                 .where(snapshotItem.videoId.eq(videoId))
                 .fetch();
     }

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @QueryProjection
 @Getter
 @Builder
@@ -13,6 +15,10 @@ import lombok.RequiredArgsConstructor;
 public class TrendingVideoStatisticsView {
     @NonNull
     private final Long snapshotId;
+    @NonNull
+    private final String snapshotRegionId;
+    @NonNull
+    private final LocalDateTime snapshotCapturedAt;
     @NonNull
     private final Integer listIndex;
     @NonNull
