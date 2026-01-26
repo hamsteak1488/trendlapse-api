@@ -1,5 +1,7 @@
 package io.github.hamsteak.trendlapse.video.infrastructure;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -36,6 +38,7 @@ public class VideoQueryRepositoryImpl implements VideoQueryRepository {
                 .select(new QVideoView(video.id, video.channelId, video.youtubeId, video.title, video.thumbnailUrl))
                 .from(video)
                 .where(condition)
+                .orderBy(new OrderSpecifier<>(Order.DESC, video.id))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
