@@ -39,6 +39,7 @@ class VideoControllerRestDocsTest extends RestDocsTestSupport {
         // given
         long id = 1L;
         long channelId = 1L;
+        String channelTitle = "Channel Title";
         String youtubeId = "Video Youtube ID";
         String title = "Video Title";
         String thumbnailUrl = "Video Thumbnail Url";
@@ -58,9 +59,9 @@ class VideoControllerRestDocsTest extends RestDocsTestSupport {
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/videos")
-                        .queryParam("channelId", String.valueOf(channelId))
                         .queryParam("youtubeId", youtubeId)
                         .queryParam("title", title)
+                        .queryParam("channelTitle", channelTitle)
                         .queryParam("size", String.valueOf(pageSize))
                         .queryParam("page", String.valueOf(pageNumber))
         ).andExpect(status().isOk());
@@ -69,7 +70,7 @@ class VideoControllerRestDocsTest extends RestDocsTestSupport {
         ArgumentCaptor<SearchVideoCommand> cmdCaptor = ArgumentCaptor.forClass(SearchVideoCommand.class);
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
         verify(searchVideoService).search(cmdCaptor.capture(), pageableCaptor.capture());
-        assertThat(cmdCaptor.getValue().getChannelId()).isEqualTo(channelId);
+        assertThat(cmdCaptor.getValue().getChannelTitle()).isEqualTo(channelTitle);
         assertThat(cmdCaptor.getValue().getYoutubeId()).isEqualTo(youtubeId);
         assertThat(cmdCaptor.getValue().getTitle()).isEqualTo(title);
         assertThat(pageableCaptor.getValue().getPageSize()).isEqualTo(pageSize);
@@ -80,17 +81,17 @@ class VideoControllerRestDocsTest extends RestDocsTestSupport {
                 .andDo(document(
                         "video/search",
                         queryParameters(
-                                parameterWithName("channelId").description("Channel ID")
-                                        .attributes(
-                                                key("constraints").value("-"),
-                                                key("optional").value("true")
-                                        ),
                                 parameterWithName("youtubeId").description("Youtube ID")
                                         .attributes(
                                                 key("constraints").value("-"),
                                                 key("optional").value("true")
                                         ),
                                 parameterWithName("title").description("Title")
+                                        .attributes(
+                                                key("constraints").value("-"),
+                                                key("optional").value("true")
+                                        ),
+                                parameterWithName("channelTitle").description("Channel Title")
                                         .attributes(
                                                 key("constraints").value("-"),
                                                 key("optional").value("true")

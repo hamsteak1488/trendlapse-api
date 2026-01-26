@@ -1,14 +1,13 @@
 package io.github.hamsteak.trendlapse.video.application.dto;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Getter
-@RequiredArgsConstructor
+@Builder
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 public class VideoSearchFilter {
-    private final Long channelId;
     private final String youtubeId;
     private final String title;
+    private final String channelTitle;
 }

@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class SearchVideoRequest {
-    private final Long channelId;
     private final String youtubeId;
     private final String title;
+    private final String channelTitle;
 }

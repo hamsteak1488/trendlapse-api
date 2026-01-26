@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static io.github.hamsteak.trendlapse.channel.domain.QChannel.channel;
 import static io.github.hamsteak.trendlapse.video.domain.QVideo.video;
 
 @Repository
@@ -29,14 +30,17 @@ public class VideoQueryRepositoryImpl implements VideoQueryRepository {
 
     @Override
     public PagedModel<VideoView> search(VideoSearchFilter filter, Pageable pageable) {
-        BooleanExpression condition = Expressions.FALSE
-                .or(eqChannelId(filter.getChannelId()))
-                .or(eqYoutubeId(filter.getYoutubeId()))
-                .or(likeTitle(filter.getTitle()));
+        BooleanExpression condition = Expressions.anyOf(
+                eqYoutubeId(filter.getYoutubeId()),
+                likeTitle(filter.getTitle()),
+                likeChannelTitle(filter.getChannelTitle()));
+
+        condition = condition != null ? condition : Expressions.FALSE;
 
         List<VideoView> content = query
                 .select(new QVideoView(video.id, video.channelId, video.youtubeId, video.title, video.thumbnailUrl))
                 .from(video)
+                .innerJoin(channel).on(channel.id.eq(video.channelId))
                 .where(condition)
                 .orderBy(new OrderSpecifier<>(Order.DESC, video.id))
                 .offset(pageable.getOffset())
@@ -46,17 +50,11 @@ public class VideoQueryRepositoryImpl implements VideoQueryRepository {
         Long total = query
                 .select(video.count())
                 .from(video)
+                .innerJoin(channel).on(channel.id.eq(video.channelId))
                 .where(condition)
                 .fetchFirst();
 
         return new PagedModel<>(new PageImpl<>(content, pageable, total));
-    }
-
-    private BooleanExpression eqChannelId(Long channelId) {
-        if (channelId == null) {
-            return null;
-        }
-        return video.channelId.eq(channelId);
     }
 
     private BooleanExpression eqYoutubeId(String youtubeId) {
@@ -71,5 +69,12 @@ public class VideoQueryRepositoryImpl implements VideoQueryRepository {
             return null;
         }
         return video.title.likeIgnoreCase("%" + title + "%");
+    }
+
+    private BooleanExpression likeChannelTitle(String channelTitle) {
+        if (channelTitle == null) {
+            return null;
+        }
+        return channel.title.likeIgnoreCase("%" + channelTitle + "%");
     }
 }

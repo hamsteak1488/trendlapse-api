@@ -29,12 +29,17 @@ class SearchVideoServiceTest {
         // given
         long id = 1L;
         long channelId = 10L;
+        String channelTitle = "Channel Title";
         String youtubeId = "Video Youtube ID";
         String title = "Video Title";
         String thumbnailUrl = "Video Thumbnail Url";
 
-        SearchVideoCommand command = new SearchVideoCommand(channelId, youtubeId, title);
-        VideoSearchFilter filter = new VideoSearchFilter(channelId, youtubeId, title);
+        SearchVideoCommand command = new SearchVideoCommand(youtubeId, title, channelTitle);
+        VideoSearchFilter filter = VideoSearchFilter.builder()
+                .youtubeId(youtubeId)
+                .title(title)
+                .channelTitle(channelTitle)
+                .build();
         Pageable pageable = Pageable.ofSize(10);
 
         when(videoQueryRepository.search(filter, pageable))

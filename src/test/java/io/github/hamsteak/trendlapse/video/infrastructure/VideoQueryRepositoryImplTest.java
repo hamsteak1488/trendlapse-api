@@ -67,10 +67,37 @@ class VideoQueryRepositoryImplTest {
 
     static Stream<Arguments> conditionResultArgumentProviders() {
         return Stream.of(
-                Arguments.of(new VideoSearchFilter(null, null, null), 0),
-                Arguments.of(new VideoSearchFilter(null, "Video Youtube ID 2", null), 1),
-                Arguments.of(new VideoSearchFilter(null, null, "Less"), 2),
-                Arguments.of(new VideoSearchFilter(null, null, "Greater equal"), 3)
+                Arguments.of(
+                        VideoSearchFilter.builder()
+                                .youtubeId(null)
+                                .title(null)
+                                .channelTitle(null)
+                                .build(),
+                        0),
+                Arguments.of(
+                        VideoSearchFilter.builder()
+                                .youtubeId("Video Youtube ID 2")
+                                .title(null)
+                                .channelTitle(null)
+                                .build(),
+                        1
+                ),
+                Arguments.of(
+                        VideoSearchFilter.builder()
+                                .youtubeId(null)
+                                .title("Less")
+                                .channelTitle(null)
+                                .build(),
+                        2
+                ),
+                Arguments.of(
+                        VideoSearchFilter.builder()
+                                .youtubeId(null)
+                                .title("Greater equal")
+                                .channelTitle(null)
+                                .build(),
+                        3
+                )
         );
     }
 
@@ -78,7 +105,11 @@ class VideoQueryRepositoryImplTest {
     void search_returns_valid_VideoViewPage() {
         // given
         Pageable pageable = Pageable.ofSize(3);
-        VideoSearchFilter filter = new VideoSearchFilter(channel.getId(), null, null);
+        VideoSearchFilter filter = VideoSearchFilter.builder()
+                .youtubeId(null)
+                .title(null)
+                .channelTitle(channel.getTitle())
+                .build();
 
         // when
         PagedModel<VideoView> videoViewPage = videoQueryRepositoryImpl.search(filter, pageable);

@@ -21,7 +21,7 @@ public class VideoController {
     @GetMapping
     public ResponseEntity<PagedModel<VideoView>> search(SearchVideoRequest request, Pageable pageable) {
         PagedModel<VideoView> videoViewPage = searchVideoService.search(
-                new SearchVideoCommand(request.getChannelId(), request.getYoutubeId(), request.getTitle()),
+                new SearchVideoCommand(request.getYoutubeId(), request.getTitle(), request.getChannelTitle()),
                 pageable);
 
         return ResponseEntity.ok(videoViewPage);

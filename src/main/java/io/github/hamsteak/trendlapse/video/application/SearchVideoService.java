@@ -20,10 +20,10 @@ public class SearchVideoService {
     }
 
     private VideoSearchFilter mapFromCommandToFilter(SearchVideoCommand command) {
-        return new VideoSearchFilter(
-                command.getChannelId(),
-                command.getYoutubeId(),
-                command.getTitle()
-        );
+        return VideoSearchFilter.builder()
+                .youtubeId(command.getYoutubeId())
+                .title(command.getTitle())
+                .channelTitle(command.getChannelTitle())
+                .build();
     }
 }
