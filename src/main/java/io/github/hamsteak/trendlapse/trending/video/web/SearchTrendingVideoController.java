@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/trendings/videos")
 @RequiredArgsConstructor
-public class SearchTrendingController {
+public class SearchTrendingVideoController {
     private final SearchTrendingVideoRankingSnapshotService searchTrendingVideoRankingSnapshotService;
     private final SearchTrendingVideoStatisticsService searchTrendingVideoStatisticsService;
 
