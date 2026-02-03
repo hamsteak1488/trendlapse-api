@@ -6,10 +6,7 @@ import io.github.hamsteak.trendlapse.collector.application.dto.FetchedRegion;
 import io.github.hamsteak.trendlapse.collector.application.dto.FetchedVideo;
 import io.github.hamsteak.trendlapse.youtube.application.NonblockingYoutubeApiClient;
 import io.github.hamsteak.trendlapse.youtube.infrastructure.YoutubeDataApiProperties;
-import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.RawChannel;
-import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.RawChannelListResponse;
-import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.RawVideo;
-import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.RawVideoListResponse;
+import io.github.hamsteak.trendlapse.youtube.infrastructure.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -18,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -41,7 +39,13 @@ public class NonblockingYoutubeApiFetcher implements YoutubeApiFetcher {
 
     @Override
     public List<FetchedRegion> fetchRegions() {
-        throw new UnsupportedOperationException();
+        RawRegionListResponse rawRegionListResponse = nonblockingYoutubeApiClient.fetchRegions().block();
+
+        Objects.requireNonNull(rawRegionListResponse, "Fetched region list must not be null.");
+
+        return rawRegionListResponse.getItems().stream()
+                .map(rawRegion -> new FetchedRegion(rawRegion.getId(), rawRegion.getName()))
+                .toList();
     }
 
     @Override

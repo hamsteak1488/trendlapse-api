@@ -44,7 +44,7 @@ public class WebClientYoutubeApiClient implements NonblockingYoutubeApiClient {
                         .doBeforeRetry(retrySignal -> {
                             Throwable failure = retrySignal.failure();
                             long attempt = retrySignal.totalRetries() + 1;
-                            log.warn("[WebClient] Retry #{} for fetching trendings (cause={})", attempt, failure.toString());
+                            log.warn("[WebClient] Retry #{} for fetching channels (cause={})", attempt, failure.toString());
                         }))
                 .flatMap(rawChannelListResponse -> {
                     // 요청한 채널이 비공개 혹은 정지당한 채널일 경우 items가 null이 되는데, 이 때 NullPointerException을 예방하기 위해 빈 리스트가 들어있는 응답으로 대체.
@@ -76,7 +76,7 @@ public class WebClientYoutubeApiClient implements NonblockingYoutubeApiClient {
                         .doBeforeRetry(retrySignal -> {
                             Throwable failure = retrySignal.failure();
                             long attempt = retrySignal.totalRetries() + 1;
-                            log.warn("[WebClient] Retry #{} for fetching trendings (cause={})", attempt, failure.toString());
+                            log.warn("[WebClient] Retry #{} for fetching videos (cause={})", attempt, failure.toString());
                         }))
                 .flatMap(rawVideoListResponse -> {
                     // 요청한 영상이 비공개 혹은 정지당한 영상일 경우 items가 null이 되는데, 이 때 NullPointerException을 예방하기 위해 빈 리스트가 들어있는 응답으로 대체.
@@ -118,6 +118,24 @@ public class WebClientYoutubeApiClient implements NonblockingYoutubeApiClient {
 
     @Override
     public Mono<RawRegionListResponse> fetchRegions() {
-        throw new UnsupportedOperationException();
+        String part = "snippet";
+
+        URI requestUri = UriComponentsBuilder.fromUriString(youtubeDataApiProperties.getBaseUrl())
+                .path("/i18nRegions")
+                .queryParam("key", youtubeDataApiProperties.getApiKey())
+                .queryParam("part", part)
+                .build().toUri();
+
+        return webClient.get()
+                .uri(requestUri)
+                .retrieve()
+                .bodyToMono(RawRegionListResponse.class)
+                .timeout(Duration.ofSeconds(youtubeDataApiProperties.getTimeout()))
+                .retryWhen(Retry.backoff(youtubeDataApiProperties.getRetryCount(), Duration.ofSeconds(1))
+                        .doBeforeRetry(retrySignal -> {
+                            Throwable failure = retrySignal.failure();
+                            long attempt = retrySignal.totalRetries() + 1;
+                            log.warn("[WebClient] Retry #{} for fetching regions (cause={})", attempt, failure.toString());
+                        }));
     }
 }
