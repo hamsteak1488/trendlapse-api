@@ -60,7 +60,7 @@ public class CollectTrendingVideoRankingSnapshotService {
         List<String> regionIds = regions.stream().map(Region::getId).toList();
         List<String> regionsIdsNotInDb = findRegionIdsNotInDb(regionIds);
         List<Region> regionsToInsert = regions.stream()
-                .filter(region -> !regionsIdsNotInDb.contains(region.getId()))
+                .filter(region -> regionsIdsNotInDb.contains(region.getId()))
                 .toList();
         regionRepository.saveAllAndFlush(regionsToInsert);
         return regionIds;
