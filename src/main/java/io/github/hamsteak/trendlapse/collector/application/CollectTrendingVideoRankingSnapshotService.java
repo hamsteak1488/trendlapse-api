@@ -7,8 +7,6 @@ import io.github.hamsteak.trendlapse.collector.application.dto.FetchedChannel;
 import io.github.hamsteak.trendlapse.collector.application.dto.FetchedRegion;
 import io.github.hamsteak.trendlapse.collector.application.dto.FetchedVideo;
 import io.github.hamsteak.trendlapse.collector.application.dto.RegionFetchedTrendingVideos;
-import io.github.hamsteak.trendlapse.collector.infrastructure.BlockingYoutubeApiFetcher;
-import io.github.hamsteak.trendlapse.collector.infrastructure.NonblockingYoutubeApiFetcher;
 import io.github.hamsteak.trendlapse.region.domain.Region;
 import io.github.hamsteak.trendlapse.region.domain.RegionRepository;
 import io.github.hamsteak.trendlapse.trending.video.domain.TrendingVideoRankingSnapshot;
@@ -32,8 +30,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class CollectTrendingVideoRankingSnapshotService {
-    private final BlockingYoutubeApiFetcher blockingYoutubeApiFetcher;
-    private final NonblockingYoutubeApiFetcher nonblockingYoutubeApiFetcher;
+    private final YoutubeApiFetcher youtubeApiFetcher;
     private final FetchedDataAssembler fetchedDataAssembler;
 
     private final RegionRepository regionRepository;
@@ -55,7 +52,7 @@ public class CollectTrendingVideoRankingSnapshotService {
     }
 
     private List<String> fetchAndStoreRegions() {
-        List<FetchedRegion> fetchedRegions = blockingYoutubeApiFetcher.fetchRegions();
+        List<FetchedRegion> fetchedRegions = youtubeApiFetcher.fetchRegions();
         List<Region> regions = fetchedDataAssembler.toRegions(fetchedRegions);
         List<String> regionIds = regions.stream().map(Region::getId).toList();
         List<String> regionsIdsNotInDb = findRegionIdsNotInDb(regionIds);
@@ -69,7 +66,7 @@ public class CollectTrendingVideoRankingSnapshotService {
     private void fetchAndStoreChannels(List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList) {
         Set<String> distinctChannelYoutubeIds = extractChannelYoutubeIds(regionFetchedTrendingVideosList);
         List<String> channelYoutubeIdsNotInDb = findChannelsNotInDbByYoutubeId(distinctChannelYoutubeIds.stream().toList());
-        List<FetchedChannel> fetchedChannelsNotInDb = nonblockingYoutubeApiFetcher.fetchChannels(channelYoutubeIdsNotInDb);
+        List<FetchedChannel> fetchedChannelsNotInDb = youtubeApiFetcher.fetchChannels(channelYoutubeIdsNotInDb);
 
         List<Channel> channelsNotInDb = fetchedDataAssembler.toChannels(fetchedChannelsNotInDb);
         channelBulkInsertRepository.bulkInsert(channelsNotInDb);
@@ -101,7 +98,7 @@ public class CollectTrendingVideoRankingSnapshotService {
     }
 
     private List<RegionFetchedTrendingVideos> fetchRegionTrendingVideos(List<String> regionIds) {
-        return nonblockingYoutubeApiFetcher.fetchTrendingVideos(regionIds).entrySet().stream()
+        return youtubeApiFetcher.fetchTrendingVideos(regionIds).entrySet().stream()
                 .map(entry ->
                         new RegionFetchedTrendingVideos(
                                 entry.getKey(),
