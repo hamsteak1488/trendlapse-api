@@ -16,6 +16,7 @@ import io.github.hamsteak.trendlapse.video.domain.VideoBulkInsertRepository;
 import io.github.hamsteak.trendlapse.video.domain.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,8 @@ public class CollectTrendingVideoRankingSnapshotService {
     private final VideoBulkInsertRepository videoBulkInsertRepository;
     private final TrendingVideoRankingSnapshotBulkInsertRepository trendingVideoRankingSnapshotBulkInsertRepository;
 
+    private final ApplicationEventPublisher applicationEventPublisher;
+
     @Transactional
     public void collect(LocalDateTime captureTime) {
         List<String> regionIds = fetchAndStoreRegions();
@@ -48,7 +51,9 @@ public class CollectTrendingVideoRankingSnapshotService {
 
         fetchAndStoreChannels(regionFetchedTrendingVideosList);
         storeVideos(regionFetchedTrendingVideosList);
-        storeTrendingVideoRankingSnapshots(regionFetchedTrendingVideosList, captureTime);
+        List<Long> snapshotIds = storeTrendingVideoRankingSnapshots(regionFetchedTrendingVideosList, captureTime);
+
+        applicationEventPublisher.publishEvent(new CollectedEvent(snapshotIds));
     }
 
     private List<String> fetchAndStoreRegions() {
@@ -107,7 +112,7 @@ public class CollectTrendingVideoRankingSnapshotService {
                 ).toList();
     }
 
-    private void storeTrendingVideoRankingSnapshots(
+    private List<Long> storeTrendingVideoRankingSnapshots(
             List<RegionFetchedTrendingVideos> regionFetchedTrendingVideosList,
             LocalDateTime captureTime
     ) {
@@ -122,7 +127,7 @@ public class CollectTrendingVideoRankingSnapshotService {
                         videoYoutubeIdEntityIdMap,
                         captureTime
                 );
-        trendingVideoRankingSnapshotBulkInsertRepository.bulkInsert(trendingVideoRankingSnapshots);
+        return trendingVideoRankingSnapshotBulkInsertRepository.bulkInsert(trendingVideoRankingSnapshots);
     }
 
     private List<String> findRegionIdsNotInDb(List<String> regionIds) {

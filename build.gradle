@@ -25,6 +25,10 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('springAiVersion', "1.1.2")
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -36,6 +40,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.security:spring-security-crypto'
+    implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'com.github.ben-manes.caffeine:caffeine:3.2.2'
@@ -62,6 +67,12 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 
     addNettyDnsWhenMacArm(delegate);
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+    }
 }
 
 def addNettyDnsWhenMacArm(DependencyHandler dependencyHandler) {

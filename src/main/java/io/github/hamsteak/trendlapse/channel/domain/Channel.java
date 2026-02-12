@@ -3,11 +3,13 @@ package io.github.hamsteak.trendlapse.channel.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Builder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,6 +31,6 @@ public class Channel {
     private String thumbnailUrl;
 
     @Column
-    @UpdateTimestamp
+    @LastModifiedDate
     private LocalDateTime lastUpdatedAt;
 }

@@ -10,6 +10,7 @@ import io.github.hamsteak.trendlapse.region.domain.Region;
 import io.github.hamsteak.trendlapse.region.domain.RegionRepository;
 import io.github.hamsteak.trendlapse.trending.video.domain.TrendingVideoRankingSnapshot;
 import io.github.hamsteak.trendlapse.trending.video.domain.TrendingVideoRankingSnapshotBulkInsertRepository;
+import io.github.hamsteak.trendlapse.trending.video.domain.TrendingVideoRankingSnapshotItem;
 import io.github.hamsteak.trendlapse.trending.video.domain.TrendingVideoRankingSnapshotRepository;
 import io.github.hamsteak.trendlapse.video.domain.Video;
 import io.github.hamsteak.trendlapse.video.domain.VideoBulkInsertRepository;
@@ -18,6 +19,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -38,15 +41,16 @@ class CollectTrendingVideoRankingSnapshotServiceTest implements YoutubeApiFetche
     @Autowired
     VideoRepository videoRepository;
     @Autowired
-    TrendingVideoRankingSnapshotRepository trendingVideoRankingSnapshotRepository;
-    @Autowired
     ChannelBulkInsertRepository channelBulkInsertRepository;
     @Autowired
     VideoBulkInsertRepository videoBulkInsertRepository;
     @Autowired
     TrendingVideoRankingSnapshotBulkInsertRepository trendingVideoRankingSnapshotBulkInsertRepository;
-
     @Autowired
+    ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    TrendingVideoRankingSnapshotRepository trendingVideoRankingSnapshotRepository;
+
     CollectTrendingVideoRankingSnapshotService sut;
 
     private List<FetchedRegion> fetchedRegions;
@@ -64,7 +68,8 @@ class CollectTrendingVideoRankingSnapshotServiceTest implements YoutubeApiFetche
                 videoRepository,
                 channelBulkInsertRepository,
                 videoBulkInsertRepository,
-                trendingVideoRankingSnapshotBulkInsertRepository
+                trendingVideoRankingSnapshotBulkInsertRepository,
+                applicationEventPublisher
         );
 
         fetchedRegions = List.of(
@@ -93,6 +98,7 @@ class CollectTrendingVideoRankingSnapshotServiceTest implements YoutubeApiFetche
     }
 
     @Test
+    @Transactional
     void test_collect() {
         // given
         LocalDateTime dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
@@ -105,6 +111,9 @@ class CollectTrendingVideoRankingSnapshotServiceTest implements YoutubeApiFetche
         List<Channel> savedChannels = channelRepository.findAll();
         List<Video> savedVideos = videoRepository.findAll();
         List<TrendingVideoRankingSnapshot> savedSnapshots = trendingVideoRankingSnapshotRepository.findAll();
+        List<TrendingVideoRankingSnapshotItem> savedSnapshotItems = savedSnapshots.stream()
+                .flatMap(snapshot -> snapshot.getItems().stream())
+                .toList();
 
         List<FetchedRegion> savedRegionsMappedToDto = savedRegions.stream()
                 .map(r -> new FetchedRegion(r.getId(), r.getName()))
@@ -115,8 +124,9 @@ class CollectTrendingVideoRankingSnapshotServiceTest implements YoutubeApiFetche
 
         assertThat(savedRegionsMappedToDto).containsExactlyInAnyOrderElementsOf(fetchedRegions);
         assertThat(savedChannelsMappedToDto).containsExactlyInAnyOrderElementsOf(fetchedChannelMap.values());
-        assertThat(savedVideos.size()).isEqualTo(3);
-        assertThat(savedSnapshots.size()).isEqualTo(3);
+        assertThat(savedVideos).hasSize(3);
+        assertThat(savedSnapshots).hasSize(3);
+        assertThat(savedSnapshotItems).hasSize(3);
     }
 
     @Override

@@ -18,8 +18,8 @@ public class GlobalExceptionHandler {
     private static HttpStatus mapStatus(DomainError domainError) {
         return switch (domainError) {
             case INVALID_USERNAME, INVALID_PASSWORD, INVALID_EMAIL, LOGIN_FAILED -> HttpStatus.BAD_REQUEST;
-            case DUPLICATE_USERNAME -> HttpStatus.CONFLICT;
-            case MEMBER_NOT_FOUND -> HttpStatus.NOT_FOUND;
+            case DUPLICATE_USERNAME, SNAPSHOT_REPORT_ALREADY_EXISTS -> HttpStatus.CONFLICT;
+            case MEMBER_NOT_FOUND, SNAPSHOT_NOT_FOUND, SNAPSHOT_REPORT_NOT_FOUND -> HttpStatus.NOT_FOUND;
         };
     }
 

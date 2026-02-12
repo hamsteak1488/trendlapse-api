@@ -8,6 +8,7 @@ import io.github.hamsteak.trendlapse.trending.video.application.dto.*;
 import io.github.hamsteak.trendlapse.trending.video.domain.QTrendingVideoRankingSnapshot;
 import io.github.hamsteak.trendlapse.trending.video.domain.QTrendingVideoRankingSnapshotItem;
 import io.github.hamsteak.trendlapse.trending.video.domain.TrendingVideoRankingSnapshot;
+import io.github.hamsteak.trendlapse.trending.video.domain.TrendingVideoRankingSnapshotItem;
 import io.github.hamsteak.trendlapse.video.application.dto.QVideoView;
 import io.github.hamsteak.trendlapse.video.domain.QVideo;
 import jakarta.persistence.EntityManager;
@@ -90,6 +91,18 @@ public class TrendingVideoQueryRepositoryImpl implements TrendingVideoQueryRepos
                 .from(snapshotItem)
                 .innerJoin(snapshotItem.snapshot)
                 .where(snapshotItem.videoId.eq(videoId))
+                .orderBy(snapshotItem.snapshot.capturedAt.asc())
+                .fetch();
+    }
+
+    @Override
+    public List<TrendingVideoRankingSnapshotItem> findRankingSnapshotItemByVideoIdIn(List<Long> videoIds) {
+        QTrendingVideoRankingSnapshotItem snapshotItem = QTrendingVideoRankingSnapshotItem.trendingVideoRankingSnapshotItem;
+
+        return query
+                .selectFrom(snapshotItem)
+                .innerJoin(snapshotItem.snapshot)
+                .where(snapshotItem.videoId.in(videoIds))
                 .fetch();
     }
 }

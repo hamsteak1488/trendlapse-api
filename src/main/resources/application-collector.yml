@@ -18,3 +18,6 @@ purge-scheduler:
   purge-cron: '0 0 0 * * *'
   batch-size: 1000
   use-log: false
+
+reporter:
+  region-ids: KR,US

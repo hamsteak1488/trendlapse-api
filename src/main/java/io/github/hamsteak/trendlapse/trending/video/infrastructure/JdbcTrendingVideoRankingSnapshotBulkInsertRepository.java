@@ -25,9 +25,9 @@ public class JdbcTrendingVideoRankingSnapshotBulkInsertRepository implements Tre
      * @param snapshots 모든 TrendingVideoRankingSnapshot 엔티티들은 capturedAt 값이 같아야 한다.
      */
     @Override
-    public void bulkInsert(List<TrendingVideoRankingSnapshot> snapshots) {
+    public List<Long> bulkInsert(List<TrendingVideoRankingSnapshot> snapshots) {
         if (snapshots.isEmpty()) {
-            return;
+            return List.of();
         }
 
         LocalDateTime captureTime = snapshots.get(0).getCapturedAt();
@@ -44,6 +44,10 @@ public class JdbcTrendingVideoRankingSnapshotBulkInsertRepository implements Tre
                 getTrendingVideoRankingSnapshotItemRowsToInsert(itemSetupedSnapshotRows);
 
         insertTrendingVideoRankingSnapshotItems(snapshotItemRowsToInsert);
+
+        return justInsertedItemLackedSnapshotRows.stream()
+                .map(row -> row.getId())
+                .toList();
     }
 
     private void validateAllCaptureTimeOfSnapshotsAreSame(

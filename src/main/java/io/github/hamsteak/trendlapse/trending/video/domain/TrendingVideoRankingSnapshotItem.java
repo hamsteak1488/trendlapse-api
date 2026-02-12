@@ -1,15 +1,15 @@
 package io.github.hamsteak.trendlapse.trending.video.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TrendingVideoRankingSnapshotItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +17,7 @@ public class TrendingVideoRankingSnapshotItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "snapshot_id", nullable = false)
+    @JsonIgnore
     private TrendingVideoRankingSnapshot snapshot;
 
     @Column
@@ -38,15 +39,4 @@ public class TrendingVideoRankingSnapshotItem {
     @Column
     @NotNull
     private Integer listIndex;
-
-    @Builder
-    private TrendingVideoRankingSnapshotItem(Long id, TrendingVideoRankingSnapshot snapshot, Long videoId, Long viewCount, Long likeCount, Long commentCount, Integer listIndex) {
-        this.id = id;
-        this.snapshot = snapshot;
-        this.videoId = videoId;
-        this.viewCount = viewCount;
-        this.likeCount = likeCount;
-        this.commentCount = commentCount;
-        this.listIndex = listIndex;
-    }
 }
