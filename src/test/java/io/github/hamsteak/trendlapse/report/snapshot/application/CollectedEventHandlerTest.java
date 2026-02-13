@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -23,6 +24,8 @@ class CollectedEventHandlerTest {
     CollectedEventHandler handler;
     @MockitoBean
     CreateTrendingVideoRankingSnapshotReportService createTrendingVideoRankingSnapshotReportService;
+    @Autowired
+    TransactionTemplate tx;
 
     @Test
     void publish_CollectedEvent_invokes_handle() {
@@ -30,7 +33,9 @@ class CollectedEventHandlerTest {
         CollectedEvent event = new CollectedEvent(List.of(1L, 2L, 3L));
 
         // when
-        publisher.publishEvent(event);
+        tx.executeWithoutResult(status -> {
+            publisher.publishEvent(event);
+        });
 
         // then
         await().atMost(3, TimeUnit.of(ChronoUnit.SECONDS))
