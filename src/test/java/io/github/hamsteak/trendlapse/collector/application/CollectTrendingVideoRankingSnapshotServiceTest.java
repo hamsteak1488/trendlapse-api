@@ -16,7 +16,9 @@ import io.github.hamsteak.trendlapse.video.domain.Video;
 import io.github.hamsteak.trendlapse.video.domain.VideoBulkInsertRepository;
 import io.github.hamsteak.trendlapse.video.domain.VideoRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
@@ -27,6 +29,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -97,12 +100,10 @@ class CollectTrendingVideoRankingSnapshotServiceTest implements YoutubeApiFetche
         );
     }
 
-    @Test
     @Transactional
-    void test_collect() {
-        // given
-        LocalDateTime dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-
+    @ParameterizedTest
+    @MethodSource("dateTimeArgumentProviders")
+    void test_collect(LocalDateTime dateTime) {
         // when
         sut.collect(dateTime);
 
@@ -127,6 +128,13 @@ class CollectTrendingVideoRankingSnapshotServiceTest implements YoutubeApiFetche
         assertThat(savedVideos).hasSize(3);
         assertThat(savedSnapshots).hasSize(3);
         assertThat(savedSnapshotItems).hasSize(3);
+    }
+
+    static Stream<Arguments> dateTimeArgumentProviders() {
+        return Stream.of(
+                Arguments.of(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)),
+                Arguments.of(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).minusNanos(1))
+        );
     }
 
     @Override

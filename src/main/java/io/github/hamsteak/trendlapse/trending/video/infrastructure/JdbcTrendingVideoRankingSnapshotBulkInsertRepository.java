@@ -77,7 +77,7 @@ public class JdbcTrendingVideoRankingSnapshotBulkInsertRepository implements Tre
         String sql = """
                 SELECT id, region_id, captured_at
                 FROM trending_video_ranking_snapshot
-                WHERE captured_at >= ? AND captured_at < ?
+                WHERE captured_at >= ? AND captured_at <= ?
                 """;
         LocalDateTime start = capturedAt.truncatedTo(ChronoUnit.SECONDS);
         LocalDateTime end = start.plusSeconds(1);
