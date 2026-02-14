@@ -13,3 +13,7 @@ spring:
 
 collect-scheduler:
   collect-cron: '-'
+
+logging:
+  level:
+    io.github.hamsteak.trendlapse: debug
