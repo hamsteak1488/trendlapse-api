@@ -21,3 +21,4 @@ purge-scheduler:
 
 reporter:
   region-ids: KR,US
+  input-video-count: 10

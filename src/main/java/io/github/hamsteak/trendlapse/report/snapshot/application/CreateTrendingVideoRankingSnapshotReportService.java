@@ -38,7 +38,10 @@ public class CreateTrendingVideoRankingSnapshotReportService {
     private final ObjectMapper objectMapper;
 
     @Value("${reporter.region-ids}")
-    private final List<String> reportRegionIds;
+    private List<String> reportRegionIds;
+
+    @Value("${reporter.input-video-count:10}")
+    private int inputVideoCount;
 
     @Transactional
     public void create(Long snapshotId) {
@@ -145,6 +148,7 @@ public class CreateTrendingVideoRankingSnapshotReportService {
                     return new VideoData(videoId, video.getChannelId(), video.getTitle(), rankHistory);
                 })
                 .sorted((v1, v2) -> compareLastRank(v1, v2))
+                .limit(inputVideoCount)
                 .toList();
     }
 
