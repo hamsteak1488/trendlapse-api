@@ -96,13 +96,13 @@ public class TrendingVideoQueryRepositoryImpl implements TrendingVideoQueryRepos
     }
 
     @Override
-    public List<TrendingVideoRankingSnapshotItem> findRankingSnapshotItemByVideoIdIn(List<Long> videoIds) {
+    public List<TrendingVideoRankingSnapshotItem> findRankingSnapshotItemByRegionIdAndVideoIdIn(String regionId, List<Long> videoIds) {
         QTrendingVideoRankingSnapshotItem snapshotItem = QTrendingVideoRankingSnapshotItem.trendingVideoRankingSnapshotItem;
 
         return query
                 .selectFrom(snapshotItem)
                 .innerJoin(snapshotItem.snapshot)
-                .where(snapshotItem.videoId.in(videoIds))
+                .where(snapshotItem.snapshot.regionId.eq(regionId), snapshotItem.videoId.in(videoIds))
                 .fetch();
     }
 }
