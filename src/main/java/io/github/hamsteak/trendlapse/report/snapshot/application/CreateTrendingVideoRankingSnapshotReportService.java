@@ -74,6 +74,8 @@ public class CreateTrendingVideoRankingSnapshotReportService {
 
         List<VideoData> videoData = createVideoData(snapshot.getRegionId(), videos);
         List<ChannelData> channelData = channels.stream()
+                .filter(channel ->
+                        videoData.stream().anyMatch(video -> video.getChannelId() == channel.getId()))
                 .map(channel -> new ChannelData(channel.getId(), channel.getTitle()))
                 .toList();
 
