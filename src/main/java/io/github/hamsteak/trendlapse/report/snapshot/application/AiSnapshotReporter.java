@@ -1,5 +1,5 @@
 package io.github.hamsteak.trendlapse.report.snapshot.application;
 
 public interface AiSnapshotReporter {
-    String report(String message);
+    String report(String inputData);
 }
