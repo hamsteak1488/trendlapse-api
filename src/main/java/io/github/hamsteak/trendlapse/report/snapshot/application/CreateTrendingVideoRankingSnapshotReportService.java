@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -128,12 +129,15 @@ public class CreateTrendingVideoRankingSnapshotReportService {
                 ).entrySet().stream()
                 .map(entry -> {
                     long videoId = entry.getKey();
+                    List<TrendingVideoRankingSnapshotItem> items = entry.getValue();
+
                     Video video = videoMap.get(videoId);
 
-                    List<TrendingVideoRankingSnapshotItem> items = entry.getValue();
                     List<Integer> rankHistory = items.stream()
+                            .sorted(Comparator.comparing(o -> o.getSnapshot().getCapturedAt()))
                             .map(item -> item.getListIndex() + 1)
                             .toList();
+
                     if (rankHistory.isEmpty()) {
                         throw new IllegalStateException("rankHistory is empty.");
                     }
