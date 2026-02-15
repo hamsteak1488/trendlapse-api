@@ -93,7 +93,7 @@ public class CreateTrendingVideoRankingSnapshotReportService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        stringBuilder.append("Analyze the data above and report briefly.");
+        stringBuilder.append("Analyze the data above and report.");
 
         return stringBuilder.toString();
     }
