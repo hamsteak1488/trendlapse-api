@@ -55,6 +55,7 @@ public class CodexApiSnapshotReporter implements AiSnapshotReporter {
     @Override
     public String report(String inputData) {
         URI requestUri = UriComponentsBuilder.fromUriString(codexApiProperties.getUrl())
+                .path("/api/chat")
                 .build().toUri();
 
         CodexApiRequest request = CodexApiRequest.builder()
