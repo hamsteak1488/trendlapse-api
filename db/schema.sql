@@ -78,3 +78,9 @@ CREATE TABLE trending_video_ranking_snapshot_report (
   CONSTRAINT fk_tvrsr_snapshot_id FOREIGN KEY (snapshot_id) REFERENCES trending_video_ranking_snapshot(id)
     ON DELETE CASCADE
 );
+
+CREATE TABLE trending_video_ranking_snapshot_report_system_prompt (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    content LONGTEXT NOT NULL,
+    PRIMARY KEY (id)
+);

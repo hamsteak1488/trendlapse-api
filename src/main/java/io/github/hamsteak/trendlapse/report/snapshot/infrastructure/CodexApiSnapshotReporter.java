@@ -1,6 +1,8 @@
 package io.github.hamsteak.trendlapse.report.snapshot.infrastructure;
 
 import io.github.hamsteak.trendlapse.report.snapshot.application.AiSnapshotReporter;
+import io.github.hamsteak.trendlapse.report.snapshot.domain.TrendingVideoRankingSnapshotReportSystemPrompt;
+import io.github.hamsteak.trendlapse.report.snapshot.domain.TrendingVideoRankingSnapshotReportSystemPromptRepository;
 import io.github.hamsteak.trendlapse.report.snapshot.infrastructure.dto.CodexApiRequest;
 import io.github.hamsteak.trendlapse.report.snapshot.infrastructure.dto.CodexApiResponse;
 import io.github.hamsteak.trendlapse.youtube.domain.YoutubeNullResponseException;
@@ -11,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @Primary
 @Component
@@ -18,39 +21,7 @@ import java.net.URI;
 public class CodexApiSnapshotReporter implements AiSnapshotReporter {
     private final RestTemplate restTemplate;
     private final CodexApiProperties codexApiProperties;
-
-    private static final String TRENDING_VIDEO_RANKING_SNAPSHOT_REPORT_SYSTEM_PROMPT =
-            """
-                    You are a professional analyst generating video ranking trend reports.
-                    
-                    PRIMARY OBJECTIVE:
-                    Analyze and describe VIDEO RANKING CHANGES and trends over time.
-                    
-                    RANK HISTORY INTERPRETATION:
-                    - rankHistory is ordered from oldest to newest.
-                    - Each value represents the rank at a 1-hour interval.
-                    - The last value is the most recent rank.
-                    - Lower rank numbers indicate higher positions.
-                    - If rank number decreases, the video is rising.
-                    - If rank number increases, the video is falling.
-                    - If rank number remains similar, the video is stable.
-                    
-                    PRIORITY RULES:
-                    - Primary focus: video ranking movement, trends, and stability.
-                    - Secondary reference: channel and region metadata may be used ONLY if directly relevant to explaining ranking behavior.
-                    - Do NOT describe channel or region metadata independently.
-                    - Do NOT list channel names or explain region context unless necessary for ranking interpretation.
-                    
-                    OUTPUT REQUIREMENTS:
-                    - Output plain text only.
-                    - No markdown or formatting symbols.
-                    - Write exactly one paragraph.
-                    - Use between 3 and 5 sentences.
-                    - Maximum 120 words.
-                    - Focus on meaningful ranking trends, patterns, and notable changes.
-                    - Avoid unnecessary explanations and metadata descriptions.
-                    - Be concise, factual, and analytical.
-                    """;
+    private final TrendingVideoRankingSnapshotReportSystemPromptRepository snapshotReportSystemPromptRepository;
 
     @Override
     public String report(String inputData) {
@@ -59,7 +30,7 @@ public class CodexApiSnapshotReporter implements AiSnapshotReporter {
                 .build().toUri();
 
         CodexApiRequest request = CodexApiRequest.builder()
-                .system(TRENDING_VIDEO_RANKING_SNAPSHOT_REPORT_SYSTEM_PROMPT)
+                .system(getSystemPrompt())
                 .user(inputData)
                 .build();
 
@@ -70,5 +41,18 @@ public class CodexApiSnapshotReporter implements AiSnapshotReporter {
         }
 
         return response.getAnswer();
+    }
+
+    private String getSystemPrompt() {
+        List<TrendingVideoRankingSnapshotReportSystemPrompt> systemPrompts = snapshotReportSystemPromptRepository.findAll();
+
+        if (systemPrompts.isEmpty()) {
+            throw new IllegalStateException("Cannot find system prompt.");
+        }
+        if (systemPrompts.size() > 1) {
+            throw new IllegalStateException("There must be only one system prompt.");
+        }
+
+        return systemPrompts.get(0).getContent();
     }
 }
