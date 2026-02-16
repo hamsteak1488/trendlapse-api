@@ -72,7 +72,7 @@ CREATE TABLE member (
 -- snapshot report
 CREATE TABLE trending_video_ranking_snapshot_report (
   snapshot_id BIGINT NOT NULL,
-  summary VARCHAR(3000) NOT NULL,
+  markdown_content VARCHAR(3000) NOT NULL,
   created_at DATETIME NOT NULL,
   PRIMARY KEY (snapshot_id),
   CONSTRAINT fk_tvrsr_snapshot_id FOREIGN KEY (snapshot_id) REFERENCES trending_video_ranking_snapshot(id)

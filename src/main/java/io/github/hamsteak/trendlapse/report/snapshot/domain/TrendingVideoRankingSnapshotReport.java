@@ -28,14 +28,14 @@ public class TrendingVideoRankingSnapshotReport {
 
     @Column
     @NotNull
-    private String summary;
+    private String markdownContent;
 
     @Column
     @CreatedDate
     private LocalDateTime createdAt;
 
-    public TrendingVideoRankingSnapshotReport(TrendingVideoRankingSnapshot snapshot, String summary) {
+    public TrendingVideoRankingSnapshotReport(TrendingVideoRankingSnapshot snapshot, String markdownContent) {
         this.snapshot = snapshot;
-        this.summary = summary;
+        this.markdownContent = markdownContent;
     }
 }

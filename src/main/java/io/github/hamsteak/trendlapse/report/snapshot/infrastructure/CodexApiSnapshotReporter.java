@@ -5,7 +5,6 @@ import io.github.hamsteak.trendlapse.report.snapshot.domain.TrendingVideoRanking
 import io.github.hamsteak.trendlapse.report.snapshot.domain.TrendingVideoRankingSnapshotReportSystemPromptRepository;
 import io.github.hamsteak.trendlapse.report.snapshot.infrastructure.dto.CodexApiRequest;
 import io.github.hamsteak.trendlapse.report.snapshot.infrastructure.dto.CodexApiResponse;
-import io.github.hamsteak.trendlapse.youtube.domain.YoutubeNullResponseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -37,7 +36,7 @@ public class CodexApiSnapshotReporter implements AiSnapshotReporter {
         CodexApiResponse response = restTemplate.postForObject(requestUri, request, CodexApiResponse.class);
 
         if (response == null) {
-            throw new YoutubeNullResponseException("CodexApiResponse is null.");
+            throw new IllegalStateException("CodexApiResponse is null.");
         }
 
         return response.getAnswer();

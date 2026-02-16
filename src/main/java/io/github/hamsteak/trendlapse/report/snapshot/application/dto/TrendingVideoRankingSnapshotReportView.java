@@ -7,5 +7,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TrendingVideoRankingSnapshotReportView {
     private final long snapshotId;
-    private final String summary;
+    private final String markdownContent;
 }

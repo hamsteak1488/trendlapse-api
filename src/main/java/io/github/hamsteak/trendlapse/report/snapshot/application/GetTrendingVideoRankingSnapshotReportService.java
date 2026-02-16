@@ -16,6 +16,6 @@ public class GetTrendingVideoRankingSnapshotReportService {
         TrendingVideoRankingSnapshotReport snapshotReport = snapshotReportRepository.findById(snapshotId)
                 .orElseThrow(() -> new SnapshotReportNotFoundException("Cannot find snapshot report."));
 
-        return new TrendingVideoRankingSnapshotReportView(snapshotReport.getSnapshotId(), snapshotReport.getSummary());
+        return new TrendingVideoRankingSnapshotReportView(snapshotReport.getSnapshotId(), snapshotReport.getMarkdownContent());
     }
 }

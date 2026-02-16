@@ -93,7 +93,7 @@ class CreateTrendingVideoRankingSnapshotReportServiceTest {
         TrendingVideoRankingSnapshotReport snapshotReport = snapshotReports.get(0);
         assertThat(snapshotReport).isNotNull();
         assertThat(snapshotReport.getSnapshotId()).isEqualTo(snapshotId);
-        assertThat(snapshotReport.getSummary()).isNotNull();
+        assertThat(snapshotReport.getMarkdownContent()).isNotNull();
     }
 
     private String channelYoutubeId(String regionId) {
