@@ -18,8 +18,6 @@ public class CollectedEventHandler {
     @Async
     @TransactionalEventListener
     public void handle(CollectedEvent event) {
-        if (true) return;
-
         List<Long> snapshotIds = event.getCollectedSnapshotIds();
         String snapshotIdsString = String.join(",", snapshotIds.stream().map(Object::toString).toList());
         log.info("Starting to create report for snapshot ids {}", snapshotIdsString);
