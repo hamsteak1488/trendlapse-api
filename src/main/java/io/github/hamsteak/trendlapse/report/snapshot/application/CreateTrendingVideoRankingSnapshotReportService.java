@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.hamsteak.trendlapse.channel.domain.Channel;
 import io.github.hamsteak.trendlapse.channel.domain.ChannelRepository;
-import io.github.hamsteak.trendlapse.report.snapshot.domain.SnapshotReportAlreadyExistsException;
 import io.github.hamsteak.trendlapse.report.snapshot.domain.TrendingVideoRankingSnapshotReport;
 import io.github.hamsteak.trendlapse.report.snapshot.domain.TrendingVideoRankingSnapshotReportRepository;
 import io.github.hamsteak.trendlapse.trending.video.application.TrendingVideoQueryRepository;
@@ -45,27 +44,28 @@ public class CreateTrendingVideoRankingSnapshotReportService {
 
     @Transactional
     public void create(Long snapshotId) {
-        // If report already exists, throw exception.
-        if (snapshotReportRepository.existsById(snapshotId)) {
-            throw new SnapshotReportAlreadyExistsException("Snapshot report already exists.");
-        }
-
-        // Create input string data.
+        // Check if snapshot corresponding to snapshotId exists.
         TrendingVideoRankingSnapshot snapshot = snapshotRepository.findById(snapshotId)
                 .orElseThrow(() -> new RuntimeException("Cannot find snapshot. (snapshotId=" + snapshotId + ")"));
-
-        String reportInput = createReportInput(snapshot);
 
         if (!reportRegionIds.contains(snapshot.getRegionId())) {
             return;
         }
 
+        // If snapshot report already exists, delete it.
+        if (snapshotReportRepository.existsById(snapshotId)) {
+            snapshotReportRepository.deleteById(snapshotId);
+            snapshotReportRepository.flush();
+            log.info("Deleted existing snapshot... (snapshotId={})", snapshotId);
+        }
+
+        // Create input string data.
+        String reportInput = createReportInput(snapshot);
         log.debug("[region ID: {}] report input = {}", snapshot.getRegionId(), reportInput);
 
         // Create a report and return it.
         String aiAnalyzeResult = aiSnapshotReporter.report(reportInput);
-        TrendingVideoRankingSnapshotReport report = new TrendingVideoRankingSnapshotReport(snapshot, aiAnalyzeResult);
-        snapshotReportRepository.save(report);
+        snapshotReportRepository.save(new TrendingVideoRankingSnapshotReport(snapshot, aiAnalyzeResult));
     }
 
     private String createReportInput(TrendingVideoRankingSnapshot snapshot) {
