@@ -44,6 +44,8 @@ public class CreateTrendingVideoRankingSnapshotReportService {
 
     @Transactional
     public void create(Long snapshotId) {
+        log.info("Starting to create report of trending video ranking snapshot (snapshotId={})", snapshotId);
+
         // Check if snapshot corresponding to snapshotId exists.
         TrendingVideoRankingSnapshot snapshot = snapshotRepository.findById(snapshotId)
                 .orElseThrow(() -> new RuntimeException("Cannot find snapshot. (snapshotId=" + snapshotId + ")"));
@@ -66,6 +68,8 @@ public class CreateTrendingVideoRankingSnapshotReportService {
         // Create a report and return it.
         String aiAnalyzeResult = aiSnapshotReporter.report(reportInput);
         snapshotReportRepository.save(new TrendingVideoRankingSnapshotReport(snapshot, aiAnalyzeResult));
+
+        log.info("Finished to create report of trending video ranking snapshot (snapshotId={})", snapshotId);
     }
 
     private String createReportInput(TrendingVideoRankingSnapshot snapshot) {
