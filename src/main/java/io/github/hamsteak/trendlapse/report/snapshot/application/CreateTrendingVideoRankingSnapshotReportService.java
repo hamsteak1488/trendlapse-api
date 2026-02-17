@@ -76,7 +76,7 @@ public class CreateTrendingVideoRankingSnapshotReportService {
         List<Video> videos = getVideos(snapshot);
         List<Channel> channels = getChannels(videos);
 
-        List<VideoData> videoData = createVideoData(snapshot.getRegionId(), videos);
+        List<VideoData> videoData = createVideoData(snapshot, videos);
         List<ChannelData> channelData = channels.stream()
                 .filter(channel ->
                         videoData.stream().anyMatch(video -> video.getChannelId() == channel.getId()))
@@ -120,7 +120,7 @@ public class CreateTrendingVideoRankingSnapshotReportService {
         );
     }
 
-    private List<VideoData> createVideoData(String regionId, List<Video> videos) {
+    private List<VideoData> createVideoData(TrendingVideoRankingSnapshot snapshot, List<Video> videos) {
         List<Long> videoIds = videos.stream()
                 .map(Video::getId)
                 .toList();
@@ -131,7 +131,11 @@ public class CreateTrendingVideoRankingSnapshotReportService {
                 ));
 
         List<TrendingVideoRankingSnapshotItem> snapshotItems =
-                trendingVideoQueryRepository.findRankingSnapshotItemByRegionIdAndVideoIdIn(regionId, videoIds);
+                trendingVideoQueryRepository.findRankingSnapshotItemByRegionIdAndCapturedAtLessThanEqualAndVideoIdIn(
+                        snapshot.getRegionId(),
+                        snapshot.getCapturedAt(),
+                        videoIds
+                );
 
         return snapshotItems.stream()
                 .collect(

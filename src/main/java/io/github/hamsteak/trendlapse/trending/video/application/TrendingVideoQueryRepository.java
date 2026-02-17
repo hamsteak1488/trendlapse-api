@@ -12,5 +12,9 @@ public interface TrendingVideoQueryRepository {
 
     List<TrendingVideoStatisticsView> findStatisticsByVideoId(long videoId);
 
-    List<TrendingVideoRankingSnapshotItem> findRankingSnapshotItemByRegionIdAndVideoIdIn(String regionId, List<Long> videoIds);
+    List<TrendingVideoRankingSnapshotItem> findRankingSnapshotItemByRegionIdAndCapturedAtLessThanEqualAndVideoIdIn(
+            String regionId,
+            LocalDateTime capturedAt,
+            List<Long> videoIds
+    );
 }
