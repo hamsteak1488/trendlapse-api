@@ -22,7 +22,7 @@ public class CodexApiSnapshotReporter implements AiSnapshotReporter {
     private final CodexApiProperties codexApiProperties;
     private final PromptRepository promptRepository;
 
-    private static final String AGENTS_INSTRUCTIONS_PROMPT_KEY = "trending-video-ranking-snapshot-agents-insturctions";
+    private static final String AGENTS_INSTRUCTIONS_PROMPT_KEY = "trending-video-ranking-snapshot-agents-instructions";
     private static final String SYSTEM_PROMPT_KEY = "trending-video-ranking-snapshot-system";
 
     @Override
