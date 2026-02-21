@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.report.snapshot.infrastructure.dto;
+package io.github.hamsteak.trendlapse.ai.infrastructure.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,4 +11,5 @@ import lombok.RequiredArgsConstructor;
 public class CodexApiRequest {
     private final String system;
     private final String user;
+    private final String agentInstructions;
 }

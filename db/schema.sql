@@ -79,8 +79,8 @@ CREATE TABLE trending_video_ranking_snapshot_report (
     ON DELETE CASCADE
 );
 
-CREATE TABLE trending_video_ranking_snapshot_report_system_prompt (
-    id BIGINT NOT NULL AUTO_INCREMENT,
+CREATE TABLE prompt (
+    id VARCHAR(255) NOT NULL,
     content LONGTEXT NOT NULL,
     PRIMARY KEY (id)
 );

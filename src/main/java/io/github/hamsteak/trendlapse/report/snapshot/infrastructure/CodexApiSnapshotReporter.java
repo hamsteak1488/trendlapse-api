@@ -1,10 +1,11 @@
 package io.github.hamsteak.trendlapse.report.snapshot.infrastructure;
 
+import io.github.hamsteak.trendlapse.ai.domain.PromptNotFoundException;
+import io.github.hamsteak.trendlapse.ai.domain.PromptRepository;
+import io.github.hamsteak.trendlapse.ai.infrastructure.CodexApiProperties;
+import io.github.hamsteak.trendlapse.ai.infrastructure.dto.CodexApiRequest;
+import io.github.hamsteak.trendlapse.ai.infrastructure.dto.CodexApiResponse;
 import io.github.hamsteak.trendlapse.report.snapshot.application.AiSnapshotReporter;
-import io.github.hamsteak.trendlapse.report.snapshot.domain.TrendingVideoRankingSnapshotReportSystemPrompt;
-import io.github.hamsteak.trendlapse.report.snapshot.domain.TrendingVideoRankingSnapshotReportSystemPromptRepository;
-import io.github.hamsteak.trendlapse.report.snapshot.infrastructure.dto.CodexApiRequest;
-import io.github.hamsteak.trendlapse.report.snapshot.infrastructure.dto.CodexApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @Primary
 @Component
@@ -20,7 +20,10 @@ import java.util.List;
 public class CodexApiSnapshotReporter implements AiSnapshotReporter {
     private final RestTemplate restTemplate;
     private final CodexApiProperties codexApiProperties;
-    private final TrendingVideoRankingSnapshotReportSystemPromptRepository snapshotReportSystemPromptRepository;
+    private final PromptRepository promptRepository;
+
+    private static final String AGENTS_INSTRUCTIONS_PROMPT_KEY = "trending-video-ranking-snapshot-agents-insturctions";
+    private static final String SYSTEM_PROMPT_KEY = "trending-video-ranking-snapshot-system";
 
     @Override
     public String report(String inputData) {
@@ -29,6 +32,7 @@ public class CodexApiSnapshotReporter implements AiSnapshotReporter {
                 .build().toUri();
 
         CodexApiRequest request = CodexApiRequest.builder()
+                .agentInstructions(getAgentInstructions())
                 .system(getSystemPrompt())
                 .user(inputData)
                 .build();
@@ -42,16 +46,15 @@ public class CodexApiSnapshotReporter implements AiSnapshotReporter {
         return response.getAnswer();
     }
 
+    private String getAgentInstructions() {
+        return promptRepository.findById(AGENTS_INSTRUCTIONS_PROMPT_KEY)
+                .orElseThrow(() -> new PromptNotFoundException("Cannot find prompt. (promptId=" + AGENTS_INSTRUCTIONS_PROMPT_KEY + ")"))
+                .getContent();
+    }
+
     private String getSystemPrompt() {
-        List<TrendingVideoRankingSnapshotReportSystemPrompt> systemPrompts = snapshotReportSystemPromptRepository.findAll();
-
-        if (systemPrompts.isEmpty()) {
-            throw new IllegalStateException("Cannot find system prompt.");
-        }
-        if (systemPrompts.size() > 1) {
-            throw new IllegalStateException("There must be only one system prompt.");
-        }
-
-        return systemPrompts.get(0).getContent();
+        return promptRepository.findById(SYSTEM_PROMPT_KEY)
+                .orElseThrow(() -> new PromptNotFoundException("Cannot find prompt. (promptId=" + SYSTEM_PROMPT_KEY + ")"))
+                .getContent();
     }
 }

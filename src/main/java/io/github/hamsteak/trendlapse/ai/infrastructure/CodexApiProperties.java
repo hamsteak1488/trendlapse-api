@@ -1,4 +1,4 @@
-package io.github.hamsteak.trendlapse.report.snapshot.infrastructure;
+package io.github.hamsteak.trendlapse.ai.infrastructure;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,8 @@
 package io.github.hamsteak.trendlapse.report.snapshot.infrastructure;
 
+import io.github.hamsteak.trendlapse.ai.domain.Prompt;
+import io.github.hamsteak.trendlapse.ai.domain.PromptRepository;
 import io.github.hamsteak.trendlapse.report.snapshot.application.AiSnapshotReporter;
-import io.github.hamsteak.trendlapse.report.snapshot.domain.TrendingVideoRankingSnapshotReportSystemPrompt;
-import io.github.hamsteak.trendlapse.report.snapshot.domain.TrendingVideoRankingSnapshotReportSystemPromptRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OpenAiSnapshotReporter implements AiSnapshotReporter {
     private final ChatClient chatClient;
-    private final TrendingVideoRankingSnapshotReportSystemPromptRepository snapshotReportSystemPromptRepository;
+    private final PromptRepository snapshotReportSystemPromptRepository;
 
     @Override
     public String report(String inputData) {
@@ -36,7 +36,7 @@ public class OpenAiSnapshotReporter implements AiSnapshotReporter {
     }
 
     private String getSystemPrompt() {
-        List<TrendingVideoRankingSnapshotReportSystemPrompt> systemPrompts = snapshotReportSystemPromptRepository.findAll();
+        List<Prompt> systemPrompts = snapshotReportSystemPromptRepository.findAll();
 
         if (systemPrompts.isEmpty()) {
             throw new IllegalStateException("Cannot find system prompt.");
