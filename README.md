@@ -28,36 +28,8 @@
 - **API 문서화**
   - Spring REST Docs + Asciidoctor 기반 문서 생성
 
-## 아키텍처 한 장
-
-```mermaid
-flowchart LR
-    subgraph Client
-      U[Client]
-    end
-
-    subgraph API[Trendlapse API - Spring Boot]
-      C1[Web Controllers]
-      C2[Application Services]
-      C3[Domain + Repository]
-      S1[Collect Scheduler]
-      S2[Purge Scheduler]
-      R1[Snapshot Reporter]
-      Cache[Caffeine Cache]
-    end
-
-    YT[YouTube Data API]
-    DB[(MySQL)]
-    DOCS[REST Docs]
-
-    U --> C1 --> C2 --> C3 --> DB
-    S1 --> YT
-    S1 --> C2
-    S2 --> C2
-    R1 --> C2
-    C2 <--> Cache
-    C2 --> DOCS
-```
+## 아키텍처
+<img width="1925" height="1086" alt="image" src="https://github.com/user-attachments/assets/c1188776-9151-46b8-aba6-787eab8b1308" />
 
 ## 기술 스택
 
@@ -65,10 +37,10 @@ flowchart LR
 |---|---|
 | Language | Java 17 |
 | Framework | Spring Boot 3.5, Spring Web, Spring Validation, Spring AOP |
-| Data | Spring Data JPA, Spring Data JDBC, Querydsl |
+| Data | Spring Data JPA, Spring Data JDBC, QueryDSL |
 | Database | MySQL (runtime), H2 (test) |
 | Cache | Spring Cache, Caffeine |
-| Async/HTTP | Spring WebFlux(WebClient), RestTemplate |
+| HTTP | WebClient, RestTemplate |
 | Resilience | Spring Retry |
 | Monitoring | Actuator, Micrometer Prometheus |
 | AI | Spring AI OpenAI |
@@ -106,7 +78,7 @@ src
 └─ docs/asciidoc
 ```
 
-- 패키지 전략: 기능 중심(package-by-feature) 구조
+- 패키지 전략: 기능 중심 구조
 - `web`: 컨트롤러/요청 DTO
 - `application`: 유스케이스 서비스/조회 인터페이스
 - `domain`: 도메인 모델/도메인 저장소 인터페이스
