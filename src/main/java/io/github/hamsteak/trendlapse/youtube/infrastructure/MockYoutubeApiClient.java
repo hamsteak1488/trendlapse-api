@@ -49,7 +49,7 @@ public class MockYoutubeApiClient implements YoutubeApiClient {
     }
 
     @Override
-    public RawVideoListResponse fetchTrendings(String regionCode, String pageToken, int maxResultCount) {
+    public RawVideoListResponse fetchTrendings(String regionId, String pageToken, int maxResultCount) {
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
@@ -59,11 +59,11 @@ public class MockYoutubeApiClient implements YoutubeApiClient {
         String nextPageToken = pageToken == null ? "page-token" : null;
         int offset = pageToken == null ? 0 : 50;
 
-        putRegionMockDataIfAbsent(regionCode);
+        putRegionMockDataIfAbsent(regionId);
 
         return new RawVideoListResponse(
                 IntStream.range(1 + offset, 51 + offset)
-                        .mapToObj(i -> videoResponseMap.get(regionCode + "-video-youtube-id-" + i)).toList(),
+                        .mapToObj(i -> videoResponseMap.get(regionId + "-video-youtube-id-" + i)).toList(),
                 nextPageToken
         );
     }
@@ -74,20 +74,20 @@ public class MockYoutubeApiClient implements YoutubeApiClient {
         return null;
     }
 
-    private void putRegionMockDataIfAbsent(String regionCode) {
-        if (regionVisitSet.contains(regionCode)) {
+    private void putRegionMockDataIfAbsent(String regionId) {
+        if (regionVisitSet.contains(regionId)) {
             return;
         }
-        regionVisitSet.add(regionCode);
+        regionVisitSet.add(regionId);
 
         //
         IntStream.range(1, 101)
                 .forEach(i -> {
-                    String channelYoutubeId = regionCode + "-channel-youtube-id-" + i;
+                    String channelYoutubeId = regionId + "-channel-youtube-id-" + i;
                     channelResponseMap.put(channelYoutubeId, new RawChannel(channelYoutubeId,
-                            new RawChannel.Snippet(regionCode + "-channel-title-" + i,
+                            new RawChannel.Snippet(regionId + "-channel-title-" + i,
                                     new RawChannel.Snippet.Thumbnails(
-                                            new RawChannel.Snippet.Thumbnails.Thumbnail(regionCode + "-channel-thumbnail-" + i)
+                                            new RawChannel.Snippet.Thumbnails.Thumbnail(regionId + "-channel-thumbnail-" + i)
                                     )
                             )
                     ));
@@ -95,11 +95,11 @@ public class MockYoutubeApiClient implements YoutubeApiClient {
 
         IntStream.range(1, 101)
                 .forEach(i -> {
-                    String videoYoutubeId = regionCode + "-video-youtube-id-" + i;
+                    String videoYoutubeId = regionId + "-video-youtube-id-" + i;
                     videoResponseMap.put(videoYoutubeId, new RawVideo(videoYoutubeId,
-                            new RawVideo.Snippet(regionCode + "-video-title-" + i, regionCode + "-channel-youtube-id-" + i,
+                            new RawVideo.Snippet(regionId + "-video-title-" + i, regionId + "-channel-youtube-id-" + i,
                                     new RawVideo.Snippet.Thumbnails(
-                                            new RawVideo.Snippet.Thumbnails.Thumbnail(regionCode + "-video-thumbnail-" + i)
+                                            new RawVideo.Snippet.Thumbnails.Thumbnail(regionId + "-video-thumbnail-" + i)
                                     )
                             ),
                             new RawVideo.Statistics(100_000, 1000, 10)

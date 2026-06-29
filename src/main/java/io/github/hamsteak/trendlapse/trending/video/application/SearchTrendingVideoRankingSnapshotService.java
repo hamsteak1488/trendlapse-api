@@ -74,7 +74,7 @@ public class SearchTrendingVideoRankingSnapshotService {
         return resultTrendingVideoRankingSnapshotViews;
     }
 
-    private static String getCacheKey(String regionCode, LocalDateTime dateTime) {
-        return regionCode + ":" + dateTime;
+    private static String getCacheKey(String regionId, LocalDateTime dateTime) {
+        return regionId + ":" + dateTime;
     }
 }

@@ -80,7 +80,7 @@ public class RestTemplateYoutubeApiClient implements YoutubeApiClient {
     }
 
     @Override
-    public RawVideoListResponse fetchTrendings(String regionCode, String pageToken, int maxResultCount) {
+    public RawVideoListResponse fetchTrendings(String regionId, String pageToken, int maxResultCount) {
         String part = String.join(",", List.of("id", "snippet, statistics"));
         String chart = "mostPopular";
 
@@ -90,7 +90,7 @@ public class RestTemplateYoutubeApiClient implements YoutubeApiClient {
                 .queryParam("part", part)
                 .queryParam("chart", chart)
                 .queryParam("maxResults", maxResultCount)
-                .queryParam("regionCode", regionCode)
+                .queryParam("regionCode", regionId)
                 .queryParam("pageToken", pageToken)
                 .build().toUri();
 

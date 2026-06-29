@@ -11,7 +11,7 @@ public interface YoutubeApiClient {
 
     RawVideoListResponse fetchVideos(List<String> videoYoutubeIds);
 
-    RawVideoListResponse fetchTrendings(String regionCode, String pageToken, int maxResultCount);
+    RawVideoListResponse fetchTrendings(String regionId, String pageToken, int maxResultCount);
 
     RawRegionListResponse fetchRegions();
 }

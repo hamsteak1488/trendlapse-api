@@ -12,7 +12,7 @@ public interface NonblockingYoutubeApiClient {
 
     Mono<RawVideoListResponse> fetchVideos(List<String> videoYoutubeIds);
 
-    Mono<RawVideoListResponse> fetchTrendings(String regionCode, String pageToken, int maxResultCount);
+    Mono<RawVideoListResponse> fetchTrendings(String regionId, String pageToken, int maxResultCount);
 
     Mono<RawRegionListResponse> fetchRegions();
 }

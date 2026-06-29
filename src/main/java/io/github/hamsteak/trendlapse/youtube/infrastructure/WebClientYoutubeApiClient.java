@@ -89,7 +89,7 @@ public class WebClientYoutubeApiClient implements NonblockingYoutubeApiClient {
     }
 
     @Override
-    public Mono<RawVideoListResponse> fetchTrendings(String regionCode, String pageToken, int maxResultCount) {
+    public Mono<RawVideoListResponse> fetchTrendings(String regionId, String pageToken, int maxResultCount) {
         String part = String.join(",", List.of("id", "snippet, statistics"));
         String chart = "mostPopular";
 
@@ -99,7 +99,7 @@ public class WebClientYoutubeApiClient implements NonblockingYoutubeApiClient {
                 .queryParam("part", part)
                 .queryParam("chart", chart)
                 .queryParam("maxResults", maxResultCount)
-                .queryParam("regionCode", regionCode)
+                .queryParam("regionCode", regionId)
                 .queryParam("pageToken", pageToken)
                 .build().toUri();
 
@@ -112,7 +112,8 @@ public class WebClientYoutubeApiClient implements NonblockingYoutubeApiClient {
                         .doBeforeRetry(retrySignal -> {
                             Throwable failure = retrySignal.failure();
                             long attempt = retrySignal.totalRetries() + 1;
-                            log.warn("[WebClient] Retry #{} for fetching trendings (region={}, cause={})", attempt, regionCode, failure.toString());
+                            log.warn("[WebClient] Retry #{} for fetching trendings (region={}, cause={})",
+                                    attempt, regionId, failure.toString());
                         }));
     }
 

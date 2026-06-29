@@ -154,25 +154,25 @@ public class NonblockingYoutubeApiFetcher implements YoutubeApiFetcher {
     @Override
     public Map<String, List<FetchedVideo>> fetchTrendingVideos(List<String> regionIds) {
         Map<String, List<FetchedVideo>> regionFetchedVideosMap = Flux.fromIterable(regionIds)
-                .flatMap(regionCode ->
+                .flatMap(regionId ->
                         Mono.zip(
-                                Mono.just(regionCode),
+                                Mono.just(regionId),
                                 fetchRawTrendingsVideos(
-                                        regionCode,
+                                        regionId,
                                         null,
                                         collectSchedulerProperties.getCollectSize()
                                 ).map(rawVideos -> rawVideos.stream()
-                                        .map(rawVideo ->
-                                                new FetchedVideo(
-                                                        rawVideo.getYoutubeId(),
-                                                        rawVideo.getChannelYoutubeId(),
-                                                        rawVideo.getTitle(),
-                                                        rawVideo.getThumbnailUrl(),
-                                                        rawVideo.getViewCount(),
-                                                        rawVideo.getLikeCount(),
-                                                        rawVideo.getCommentCount()
-                                                )
-                                        ).toList()
+                                        .map(rawVideo -> {
+                                            return new FetchedVideo(
+                                                    rawVideo.getYoutubeId(),
+                                                    rawVideo.getChannelYoutubeId(),
+                                                    rawVideo.getTitle(),
+                                                    rawVideo.getThumbnailUrl(),
+                                                    rawVideo.getViewCount(),
+                                                    rawVideo.getLikeCount(),
+                                                    rawVideo.getCommentCount()
+                                            );
+                                        }).toList()
                                 )
                         )
                 ).collectMap(
@@ -181,16 +181,21 @@ public class NonblockingYoutubeApiFetcher implements YoutubeApiFetcher {
                 ).block();
 
         if (regionFetchedVideosMap == null) {
-            log.warn("Fetching trending videos job appears to have failed. regionCodes={}", regionIds);
+            log.warn("Fetching trending videos job appears to have failed. regionIds={}", regionIds);
             return Map.of();
         }
 
         return regionFetchedVideosMap;
     }
 
-    private Mono<List<RawVideo>> fetchRawTrendingsVideos(String regionCode, String pageToken, int remainingCount) {
+    private Mono<List<RawVideo>> fetchRawTrendingsVideos(
+            String regionId,
+            String pageToken,
+            int remainingCount
+    ) {
         int resultCount = Math.min(remainingCount, maxResultCount);
-        Mono<RawVideoListResponse> responseMono = nonblockingYoutubeApiClient.fetchTrendings(regionCode, pageToken, resultCount);
+        Mono<RawVideoListResponse> responseMono
+                = nonblockingYoutubeApiClient.fetchTrendings(regionId, pageToken, resultCount);
 
         return responseMono.flatMap(rawVideoListResponse -> {
             List<RawVideo> rawVideos = rawVideoListResponse.getItems();
@@ -200,14 +205,15 @@ public class NonblockingYoutubeApiFetcher implements YoutubeApiFetcher {
             }
 
             Mono<List<RawVideo>> postPageResponseMono = fetchRawTrendingsVideos(
-                    regionCode,
+                    regionId,
                     rawVideoListResponse.getNextPageToken(),
                     remainingCount - resultCount
             );
 
             return Mono.just(rawVideos).zipWith(
                     postPageResponseMono,
-                    (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).toList()
+                    (l1, l2)
+                            -> Stream.concat(l1.stream(), l2.stream()).toList()
             );
         });
     }

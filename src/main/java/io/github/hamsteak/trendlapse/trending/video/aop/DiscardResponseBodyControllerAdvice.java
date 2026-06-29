@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import java.util.List;
 
 @ControllerAdvice
-public class EmptyResponseBodyControllerAdvice implements ResponseBodyAdvice<Object> {
+public class DiscardResponseBodyControllerAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         return true;

@@ -112,40 +112,42 @@ public class BlockingYoutubeApiFetcher implements YoutubeApiFetcher {
     public Map<String, List<FetchedVideo>> fetchTrendingVideos(List<String> regionIds) {
         Map<String, List<FetchedVideo>> regionFetchedVideoMap = new HashMap<>();
 
-        for (String regionCode : regionIds) {
+        for (String regionId : regionIds) {
             List<RawVideo> rawVideos = new ArrayList<>();
 
             String pageToken = null;
             int remainingCount = collectSchedulerProperties.getCollectSize();
             while (remainingCount > 0) {
                 RawVideoListResponse rawVideoListResponse =
-                        youtubeApiClient.fetchTrendings(regionCode, pageToken, Math.min(remainingCount, maxResultCount));
-
+                        youtubeApiClient.fetchTrendings(
+                                regionId,
+                                pageToken,
+                                Math.min(remainingCount, maxResultCount)
+                        );
                 rawVideos.addAll(rawVideoListResponse.getItems());
 
                 if (rawVideoListResponse.getNextPageToken() == null) {
                     break;
                 }
-
                 pageToken = rawVideoListResponse.getNextPageToken();
-
                 remainingCount -= maxResultCount;
             }
 
             List<FetchedVideo> fetchedVideos = rawVideos.stream()
-                    .map(rawVideo ->
-                            new FetchedVideo(
-                                    rawVideo.getYoutubeId(),
-                                    rawVideo.getChannelYoutubeId(),
-                                    rawVideo.getTitle(),
-                                    rawVideo.getThumbnailUrl(),
-                                    rawVideo.getViewCount(),
-                                    rawVideo.getLikeCount(),
-                                    rawVideo.getCommentCount()
-                            ))
+                    .map(rawVideo -> {
+                        return new FetchedVideo(
+                                rawVideo.getYoutubeId(),
+                                rawVideo.getChannelYoutubeId(),
+                                rawVideo.getTitle(),
+                                rawVideo.getThumbnailUrl(),
+                                rawVideo.getViewCount(),
+                                rawVideo.getLikeCount(),
+                                rawVideo.getCommentCount()
+                        );
+                    })
                     .toList();
 
-            regionFetchedVideoMap.put(regionCode, fetchedVideos);
+            regionFetchedVideoMap.put(regionId, fetchedVideos);
         }
 
         return regionFetchedVideoMap;
